@@ -209,7 +209,7 @@
   (if new-content
       (progn 
         (nodefun-empty node)
-        (buildnode:append-nodes node (build-element new-content))
+        (buildnode:append-nodes node (build-elements new-content))
         node)
       (nodefun-serialize node T)))
 
