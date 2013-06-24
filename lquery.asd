@@ -12,7 +12,7 @@
   :name "lQuery"
   :version "1.0.3"
   :author "Nicolas Hafner <shinmera@tymoon.eu>"
-  :license "LLGPL"
+  :license "Artistic"
   :description "A library to allow jQuery-like HTML/DOM manipulation."
   :components ((:file "lquery")
                (:file "lquery-funcs" :depends-on ("lquery")))
