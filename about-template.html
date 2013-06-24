@@ -1,0 +1,124 @@
+<!--
+  This file is a part of lQuery
+  (c) 2013 TymoonNET/NexT http://tymoon.eu (shinmera@tymoon.eu)
+  Author: Nicolas Hafner <shinmera@tymoon.eu>
+  !-->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>lQuery - About</title>
+    <style type="text/css">
+      code{font-family: Consolas, Inconsolata, monospace;}
+      h3{display: inline-block;margin:0;padding:0;}
+      #funcs{list-style: none;}
+      #funcs li{margin-bottom: 20px;}
+      #funcs p{margin: 0 0 0 10px;}
+    </style>
+  </head>
+  <body>
+    <header>
+      <img src="http://shinmera.tymoon.eu/public/lquery-logo.png" alt="lQuery"/>
+      <h1>v1.0.3</h1>
+    </header>
+    <div id="content">
+      <article>
+        <header><h2>What is lQuery?</h2></header>
+        <p>
+          lQuery is a DOM manipulation library written in Common Lisp, inspired by and based on the <a href="http://jquery.com/">jQuery</a> syntax and functions. It uses <a href="http://common-lisp.net/project/cxml/">Closure-XML</a> and <a href="https://github.com/AccelerationNet/css-selectors">CSS-Selectors</a> in the background to achieve its work. Its main idea is to replace HTML templating systems and allow generated HTML for websites while relying on pure HTML files. This achieves a much cleaner separation of static and dynamic page parts.
+        </p>
+      </article>
+      <article>
+        <header><h2>How To</h2></header>
+        <p>
+          Load lQuery with ASDF or Quicklisp.
+        </p>
+        <code>(asdf:load-system :lquery)</code>
+        <p>
+          First, lQuery needs to be initialized with a document to work on:
+        </p>
+        <code>($ (initialize #p"/path/to/input.html"))</code>
+        <p>
+          After that, you can use the $ function to select and manipulate the DOM:
+        </p>
+        <code>($ "article")</code><br />
+        <code>($ "article" (add-class "fancy") (attr :foo "bar"))</code>
+        <p>
+          To render the HTML to a string use <code>serialize</code>. If you want to save it to a file directly, there's also <code>write-to-file</code>.
+        </p>
+        <code>($ (serialize))</code><br />
+        <code>($ (write-to-file #p"/path/to/output.html"))</code>
+        <p>
+          So a quick file manipulation could look something like this:
+        </p>
+        <code>($ (initialize #p"/path/to/input.html") "article" (append-to "content") (add-class "foo") (write-to-file #p"/path/to/output.html"))</code>
+        <p>
+          Aside from using selectors as the first step, it's also possible to use any other variable or list and operate on it:
+        </p>
+        <code>($ (list node-a node-b) "article" (serialize))</code>
+        <p>
+          Selectors can come at any point in the sequence of lQuery operations and will always act on the current set of elements.
+          If an operation evaluates to a list or a single node, the current set of elements is set to this result.
+        </p>
+        <code>($ "a" (text "Link") ($ "p") (text "Paragraph"))</code>
+        <p>
+          This is equivalent to the following:
+        </p>
+        <code>($ "a" (text "Link"))</code><br />
+        <code>($ "p" (text "Paragraph"))</code>
+        <p>
+          While this sort of chaining is possible, it is discouraged and multiple statements should be used instead to ensure proper readability.
+        </p>
+      </article>
+      <article>
+        <header><h2>Extending lQuery</h2></header>
+        <p>
+          Switch package to <code>lquery</code> and use either <code>defnodefun</code> or <code>defnodelistfun</code> to define new functions.
+          The syntax is as follows:
+        </p>
+        <code>(defnodefun FUNCTION-NAME (NODE-VARIABLE ARGUMENTS) DOCSTRING BODY)</code><br />
+        <code>(defnodelistfun FUNCTION-NAME (LIST-VARIABLE ARGUMENTS) DOCSTRING BODY)</code>
+        <p>
+          <code>DOCSTRING</code> is optional. These functions act as shorthand macros for <code>defmethod</code> on <code>list</code> and <code>dom:node</code>.
+          Any function name is internally preceded with "nodefun-" as to avoid namespace conflicts.
+          Therefore, to call other, existing functions from within a node function, it needs to be preceded with "nodefun-".
+          Short example time:
+        </p>
+        <pre><code>(defnodefun myfun (node value)
+  "This is my function"
+  (nodefun-attr node :my-attribute value))</code></pre>
+        <p>
+          This would define a function that sets the "my-attribute" attribute on every node to the specified value.
+          defnodelistfun is analogous, except that it acts on the current set of nodes, instead of an individual one.
+          This allows you to create set-modifying functions or implement more optimized version of individual node modifiers.
+        </p>
+      </article>
+      <article>
+        <header><h2>Other Guff</h2></header>
+        <p>
+          lQuery is a sub-project of TyNETv5 ("Radiance"), licensed under the <a href="http://opensource.franz.com/preamble.html">LLGPL</a> and &#169;2013 TymoonNET/NexT, <a href="http://shinmera.com">Nicolas Hafner</a>.
+        </p>
+      </article>
+      <article>
+        <header><h2>Package Function Index</h2></header>
+        <ul id="funcs">
+          <li id="template">
+            <a name="" class="anchor"></a>
+            <article>
+              <header>
+                <span class="functype">test</span>
+                <code>
+                  <h3 class="funcname">Foo</h3>
+                  <span class="funcargs">()</span>
+                </code>
+              </header>
+              <p class="funcdesc">
+                Foobar
+              </p>
+            </article>
+          </li>
+        </ul>
+      </article>
+    </div>
+  </body>
+</html>

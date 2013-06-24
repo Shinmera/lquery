@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<!--
+  This file is a part of lQuery
+  (c) 2013 TymoonNET/NexT http://tymoon.eu (shinmera@tymoon.eu)
+  Author: Nicolas Hafner <shinmera@tymoon.eu>
+  !--><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8"/>
+    <title>lQuery - About</title>
+    <style type="text/css">
+      code{font-family: Consolas, Inconsolata, monospace;}
+      h3{display: inline-block;margin:0;padding:0;}
+      #funcs{list-style: none;}
+      #funcs li{margin-bottom: 20px;}
+      #funcs p{margin: 0 0 0 10px;}
+    </style>
+  </head>
+  <body>
+    <header>
+      <img src="http://shinmera.tymoon.eu/public/lquery-logo.png" alt="lQuery"/>
+      <h1>v1.0.3</h1>
+    </header>
+    <div id="content">
+      <article>
+        <header><h2>What is lQuery?</h2></header>
+        <p>
+          lQuery is a DOM manipulation library written in Common Lisp, inspired by and based on the <a href="http://jquery.com/">jQuery</a> syntax and functions. It uses <a href="http://common-lisp.net/project/cxml/">Closure-XML</a> and <a href="https://github.com/AccelerationNet/css-selectors">CSS-Selectors</a> in the background to achieve its work. Its main idea is to replace HTML templating systems and allow generated HTML for websites while relying on pure HTML files. This achieves a much cleaner separation of static and dynamic page parts.
+        </p>
+      </article>
+      <article>
+        <header><h2>How To</h2></header>
+        <p>
+          Load lQuery with ASDF or Quicklisp.
+        </p>
+        <code>(asdf:load-system :lquery)</code>
+        <p>
+          First, lQuery needs to be initialized with a document to work on:
+        </p>
+        <code>($ (initialize #p"/path/to/input.html"))</code>
+        <p>
+          After that, you can use the $ function to select and manipulate the DOM:
+        </p>
+        <code>($ "article")</code><br/>
+        <code>($ "article" (add-class "fancy") (attr :foo "bar"))</code>
+        <p>
+          To render the HTML to a string use <code>serialize</code>. If you want to save it to a file directly, there's also <code>write-to-file</code>.
+        </p>
+        <code>($ (serialize))</code><br/>
+        <code>($ (write-to-file #p"/path/to/output.html"))</code>
+        <p>
+          So a quick file manipulation could look something like this:
+        </p>
+        <code>($ (initialize #p"/path/to/input.html") "article" (append-to "content") (add-class "foo") (write-to-file #p"/path/to/output.html"))</code>
+        <p>
+          Aside from using selectors as the first step, it's also possible to use any other variable or list and operate on it:
+        </p>
+        <code>($ (list node-a node-b) "article" (serialize))</code>
+        <p>
+          Selectors can come at any point in the sequence of lQuery operations and will always act on the current set of elements.
+          If an operation evaluates to a list or a single node, the current set of elements is set to this result.
+        </p>
+        <code>($ "a" (text "Link") ($ "p") (text "Paragraph"))</code>
+        <p>
+          This is equivalent to the following:
+        </p>
+        <code>($ "a" (text "Link"))</code><br/>
+        <code>($ "p" (text "Paragraph"))</code>
+        <p>
+          While this sort of chaining is possible, it is discouraged and multiple statements should be used instead to ensure proper readability.
+        </p>
+      </article>
+      <article>
+        <header><h2>Extending lQuery</h2></header>
+        <p>
+          Switch package to <code>lquery</code> and use either <code>defnodefun</code> or <code>defnodelistfun</code> to define new functions.
+          The syntax is as follows:
+        </p>
+        <code>(defnodefun FUNCTION-NAME (NODE-VARIABLE ARGUMENTS) DOCSTRING BODY)</code><br/>
+        <code>(defnodelistfun FUNCTION-NAME (LIST-VARIABLE ARGUMENTS) DOCSTRING BODY)</code>
+        <p>
+          <code>DOCSTRING</code> is optional. These functions act as shorthand macros for <code>defmethod</code> on <code>list</code> and <code>dom:node</code>.
+          Any function name is internally preceded with "nodefun-" as to avoid namespace conflicts.
+          Therefore, to call other, existing functions from within a node function, it needs to be preceded with "nodefun-".
+          Short example time:
+        </p>
+        <pre><code>(defnodefun myfun (node value)
+  "This is my function"
+  (nodefun-attr node :my-attribute value))</code></pre>
+        <p>
+          This would define a function that sets the "my-attribute" attribute on every node to the specified value.
+          defnodelistfun is analogous, except that it acts on the current set of nodes, instead of an individual one.
+          This allows you to create set-modifying functions or implement more optimized version of individual node modifiers.
+        </p>
+      </article>
+      <article>
+        <header><h2>Other Guff</h2></header>
+        <p>
+          lQuery is a sub-project of TyNETv5 ("Radiance"), licensed under the <a href="http://opensource.franz.com/preamble.html">LLGPL</a> and ©2013 TymoonNET/NexT, <a href="http://shinmera.com">Nicolas Hafner</a>.
+        </p>
+      </article>
+      <article>
+        <header><h2>Package Function Index</h2></header>
+        <ul id="funcs"><li id="template">
+            <a class="anchor" name="$"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL MACRO</span>
+                <code>
+                  <h3 class="funcname">$</h3>
+                  <span class="funcargs">(&amp;REST ACTIONS)</span>
+                </code>
+              </header>
+              <p class="funcdesc">The main lQuery function to select and manipulate the DOM. The base syntax is as follows:
+   ($ "selector" (function args*)*)
+   
+   Strings will evaluate to selectors and always act on the current set of elements.
+   Function pointers will be called with the current set of elements passed to the function.
+   A single element or a list replaces the current set of elements.
+   
+   An inline list represents a function call, although nodefun- and lquery functions take precedence.
+   ($ (serialize)) evaluates (basically) to (nodefun-serialize working-nodes). However, if the named
+   function is not a nodefun, packages are searched for a matching symbol in the following order: 
+   lquery, *PACKAGE*, cl. If the function cannot be found in any of those, it is silently dropped.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="INITIALIZE"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL FUNCTION</span>
+                <code>
+                  <h3 class="funcname">INITIALIZE</h3>
+                  <span class="funcargs">(DOCUMENT)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Sets the *lquery-master-document* variable to the provided document.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="LOAD-PAGE"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL FUNCTION</span>
+                <code>
+                  <h3 class="funcname">LOAD-PAGE</h3>
+                  <span class="funcargs">(FILE &amp;OPTIONAL (DTD NIL) (BUILDER (MAKE-DOM-BUILDER)))</span>
+                </code>
+              </header>
+              <p class="funcdesc">Load the given file into a HTML DOM. If dtd is set to non-NIL, the document is checked against the given DTD specification. Alternatively a cxml-dom builder can be specified as well.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-ADD"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-ADD</h3>
+                  <span class="funcargs">(NODELIST SELECTOR-OR-NODES)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Add elements to the set of matched elements.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-ADD-CLASS"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-ADD-CLASS</h3>
+                  <span class="funcargs">(NODELIST &amp;REST CLASSES)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Adds the specified class(es) to the set of matched elements.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-AFTER"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-AFTER</h3>
+                  <span class="funcargs">(NODELIST HTML-OR-NODES)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Insert content (in html-string or node-list form) after each element.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-ANCESTOR"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-ANCESTOR</h3>
+                  <span class="funcargs">(NODELIST)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Find the common ancestor of all elements.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-APPEND"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-APPEND</h3>
+                  <span class="funcargs">(NODELIST HTML-OR-NODES)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Insert content (in html-string or node-list form) to the end of each element.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-APPEND-TO"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-APPEND-TO</h3>
+                  <span class="funcargs">(NODELIST SELECTOR-OR-NODES)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Insert every element to the end of the target(s).</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-ATTR"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-ATTR</h3>
+                  <span class="funcargs">(NODELIST &amp;REST PAIRS)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Retrieve or set attributes on a node</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-BEFORE"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-BEFORE</h3>
+                  <span class="funcargs">(NODELIST HTML-OR-NODES)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Insert content (in html-string or node-list form) before each element.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-CHILD-INDEX"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-CHILD-INDEX</h3>
+                  <span class="funcargs">(NODELIST)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Returns the index of the element within its parent, also counting text nodes. See index() otherwise.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-CHILDREN"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-CHILDREN</h3>
+                  <span class="funcargs">(NODELIST &amp;OPTIONAL SELECTOR)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Get the children of each element, optionally filtered by a selector.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-CLONE"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-CLONE</h3>
+                  <span class="funcargs">(NODELIST)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Create a deep copy of the set of matched elements.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-CLOSEST"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-CLOSEST</h3>
+                  <span class="funcargs">(NODELIST SELECTOR)</span>
+                </code>
+              </header>
+              <p class="funcdesc">For each element in the set, get the first element that matches the selector by testing the element itself and traversing up through its ancestors in the DOM tree.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-CONTAINS"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-CONTAINS</h3>
+                  <span class="funcargs">(NODELIST STRING)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Select all elements that contain the specified text.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-CONTENTS"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-CONTENTS</h3>
+                  <span class="funcargs">(NODELIST)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Get the children of each element, including text and comment nodes.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-CSS"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-CSS</h3>
+                  <span class="funcargs">(NODELIST &amp;REST PAIRS)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Retrieve or set css style attributes on a node.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-DATA"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-DATA</h3>
+                  <span class="funcargs">(NODELIST &amp;REST PAIRS)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Retrieve or set data attributes on a node. This is a convenience method and uses attr in the back.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-DEEPEST"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-DEEPEST</h3>
+                  <span class="funcargs">(NODELIST)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Returns the innermost (left-bound) child element.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-EACH"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-EACH</h3>
+                  <span class="funcargs">(NODELIST FUN)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Execute the specified function on each element until NIL is returned or all elements have been processed. The original set of elements is always returned.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-EMPTY"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-EMPTY</h3>
+                  <span class="funcargs">(NODELIST)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Remove all child nodes from the set of matched elements.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-EQ"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-EQ</h3>
+                  <span class="funcargs">(NODELIST INDEX)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Reduce the set of matched elements to the one at the specified index</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-EVEN"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-EVEN</h3>
+                  <span class="funcargs">(NODELIST)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Selects even elements.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-FILTER"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-FILTER</h3>
+                  <span class="funcargs">(NODELIST SELECTOR-OR-FUNCTION)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Reduce the set of matched elements to those that match the selector or pass the function's test.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-FIND"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-FIND</h3>
+                  <span class="funcargs">(NODELIST SELECTOR-OR-FUNCTION &amp;KEY TEST-SELF (TEST-SELF NIL))</span>
+                </code>
+              </header>
+              <p class="funcdesc">Get the descendants of each element filtered by selector or function.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-FIRST"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-FIRST</h3>
+                  <span class="funcargs">(NODELIST)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Reduce the set of matched elements to the first in the set.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-GT"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-GT</h3>
+                  <span class="funcargs">(NODELIST INDEX)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Select all elements at a greater than index(0) within the matched set.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-HAS"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-HAS</h3>
+                  <span class="funcargs">(NODELIST SELECTOR-OR-NODES)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Reduce the set of matched elements to those that have a descendant that matches the selector or element.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-HAS-CLASS"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-HAS-CLASS</h3>
+                  <span class="funcargs">(NODELIST CLASS)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Determine whether any of the matched elements are assigned to the given class.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-HIDE"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-HIDE</h3>
+                  <span class="funcargs">(NODELIST)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Hide the matched elements (short for (css :display 'none')).</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-HTML"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-HTML</h3>
+                  <span class="funcargs">(NODELIST &amp;OPTIONAL NEW-CONTENT)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Get the HTML contents of the elements or set the HTML contents of every matched element.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-INDEX"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-INDEX</h3>
+                  <span class="funcargs">(NODELIST)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Find the index of the node within its parent.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-INITIALIZE"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-INITIALIZE</h3>
+                  <span class="funcargs">(NODELIST FILE)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Re-initializes lQuery with a new page.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-INSERT-AFTER"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-INSERT-AFTER</h3>
+                  <span class="funcargs">(NODELIST SELECTOR-OR-NODES)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Insert every element after the target.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-INSERT-BEFORE"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-INSERT-BEFORE</h3>
+                  <span class="funcargs">(NODELIST SELECTOR-OR-NODES)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Insert every element before the target.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-IS"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-IS</h3>
+                  <span class="funcargs">(NODELIST SELECTOR-OR-NODES)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Check the current elements against a selector or list of elements and return true if at least one of them matches.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-IS-EMPTY"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-IS-EMPTY</h3>
+                  <span class="funcargs">(NODELIST)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Check if the node contains no children and/or only empty (whitespace) text nodes. If it is empty, T is returned, otherwise NIL.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-LAST"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-LAST</h3>
+                  <span class="funcargs">(NODELIST)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Reduce the set of matched elements to the final one in the set.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-LENGTH"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-LENGTH</h3>
+                  <span class="funcargs">(NODELIST)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Returns the number of elements in the list.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-LT"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-LT</h3>
+                  <span class="funcargs">(NODELIST INDEX)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Select all elements at an index less than the index within the matched set.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-MAP"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-MAP</h3>
+                  <span class="funcargs">(NODELIST FUNCTION)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Pass each element through a function (which has to accept one argument, the node), returning the list of all results.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-NEXT"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-NEXT</h3>
+                  <span class="funcargs">(NODELIST &amp;OPTIONAL SELECTOR)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Get the immediately following sibling of each element (if there is one). If a selector is provided, the sibling is only included if it matches.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-NEXT-ALL"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-NEXT-ALL</h3>
+                  <span class="funcargs">(NODELIST &amp;OPTIONAL SELECTOR)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Get all following siblings of each element. If a selector is provided, the sibling is only included if it matches.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-NEXT-UNTIL"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-NEXT-UNTIL</h3>
+                  <span class="funcargs">(NODELIST SELECTOR-OR-NODES)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Get all following silings of each element up to (excluding) the element matched by the selector or node list.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-NODE"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-NODE</h3>
+                  <span class="funcargs">(NODELIST &amp;OPTIONAL N)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Return the specified node (default first) directly, without encompassing it into a list.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-NOT"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-NOT</h3>
+                  <span class="funcargs">(NODELIST SELECTOR-OR-NODES)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Remove elements from the set of matched elements.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-NOT-EMPTY"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-NOT-EMPTY</h3>
+                  <span class="funcargs">(NODELIST)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Check if the node contains no children and/or only empty (whitespace) text nodes. If the node is effectively empty, NIL is returned. Otherwise a list of all non-empty children and text-nodes is returned.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-ODD"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-ODD</h3>
+                  <span class="funcargs">(NODELIST)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Select all odd elements from the current set.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-PARENT"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-PARENT</h3>
+                  <span class="funcargs">(NODELIST &amp;OPTIONAL SELECTOR)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Get the parent of each element, optionally filtered by a selector.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-PARENTS"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-PARENTS</h3>
+                  <span class="funcargs">(NODELIST &amp;OPTIONAL SELECTOR)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Get the ancestors of each element, optionally filtered by a selector. Closest parent first.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-PARENTS-UNTIL"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-PARENTS-UNTIL</h3>
+                  <span class="funcargs">(NODELIST SELECTOR-OR-NODES)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Get the ancestors of each element, up to (excluding) the element matched by the selector or node list. Closest parent first</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-PREPEND"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-PREPEND</h3>
+                  <span class="funcargs">(NODELIST HTML-OR-NODES)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Insert content, specified by the parameter, to the beginning of each element.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-PREPEND-TO"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-PREPEND-TO</h3>
+                  <span class="funcargs">(NODELIST SELECTOR-OR-NODES)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Insert every element to the beginning of the target(s).</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-PREV"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-PREV</h3>
+                  <span class="funcargs">(NODELIST &amp;OPTIONAL SELECTOR)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Get the immediately preceding sibling of each element (if there is one). If a selector is provided, the sibling is only included if it matches.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-PREV-ALL"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-PREV-ALL</h3>
+                  <span class="funcargs">(NODELIST &amp;OPTIONAL SELECTOR)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Get all preceeding siblings of each element. If a selector is provided, the sibling is only included if it matches.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-PREV-UNTIL"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-PREV-UNTIL</h3>
+                  <span class="funcargs">(NODELIST SELECTOR-OR-NODES)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Get all preceeding silings of each element down to (excluding) the element matched by the selector or node list.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-REMOVE"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-REMOVE</h3>
+                  <span class="funcargs">(NODELIST)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Remove the set of matched elements from the DOM.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-REMOVE-ATTR"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-REMOVE-ATTR</h3>
+                  <span class="funcargs">(NODELIST &amp;REST ATTRIBUTES)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Remove attributes from each element.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-REMOVE-CLASS"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-REMOVE-CLASS</h3>
+                  <span class="funcargs">(NODELIST &amp;REST CLASSES)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Remove classes from each element.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-REMOVE-DATA"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-REMOVE-DATA</h3>
+                  <span class="funcargs">(NODELIST &amp;REST DATA)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Remove data attributes from each element. This is a convenience method and uses remove-attr in the back.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-REPLACE-ALL"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-REPLACE-ALL</h3>
+                  <span class="funcargs">(NODELIST SELECTOR-OR-NODES)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Replace each target element with the set of matched elements.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-REPLACE-WITH"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-REPLACE-WITH</h3>
+                  <span class="funcargs">(NODELIST HTML-OR-NODES)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Replace each element with the provided new content and return the set of elements that was removed.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-SERIALIZE"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-SERIALIZE</h3>
+                  <span class="funcargs">(NODELIST &amp;OPTIONAL OMIT-SELF)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Serialize the node into a string.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-SHOW"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-SHOW</h3>
+                  <span class="funcargs">(NODELIST)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Display the matched elements (short for (css :display 'block'))</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-SIBLINGS"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-SIBLINGS</h3>
+                  <span class="funcargs">(NODELIST &amp;OPTIONAL SELECTOR)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Get the siblings of each element, optionally filtered by a selector.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-SIZE"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-SIZE</h3>
+                  <span class="funcargs">(NODELIST)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Return the number of elements in the list.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-SLICE"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-SLICE</h3>
+                  <span class="funcargs">(NODELIST START &amp;OPTIONAL END)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Reduce the set of matched elements to a subset specified by a range of indices</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-TEXT"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-TEXT</h3>
+                  <span class="funcargs">(NODELIST &amp;OPTIONAL TEXT DOCUMENT)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Get the combined text contents of each element, including their descendants, or set the text contents of the matched elements.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-TOGGLE-CLASS"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-TOGGLE-CLASS</h3>
+                  <span class="funcargs">(NODELIST &amp;REST CLASSES)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Add or remove one or more classes from each element, depending on their presence within the element.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-UNWRAP"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-UNWRAP</h3>
+                  <span class="funcargs">(NODELIST)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Remove the parents of the set of matched elements from the DOM, leaving the matched elements in their place. The parent is removed if it is empty after unwrapping.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-VAL"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-VAL</h3>
+                  <span class="funcargs">(NODELIST &amp;OPTIONAL VALUE)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Get the current values or set the value of every matched element. This uses (attr :value val) in the back.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-WRAP"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-WRAP</h3>
+                  <span class="funcargs">(NODELIST HTML-OR-NODES)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Wrap an HTML structure around each element. Note that always the first subnode is chosen.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-WRAP-ALL"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-WRAP-ALL</h3>
+                  <span class="funcargs">(NODELIST HTML-OR-NODES)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Wrap an HTML structure around all elements inside their next (common) parent.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-WRAP-INNER"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-WRAP-INNER</h3>
+                  <span class="funcargs">(NODELIST HTML-OR-NODES)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Wrap an HTML structure around the contents of each element.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="NODEFUN-WRITE-TO-FILE"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL GENERIC</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-WRITE-TO-FILE</h3>
+                  <span class="funcargs">(NODELIST FILE &amp;KEY DOCTYPE IF-DOES-NOT-EXIST IF-EXISTS (IF-EXISTS SUPERSEDE)
+ (IF-DOES-NOT-EXIST CREATE) (DOCTYPE html))</span>
+                </code>
+              </header>
+              <p class="funcdesc">Write the serialized node to the file. Note that always only the first element is written.</p>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="PARSE-HTML"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL FUNCTION</span>
+                <code>
+                  <h3 class="funcname">PARSE-HTML</h3>
+                  <span class="funcargs">(HTML)</span>
+                </code>
+              </header>
+              <p class="funcdesc">Build the given string into DOM objects related to the master document.</p>
+            </article>
+          </li></ul>
+      </article>
+    </div>
+  </body>
+</html>
