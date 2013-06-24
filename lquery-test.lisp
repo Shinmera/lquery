@@ -36,7 +36,17 @@
   (is (= 2
          (length ($ "article header, article blockquote"))))
   (is (eq (first ($ "ul"))
-          (first ($ "#list")))))
+          (first ($ "#list"))))
+  (is (eq (first ($ "ul"))
+          (let ((selector "#list"))
+            (first ($ selector)))))
+  (is (eq T
+          (labels ((document-p (nodes) (dom:document-p (first nodes))))
+            ($ #'document-p))))
+  (is (eq NIL
+          ($ ())))
+  (is (eq 2
+          ($ (+ 1 1)))))
 
 (test fun-add
   (init-test-environment)
