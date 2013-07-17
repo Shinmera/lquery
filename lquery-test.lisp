@@ -602,4 +602,4 @@
 (test fun-serialize
   (init-test-environment)
   (is (string-equal "<p>Article Text</p>"
-                    (first ($ "article p" (serialize))))))
+                    (first ($ "article p" (serialize :doctype NIL))))))

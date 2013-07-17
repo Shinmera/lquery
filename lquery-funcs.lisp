@@ -211,7 +211,7 @@
         (nodefun-empty node)
         (buildnode:append-nodes node (build-elements new-content))
         node)
-      (nodefun-serialize node T)))
+      (nodefun-serialize node :omit-self T :doctype NIL)))
 
 (defnodefun index (node)
   "Find the index of the node within its parent."
@@ -498,19 +498,21 @@
 (defnodelistfun write-to-file (working-nodes file &key (doctype "html") (if-does-not-exist :CREATE) (if-exists :SUPERSEDE))
   "Write the serialized node to the file. Note that always only the first element is written."
   (with-open-file (stream file :direction :OUTPUT :if-does-not-exist if-does-not-exist :if-exists if-exists)
-    (write-line (format nil "<!DOCTYPE ~a>" doctype) stream)
-    (write-string (first (nodefun-serialize (first working-nodes))) stream))
+    (write-string (first (nodefun-serialize (first working-nodes) :doctype doctype)) stream))
   working-nodes)
 
-(defnodefun serialize (node &optional (omit-self NIL))
+(defnodefun serialize (node &key (omit-self NIL) (doctype "html"))
   "Serialize the node into a string."
   (labels ((parse (node) (trim (dom:map-document (cxml:make-string-sink :omit-xml-declaration-p T :canonical NIL) node))))
-    (if (or (dom:document-p node) omit-self)
-        (parse node)
-        (let ((clone (dom:clone-node node T))
-              (pseudo (first (build-elements "<div></div>"))))
-          (buildnode:insert-nodes pseudo 0 clone)
-          (parse pseudo)))))
+    (concatenate 
+     'string
+     (if doctype (format nil "<!DOCTYPE ~a>" doctype))
+     (if (or (dom:document-p node) omit-self)
+         (parse node)
+         (let ((clone (dom:clone-node node T))
+               (pseudo (first (build-elements "<div></div>"))))
+           (buildnode:insert-nodes pseudo 0 clone)
+           (parse pseudo))))))
 
 ; Urngh. To avoid copying and creating, there seems to be no other choice but to build the root tag ourselves.
 (defnodefun serialize2 (node)
