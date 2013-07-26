@@ -432,13 +432,14 @@
   (subseq working-nodes start end))
 
 (defnodefun text (node &optional text (document *lquery-master-document*))
-  "Get the combined text contents of each element, including their descendants, or set the text contents of the matched elements."
+  "Get the combined text contents of each element, including their descendants. If text is set, all text nodes are removed and a new text node is appended to the end of the node."
   (if text
-      (let ((children (nodefun-children node)))
-        (nodefun-empty node)
-        (nodefun-append node (concatenate 'list 
-                                          (list (dom:create-text-node document text))
-                                          children)))
+      (progn
+        (vector-push-extend 
+         (dom:create-text-node document text)
+         (setf (slot-value node 'rune-dom::children)
+               (delete-if #'dom:text-node-p (slot-value node 'rune-dom::children))))
+        node)
       (buildnode:text-of-dom-snippet node #\space)))
 
 (defnodefun toggle-class (node &rest classes)
