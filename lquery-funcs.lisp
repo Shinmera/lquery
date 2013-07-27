@@ -59,8 +59,11 @@
          (loop for key in pairs
              collecting (dom:get-attribute node (assure-attribute key)))
          (loop for (key val) on pairs by #'cddr
-             do (dom:set-attribute node (assure-attribute key) (trim val))
-             return node)))))
+            if val
+              do (dom:set-attribute node (assure-attribute key) (trim val))
+            else
+              do (dom:remove-attribute node (assure-attribute key))
+            finally (return node))))))
 
 (defnodefun before (node html-or-nodes)
   "Insert content (in html-string or node-list form) before each element."
@@ -433,6 +436,7 @@
 
 (defnodefun text (node &optional text (document *lquery-master-document*))
   "Get the combined text contents of each element, including their descendants. If text is set, all text nodes are removed and a new text node is appended to the end of the node."
+  (unless (dom:document-p document) (setf document (slot-value document 'rune-dom::owner)))
   (if text
       (progn
         (vector-push-extend 
