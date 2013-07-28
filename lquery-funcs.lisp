@@ -14,8 +14,8 @@
   "Adds the specified class(es) to the set of matched elements."
   (let ((attribute (dom:get-attribute node "class")))
     (loop for class in classes
-         do (setf class (assure-attribute class))
-         do (setf attribute (concatenate 'string attribute " " class)))
+         do (setf class (assure-attribute class)
+                  attribute (concatenate 'string attribute " " class)))
     (dom:set-attribute node "class" (trim attribute))
     node))
 
@@ -131,7 +131,7 @@
   (case (length pairs)
     (0 (error "Data attribute arguments must be one or more attributes or one or more key-value pairs."))
     (otherwise (loop for attr in pairs
-                    for i upto (length pairs)
+                  for i = 0 then (1+ i)
                   do (if (symbolp attr)
                          (setf (nth i pairs) (symb "data-" attr)))
                   finally (return (apply #'nodefun-attr node pairs))))))
@@ -286,8 +286,8 @@
   (let ((family (nodefun-next-all node))
         (find-fun (list-or-selector-func selector-or-nodes)))
     (loop for sibling in family
-         until (funcall find-fun sibling)
-         collect sibling)))
+       until (funcall find-fun sibling)
+       collect sibling)))
 
 (defnodelistfun node (working-nodes &optional (n 0))
   "Return the specified node (default first) directly, without encompassing it into a list."
@@ -341,7 +341,7 @@
 (defnodelistfun prepend-to (working-nodes selector-or-nodes)
   "Insert every element to the beginning of the target(s)."
   (loop for target in (nodes-or-select selector-or-nodes)
-       do (nodefun-prepend target working-nodes))
+     do (nodefun-prepend target working-nodes))
   working-nodes)
 
 (defnodefun prev (node &optional selector)
@@ -368,8 +368,8 @@
   (let ((family (nodefun-prev-all node))
         (find-fun (list-or-selector-func selector-or-nodes)))
     (loop for sibling in family
-         until (funcall find-fun sibling)
-         collect sibling)))
+       until (funcall find-fun sibling)
+       collect sibling)))
 
 (defnodefun remove (node)
   "Remove the set of matched elements from the DOM."
@@ -381,8 +381,8 @@
 (defnodefun remove-attr (node &rest attributes)
   "Remove attributes from each element."
   (loop for attr in attributes
-       do (setf attr (assure-attribute attr))
-       if (dom:has-attribute node attr)
+     do (setf attr (assure-attribute attr))
+     if (dom:has-attribute node attr)
        do (dom:remove-attribute node attr))
   node)
 
@@ -449,9 +449,9 @@
 (defnodefun toggle-class (node &rest classes)
   "Add or remove one or more classes from each element, depending on their presence within the element."
   (loop for class in classes
-       do (if (nodefun-has-class node class)
-              (nodefun-remove-class node class)
-              (nodefun-add-class node class)))
+     do (if (nodefun-has-class node class)
+            (nodefun-remove-class node class)
+            (nodefun-add-class node class)))
   node)
 
 (defnodefun unwrap (node)
@@ -485,11 +485,11 @@
      do (setf (gethash parent parentmap)
               (append (gethash parent parentmap) (list node))) 
      finally (loop for parent being the hash-keys of parentmap
-                  for children being the hash-values of parentmap
-                  for wrapper = (dom:clone-node wrapper-template T)
-                  for index = (first (sort (nodefun-child-index children) #'<))
-                  do (progn (buildnode:insert-nodes (first (nodefun-deepest wrapper)) 0 children)
-                            (buildnode:insert-nodes parent index wrapper))))
+                for children being the hash-values of parentmap
+                for wrapper = (dom:clone-node wrapper-template T)
+                for index = (first (sort (nodefun-child-index children) #'<))
+                do (buildnode:insert-nodes (first (nodefun-deepest wrapper)) 0 children)
+                   (buildnode:insert-nodes parent index wrapper)))
   working-nodes)  
 
 (defnodefun wrap-inner (node html-or-nodes)
