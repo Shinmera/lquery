@@ -440,7 +440,7 @@
   (if text
       (progn
         (vector-push-extend 
-         (dom:create-text-node document (format "~a" NIL text))
+         (dom:create-text-node document (format NIL "~a" text))
          (setf (slot-value node 'rune-dom::children)
                (delete-if #'dom:text-node-p (slot-value node 'rune-dom::children))))
         node)
