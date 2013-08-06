@@ -54,16 +54,13 @@
   (case (length pairs)
     (0 (error "Attribute arguments must be one or more attributes or one or more key-value pairs."))
     (1 (dom:get-attribute node (assure-attribute (first pairs))))
-    (otherwise
-     (if (and (symbolp (first pairs)) (symbolp (second pairs)))
-         (loop for key in pairs
-             collecting (dom:get-attribute node (assure-attribute key)))
-         (loop for (key val) on pairs by #'cddr
-            if val
-              do (dom:set-attribute node (assure-attribute key) (trim val))
-            else
-              do (dom:remove-attribute node (assure-attribute key))
-            finally (return node))))))
+    (otherwise 
+     (loop for (key val) on pairs by #'cddr
+        if val
+          do (dom:set-attribute node (assure-attribute key) (trim val))
+        else
+          do (dom:remove-attribute node (assure-attribute key))
+        finally (return node)))))
 
 (defnodefun before (node html-or-nodes)
   "Insert content (in html-string or node-list form) before each element."
