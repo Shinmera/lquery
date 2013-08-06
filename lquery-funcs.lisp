@@ -212,7 +212,7 @@
   (if new-content
       (progn 
         (nodefun-empty node)
-        (buildnode:append-nodes node (build-elements new-content))
+        (buildnode:append-nodes node (build-elements (format NIL "~a" new-content)))
         node)
       (nodefun-serialize node :omit-self T :doctype NIL)))
 
@@ -440,7 +440,7 @@
   (if text
       (progn
         (vector-push-extend 
-         (dom:create-text-node document text)
+         (dom:create-text-node document (format "~a" NIL text))
          (setf (slot-value node 'rune-dom::children)
                (delete-if #'dom:text-node-p (slot-value node 'rune-dom::children))))
         node)
