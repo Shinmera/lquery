@@ -56,7 +56,7 @@
     (1 (dom:get-attribute node (assure-attribute (first pairs))))
     (otherwise 
      (loop for (key val) on pairs by #'cddr
-        do (buildnode:set-attribute node (assure-attribute key) val)
+        do (buildnode:set-attribute node key val)
         finally (return node)))))
 
 (defnodefun before (node html-or-nodes)
