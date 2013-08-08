@@ -10,12 +10,13 @@
 
 (defsystem lquery
   :name "lQuery"
-  :version "1.0.3"
+  :version "2.0.0"
   :author "Nicolas Hafner <shinmera@tymoon.eu>"
   :license "Artistic"
   :description "A library to allow jQuery-like HTML/DOM manipulation."
+  :serial T
   :components ((:file "lquery")
-               (:file "lquery-funcs" :depends-on ("lquery")))
+               (:file "lquery-funcs"))
   :depends-on (:cxml
                :cxml-dom
                :closure-html
