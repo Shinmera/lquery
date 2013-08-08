@@ -44,7 +44,7 @@
 
 (defun parse-html (html)
   "Build the given string into DOM objects related to the master document."
-  (build-elements html))
+  (lquery-funcs::build-elements html))
 
 (defmacro define-node-function (name (node-name &rest arguments) &optional docstring &body body)
   "Defines a new node function. This is the main mechanism by which node manipulations are defined.
@@ -134,7 +134,7 @@ define-symbol-handler, respectively.")
     (let ((function (car list)))
       (cond 
         ((eq function 'FUNCTION) `(,(cadr list) ,nodes))
-        ((eq function 'EVAL) `($ ,nodes ,(eval (second list))))
+        ((eq function 'EVAL) `($ (inline ,nodes) ,(eval (second list))))
         ((eq function 'INLINE) `(determine-symbol ,(second list) ,nodes))
         (T (let ((nodefun (find-symbol (format NIL "NODEFUN-~a" function) :lquery-funcs)))
              (if nodefun
