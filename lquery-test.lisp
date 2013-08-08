@@ -45,8 +45,12 @@
             ($ #'document-p))))
   (is (eq NIL
           ($ ())))
-  (is (eq 2
-          ($ (+ 1 1)))))
+  (is (eq T
+          ($ (inline T))))
+  (is (eq (first ($ "ul"))
+          (first ($ (inline "ul")))))
+  (is (eq (first ($ "ul"))
+          (first ($ (eval (format NIL "ul")))))))
 
 (test fun-add
   (init-test-environment)
@@ -65,8 +69,8 @@
                     (dom:get-attribute (first ($ "article" (add-class "bar"))) "class")))
   (is (string-equal (format NIL "~a ~a" (dom:get-attribute (first ($ "div")) "class") "baz")
                     (dom:get-attribute (first ($ "div" (add-class "baz"))) "class"))))
-  
-(test (fun-after :depends-on (AND . (fun-children)))
+
+(test (fun-after :depends-on (AND . (fun-children fun-child-index)))
   (init-test-environment)
   (is (eq (first ($ "article blockquote p"))
           (first ($ "article blockquote p" (after "<div>Foo</div>")))))
@@ -75,7 +79,7 @@
   (is (string-equal "div"
                     (dom:node-name (first (last ($ "article blockquote" (children))))))))
 
-(test fun-ancestor
+(test (fun-ancestor :depends-on (AND . (fun-parents)))
   (init-test-environment)
   (is (eq (first ($ "article"))
           (first ($ "article header, article blockquote" (ancestor)))))
@@ -93,7 +97,7 @@
   (is (= 2
          (length ($ "#target article" (children))))))
 
-(test (fun-append-to :depends-on (AND . (fun-children)))
+(test (fun-append-to :depends-on (AND . (fun-children fun-append)))
   (init-test-environment)
   (is (eq (first ($ "#source article"))
           (first ($ "#source article" (append-to "#target")))))
@@ -113,7 +117,7 @@
   (is (string-equal (dom:get-attribute (first ($ "#source article")) "foo")
                     (first ($ "#source article" (attr :foo))))))
 
-(test (fun-before :depends-on (AND . (fun-children)))
+(test (fun-before :depends-on (AND . (fun-children fun-child-index)))
   (init-test-environment)
   (is (eq (first ($ "article blockquote p"))
           (first ($ "article blockquote p" (before "<div>Foo</div>")))))
@@ -185,14 +189,14 @@
   (is (string-equal "color:blue;"
                     (dom:get-attribute (first ($ "#target" (css :foo "" :color "blue"))) "style"))))
 
-(test fun-data
+(test (fun-data :depends-on (AND . (fun-attr)))
   (init-test-environment)
   (is (eq (first ($ "#target"))
           (first ($ "#target" (data :foo "bar")))))
   (is (string-equal "bar"
                     (first ($ "#target" (data :foo))))))
 
-(test fun-deepest 
+(test (fun-deepest :depends-on (AND . (fun-remove)))
   (init-test-environment)
   (is (eq (first ($ "#source>p"))
           (first ($ "#source" (deepest)))))
@@ -239,7 +243,7 @@
   (is (eq (second ($ "head, body"))
           (first ($ "head, body" (filter "body"))))))
 
-(test fun-find
+(test (fun-find :depends-on (AND . (fun-children fun-filter)))
   (init-test-environment)
   (is (= 3
          (length ($ "html" (find "li")))))
@@ -260,7 +264,7 @@
   (is (eq (second ($ "li"))
           (first ($ "li" (gt 1))))))
 
-(test fun-has
+(test (fun-has :depends-on (AND . (fun-find)))
   (init-test-environment)
   (is (= 2
          (length ($ "head, body, article" (has "p")))))
@@ -272,19 +276,19 @@
   (is (eq T ($ "head, body, div" (has-class "fixed"))))
   (is-false (eq T ($ "div" (has-class "foobar")))))
 
-(test fun-hide
+(test (fun-hide :depends-on (AND . (fun-css)))
   (init-test-environment)
   (is (string-equal "display:none;"
                     (dom:get-attribute (first ($ "article" (hide))) "style"))))
 
-(test (fun-html :depends-on (AND . (fun-serialize)))
+(test (fun-html :depends-on (AND . (fun-empty fun-serialize)))
   (init-test-environment)
   (is (eq (first ($ "li"))
           (first ($ "li" (html "FOO")))))
   (is (string-equal "FOO"
                     (first ($ "li" (html))))))
 
-(test fun-index
+(test (fun-index :depends-on (AND . (fun-children fun-parent)))
   (init-test-environment)
   (is (= 2
          (first ($ "article" (index)))))
@@ -296,7 +300,7 @@
   (is (eq (first ($ (initialize *test-file*)))
           (first ($)))))
 
-(test (fun-insert-after :depends-on (AND . (fun-contains)))
+(test (fun-insert-after :depends-on (AND . (fun-contains fun-after)))
   (init-test-environment)
   (is-false (eq (first ($ "article"))
                 (first ($ "article" (insert-after "#target")))))
@@ -305,7 +309,7 @@
   (is (string-equal "article"
                     (dom:node-name (first (last ($ "body" (children))))))))
 
-(test (fun-insert-before :depends-on (AND . (fun-contains)))
+(test (fun-insert-before :depends-on (AND . (fun-contains fun-before)))
   (init-test-environment)
   (is-false (eq (first ($ "article"))
                 (first ($ "article" (insert-before "#target")))))
@@ -319,7 +323,7 @@
   (is (eq T ($ "head, body, div" (is "#source"))))
   (is-false (eq T ($ "head, body" (is "#source")))))
 
-(test fun-is-empty
+(test (fun-is-empty :depends-on (AND . (fun-not-empty)))
   (init-test-environment)
   (is (eq NIL ($ "title" (is-empty))))
   (is (eq T ($ "#target" (is-empty)))))
@@ -348,7 +352,7 @@
   (is (string-equal "source"
                     (first ($ "div" (map (lambda (node) (dom:get-attribute node "id"))))))))
 
-(test fun-next
+(test (fun-next :depends-on (AND . (fun-children fun-parent fun-index)))
   (init-test-environment)
   (is (eq (first ($ "#list"))
           (first ($ "#source>p" (next)))))
@@ -356,7 +360,7 @@
           (first ($ "article header" (next)))))
   (is (eq NIL ($ "article header" (next "div")))))
 
-(test (fun-next-all :depends-on (AND . (fun-first fun-last)))
+(test (fun-next-all :depends-on (AND . (fun-children fun-parent fun-index fun-first fun-last)))
   (init-test-environment)
   (is (= 2
          (length ($ "#list li" (first) (next-all)))))
@@ -365,7 +369,7 @@
   (is (eq (first ($ "#list"))
           (first ($ "#source p" (next-all "ul"))))))
 
-(test fun-next-until
+(test (fun-next-until :depends-on (AND . (fun-next-all)))
   (init-test-environment)
   (is (= 1
          (length ($ "h1" (next-until "#target")))))
@@ -427,7 +431,7 @@
   (is (string-equal "article"
                     (dom:node-name (first ($ "#list" (children)))))))
 
-(test (fun-prepend-to :depends-on (AND . (fun-children)))
+(test (fun-prepend-to :depends-on (AND . (fun-children fun-prepend)))
   (init-test-environment)
   (is (eq (first ($ "article"))
           (first ($ "article" (prepend-to ($ "#list"))))))
@@ -436,7 +440,7 @@
   (is (string-equal "article"
                     (dom:node-name (first ($ "#list" (children)))))))
 
-(test fun-prev
+(test (fun-prev :depends-on (AND . (fun-children fun-parent fun-index)))
   (init-test-environment)
   (is (eq (first ($ "#list"))
           (first ($ "article" (prev)))))
@@ -444,7 +448,7 @@
           (first ($ "article blockquote" (prev)))))
   (is (eq NIL ($ "article blockquote" (prev "div")))))
 
-(test (fun-prev-all :depends-on (AND . (fun-first fun-last)))
+(test (fun-prev-all :depends-on (AND . (fun-children fun-parent fun-index fun-first fun-last)))
   (init-test-environment)
   (is (= 2
          (length ($ "#list li" (last) (prev-all)))))
@@ -453,7 +457,7 @@
   (is (eq (first ($ "#list"))
           (first ($ "article" (prev-all "ul"))))))
 
-(test fun-prev-until
+(test (fun-prev-until :depends-on (AND . (fun-prev-all)))
   (init-test-environment)
   (is (= 1
          (length ($ "#target" (prev-until "h1")))))
@@ -482,14 +486,14 @@
   (is (eq NIL ($ "#source" (has-class "bar"))))
   (is (eq T ($ "#source" (has-class "baz")))))
 
-(test (fun-remove-data :depends-on (AND . (fun-data)))
+(test (fun-remove-data :depends-on (AND . (fun-data fun-remove-attr)))
   (init-test-environment)
   ($ "#source" (data :foo "bar"))
   (is (eq (first ($ "#source"))
           (first ($ "#source" (remove-data "foo")))))
   (is (eq NIL (dom:has-attribute (first ($ "#source")) "data-foo"))))
 
-(test (fun-replace-all :depends-on (AND . (fun-children)))
+(test (fun-replace-all :depends-on (AND . (fun-children fun-after fun-remove)))
   (init-test-environment)
   (is (eq (first ($ "article"))
           (first ($ "article" (replace-all "#target")))))
@@ -498,7 +502,7 @@
   (is (string-equal "article"
                     (dom:node-name (first (last ($ "body" (children))))))))
 
-(test (fun-replace-with :depends-on (AND . (fun-children)))
+(test (fun-replace-with :depends-on (AND . (fun-children fun-after fun-remove)))
   (init-test-environment)
   (is (eq (first ($ "#target"))
           (first ($ "#target" (replace-with ($ "article"))))))
@@ -507,19 +511,19 @@
   (is (string-equal "article"
                     (dom:node-name (first (last ($ "body" (children))))))))
 
-(test fun-show
+(test (fun-show :depends-on (AND . (fun-css)))
   (init-test-environment)
   (is (string-equal "display:block;"
                     (dom:get-attribute (first ($ "article" (show))) "style"))))
 
-(test fun-siblings
+(test (fun-siblings :depends-on (AND . (fun-children fun-parent)))
   (init-test-environment)
   (is (= 2
          (length ($ "#source" (siblings)))))
   (is (eq (first ($ "#target"))
           (second ($ "#source" (siblings))))))
 
-(test fun-size
+(test (fun-size :depends-on (AND . (fun-length)))
   (init-test-environment)
   (is (= (length ($ "li"))
          ($ "li" (size)))))
@@ -540,7 +544,7 @@
   (is (string-equal "FooBar"
                     (first ($ "#source>p" (text))))))
 
-(test (fun-toggle-class :depends-on (AND . (fun-has-class)))
+(test (fun-toggle-class :depends-on (AND . (fun-has-class fun-remove-class fun-add-class)))
   (init-test-environment)
   (is-false (eq T ($ "article" (has-class "foo"))))
   (is (eq (first ($ "article"))
@@ -550,7 +554,7 @@
           (first ($ "article" (toggle-class "foo")))))
   (is-false (eq T ($ "article" (has-class "foo")))))
 
-(test fun-unwrap
+(test (fun-unwrap :depends-on (AND . (fun-insert-before fun-remove fun-is-empty)))
   (init-test-environment)
   (is (eq (first ($ "li"))
           (first ($ "li" (unwrap)))))
@@ -558,14 +562,14 @@
   (is (eq (first ($ "#source"))
           (dom:parent-node (first ($ "li"))))))
 
-(test fun-val
+(test (fun-val :depends-on (AND . (fun-attr)))
   (init-test-environment)
   (is (eq (first ($ "article"))
           (first ($ "article" (val "foo")))))
   (is (string-equal "foo"
                     (first ($ "article" (val))))))
 
-(test fun-wrap
+(test (fun-wrap :depends-on (AND . (fun-prepend fun-deepest fun-replace-all)))
   (init-test-environment)
   (is (eq (first ($ "li"))
           (first ($ "li" (wrap "<div></div>")))))
@@ -574,7 +578,7 @@
   (is-false (eq (dom:parent-node (first ($ "li")))
                 (dom:parent-node (second ($ "li"))))))
 
-(test fun-wrap-all
+(test (fun-wrap-all :depends-on (AND . (fun-child-index fun-deepest)))
   (init-test-environment)
   (is (eq (first ($ "li"))
           (first ($ "li" (wrap-all "<div></div>")))))
@@ -583,7 +587,7 @@
   (is (eq (dom:parent-node (first ($ "li")))
           (dom:parent-node (second ($ "li"))))))
 
-(test fun-wrap-inner
+(test (fun-wrap-inner :depends-on (AND . (fun-prepend fun-deepest fun-empty fun-append)))
   (init-test-environment)
   (is (eq (first ($ "#list"))
           (first ($ "#list" (wrap-inner "<div></div>")))))
@@ -592,7 +596,7 @@
   (is (eq (dom:parent-node (first ($ "li")))
           (dom:parent-node (second ($ "li"))))))
 
-(test fun-write-to-file
+(test (fun-write-to-file :depends-on (AND . (fun-serialize)))
   (init-test-environment)
   (is (eq (first ($ "article"))
           (first ($ "article" (write-to-file (merge-pathnames "test-output.html" (asdf:system-source-directory :lquery)))))))
