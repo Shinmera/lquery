@@ -141,7 +141,7 @@
 
 (define-node-function append (node html-or-nodes)
   "Insert content (in html-string or node-list form) to the end of each element."
-  (apply #'buildnode:append-nodes node (nodes-or-build html-or-nodes))
+  (mapc #'(lambda (new-child) (dom:append-child node new-child)) (nodes-or-build html-or-nodes)) 
   node)
 
 (define-node-list-function append-to (working-nodes selector-or-nodes)
