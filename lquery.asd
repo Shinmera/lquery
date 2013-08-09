@@ -15,7 +15,8 @@
   :license "Artistic"
   :description "A library to allow jQuery-like HTML/DOM manipulation."
   :serial T
-  :components ((:file "lquery")
+  :components ((:file "package")
+               (:file "lquery")
                (:file "lquery-funcs"))
   :depends-on (:cxml
                :cxml-dom

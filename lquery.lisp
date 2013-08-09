@@ -4,25 +4,6 @@
   Author: Nicolas Hafner <shinmera@tymoon.eu>
 |#
 
-
-(defpackage org.tymoonnext.radiance.lib.lquery
-  (:nicknames :lquery :radiance-lib-lquery)
-  (:use :cl :css :buildnode :alexandria :split-sequence)
-  (:export
-   
-   :*lquery-master-document*
-   :parse-html
-   :initialize
-   :load-page
-   :$
-   :inline
-
-   :define-node-function
-   :define-node-list-function
-   :define-symbol-handler
-   :define-argument-handler
-   ))
-
 (in-package :lquery)
 
 (defvar *lquery-master-document* NIL)
