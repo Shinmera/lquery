@@ -33,20 +33,19 @@ All node functions are automatically created in the lquery-funcs package."
   (unless (stringp docstring)
     (setf body (append (list docstring) body))
     (setf docstring (format NIL "lQuery node function ~a" name)))
-  (let ((declarations (loop for expr = (first body)
-                         while (and expr (consp expr) (eql (first expr) 'DECLARE))
-                         do (setf body (cdr body))
-                         collect expr))
-        (nodesym (gensym (format NIL "~a" node-name))))
+  (let ((argslist (cons node-name
+                        (loop for arg in arguments
+                           unless (find arg '(&optional &key &allow-other-keys &rest))
+                           collect (if (listp arg) (first arg) arg))))
+        (funsymb (gensym "FUN")))
+        
     `(defun ,(intern (format NIL "NODEFUN-~a" name) :lquery-funcs) (,node-name ,@arguments)
        ,docstring
-       ,@declarations
-       (if (listp ,node-name)
-           (let ((,nodesym ,node-name))
+       (flet ((,funsymb ,argslist ,@body))
+         (if (listp ,node-name)
              (alexandria:flatten 
-              (loop for ,node-name in ,nodesym
-                 collect (progn ,@body))))
-           (progn ,@body)))))
+              (mapcar #'(lambda (,node-name) (,funsymb ,@argslist)) ,node-name))
+             (,funsymb ,@argslist))))))
 
 (defmacro define-node-list-function (name (list-name &rest arguments) &optional docstring &body body)
   "Defines a new function that operates on the current node list instead of individual elements.
