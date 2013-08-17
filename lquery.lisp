@@ -116,8 +116,8 @@ define-symbol-handler, respectively.")
         ((eq function 'FUNCTION) `(,(cadr list) ,nodes))
         ((eq function 'EVAL) `($ (inline ,nodes) ,(eval (second list))))
         ((eq function 'INLINE) `(determine-symbol ,(second list) ,nodes))
-        (T (let ((nodefun (find-symbol (format NIL "NODEFUN-~a" function) :lquery-funcs)))
-             (if nodefun
+        (T (multiple-value-bind (nodefun status) (find-symbol (format NIL "NODEFUN-~a" function) :lquery-funcs)
+             (if (and nodefun (eq status :EXTERNAL))
                  (append `(,nodefun ,nodes) (cdr list))
                  (append `(,function ,nodes) (cdr list)))))))))
 

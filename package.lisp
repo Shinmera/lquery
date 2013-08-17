@@ -73,7 +73,7 @@
    :nodefun-odd
    :nodefun-parent
    :nodefun-parents
-   :parents-until
+   :nodefun-parents-until
    :nodefun-prepend
    :nodefun-prepend-to
    :nodefun-prev
