@@ -318,9 +318,12 @@
          until (equal (nth i children) node)
          finally (return i))))
 
-(define-node-list-function initialize (working-nodes file)
+(define-node-list-function initialize (working-nodes document)
   "Re-initializes lQuery with a new page."
-  (list (initialize (load-page file))))
+  (list (initialize
+         (etypecase document
+           (pathname (load-page document))
+           (string (parse-html document))))))
 
 (define-node-list-function insert-after (working-nodes selector-or-nodes)
   "Insert every element after the target."
