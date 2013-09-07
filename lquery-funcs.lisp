@@ -533,16 +533,21 @@
   "Reduce the set of matched elements to a subset specified by a range of indices"
   (subseq working-nodes start end))
 
-(define-node-function text (node &optional text (document *lquery-master-document*))
-  "Get the combined text contents of each element, including their descendants. If text is set, all text nodes are removed and a new text node is appended to the end of the node."
+(define-node-function text (node &optional (text NIL t-s-p) (document *lquery-master-document*))
+  "Get the combined text contents of each element, including their descendants. If text is set, all text nodes are removed and a new text node is appended to the end of the node. If text is NIL, all text nodes are removed from the node."
   (unless (dom:document-p document) (setf document (slot-value document 'rune-dom::owner)))
-  (if text
-      (progn
-        (vector-push-extend 
-         (dom:create-text-node document (format NIL "~a" text))
-         (setf (slot-value node 'rune-dom::children)
-               (delete-if #'dom:text-node-p (slot-value node 'rune-dom::children))))
-        node)
+  (if t-s-p
+      (if text 
+          (progn
+            (vector-push-extend 
+             (dom:create-text-node document (format NIL "~a" text))
+             (setf (slot-value node 'rune-dom::children)
+                   (delete-if #'dom:text-node-p (slot-value node 'rune-dom::children))))
+            node)
+          (progn
+            (setf (slot-value node 'rune-dom::children)
+                  (delete-if #'dom:text-node-p (slot-value node 'rune-dom::children)))
+            node))
       (buildnode:text-of-dom-snippet node #\space)))
 
 (define-node-function toggle-class (node &rest classes)
