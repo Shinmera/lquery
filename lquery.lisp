@@ -12,11 +12,8 @@
   "Load the given file or string into a HTML DOM. If dtd is set to non-NIL, the document is checked against the given DTD specification. Alternatively a cxml-dom builder can be specified as well."
   (flet ((parse (html)
            (if dtd
-               (cxml:parse html builder)
-               (flet ((resolver (pubid sysid)
-                        (declare (ignore pubid sysid))
-                        (flexi-streams:make-in-memory-input-stream nil)))
-                 (cxml:parse html builder :entity-resolver #'resolver)))))
+               (cxml:parse html builder :dtd dtd)
+               (chtml:parse html builder))))
     (etypecase file-or-string
       (pathname (with-open-file (html file-or-string :element-type '(unsigned-byte 8))
                   (parse html)))
