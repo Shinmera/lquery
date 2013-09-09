@@ -242,11 +242,16 @@
   "Removes the node (optionally filtered by the selector) from the document. Alias for remove()"
   (funcall #'nodefun-remove node selector))
 
-(define-node-list-function each (working-nodes fun)
-  "Execute the specified function on each element until NIL is returned or all elements have been processed. The original set of elements is always returned."
-  (loop for node in working-nodes
-       while (funcall fun node))
-  working-nodes)
+(define-node-list-function each (working-nodes fun &key replace)
+  "Execute the specified function on each element until NIL is returned or all elements have been processed. The original set of elements is returned if replace is NIL."
+  (if replace
+      (loop for node in working-nodes
+         for result = (funcall fun node)
+         while result
+         collect result)
+      (loop for node in working-nodes
+         while (funcall fun node)
+         finally (return working-nodes))))
 
 (define-node-function empty (node)
   "Remove all child nodes from the set of matched elements."
