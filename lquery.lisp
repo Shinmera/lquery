@@ -8,15 +8,19 @@
 
 (defvar *lquery-master-document* NIL)
 
-(defun load-page (file &optional (dtd NIL) (builder (cxml-dom:make-dom-builder)))
-  "Load the given file into a HTML DOM. If dtd is set to non-NIL, the document is checked against the given DTD specification. Alternatively a cxml-dom builder can be specified as well."
-  (with-open-file (html file :element-type '(unsigned-byte 8))
-     (if dtd
-         (cxml:parse html builder)
-         (flet ((resolver (pubid sysid)
-                  (declare (ignore pubid sysid))
-                  (flexi-streams:make-in-memory-input-stream nil)))
-           (cxml:parse html builder :entity-resolver #'resolver)))))
+(defun load-page (file-or-string &optional (dtd NIL) (builder (cxml-dom:make-dom-builder)))
+  "Load the given file or string into a HTML DOM. If dtd is set to non-NIL, the document is checked against the given DTD specification. Alternatively a cxml-dom builder can be specified as well."
+  (flet ((parse (html)
+           (if dtd
+               (cxml:parse html builder)
+               (flet ((resolver (pubid sysid)
+                        (declare (ignore pubid sysid))
+                        (flexi-streams:make-in-memory-input-stream nil)))
+                 (cxml:parse html builder :entity-resolver #'resolver)))))
+    (etypecase file-or-string
+      (pathname (with-open-file (html file-or-string :element-type '(unsigned-byte 8))
+                  (parse html)))
+      (string (parse file-or-string)))))
 
 (defun initialize (document)
   "Sets the *lquery-master-document* variable to the provided document."

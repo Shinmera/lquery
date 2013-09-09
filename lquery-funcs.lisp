@@ -320,10 +320,7 @@
 
 (define-node-list-function initialize (working-nodes document)
   "Re-initializes lQuery with a new page."
-  (list (initialize
-         (etypecase document
-           (pathname (load-page document))
-           (string (parse-html document))))))
+  (list (initialize (load-page document))))
 
 (define-node-list-function insert-after (working-nodes selector-or-nodes)
   "Insert every element after the target."
