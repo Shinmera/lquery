@@ -323,7 +323,7 @@
          until (equal (nth i children) node)
          finally (return i))))
 
-(define-node-list-function initialize (working-nodes document &key (type :HTML))
+(define-node-list-function initialize (working-nodes document &key (type :XML))
   "Re-initializes lQuery with a new page."
   (list (initialize (load-page document :type type))))
 

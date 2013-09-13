@@ -8,7 +8,7 @@
 
 (defvar *lquery-master-document* NIL)
 
-(defun load-page (file-or-string &key (type :HTML) (builder (cxml-dom:make-dom-builder)))
+(defun load-page (file-or-string &key (type :XML) (builder (cxml-dom:make-dom-builder)))
   "Load the given file or string into a HTML DOM.
 If type is :HTML, the file is treated as a full HTML document.
 If type is NIL or :XML, the file is treated as an XML document, which does not need to contain the HTML root nodes.
