@@ -8,12 +8,22 @@
 
 (defvar *lquery-master-document* NIL)
 
-(defun load-page (file-or-string &optional (dtd NIL) (builder (cxml-dom:make-dom-builder)))
-  "Load the given file or string into a HTML DOM. If dtd is set to non-NIL, the document is checked against the given DTD specification. Alternatively a cxml-dom builder can be specified as well."
+(defun load-page (file-or-string &key (type :XML) (builder (cxml-dom:make-dom-builder)))
+  "Load the given file or string into a HTML DOM.
+If type is :HTML, the file is treated as a full HTML document.
+If type is NIL or :XML, the file is treated as an XML document, which does not need to contain the HTML root nodes.
+Alternatively, the type can be a DTD specification that will be supplied to cxml:parse 's dtd keyword."
   (flet ((parse (html)
-           (if dtd
-               (cxml:parse html builder :dtd dtd)
-               (chtml:parse html builder))))
+           (case type
+             (:HTML
+              (chtml:parse html builder))
+             ((NIL :XML)
+              (flet ((resolver (pubid sysid)
+                       (declare (ignore pubid sysid))
+                       (flexi-streams:make-in-memory-input-stream nil)))
+                (cxml:parse html builder :entity-resolver #'resolver)))
+             (T 
+              (cxml:parse html builder :dtd type)))))
     (etypecase file-or-string
       (pathname (with-open-file (html file-or-string :element-type '(unsigned-byte 8))
                   (parse html)))
