@@ -8,6 +8,12 @@
 
 (defvar *lquery-master-document* NIL)
 
+(defun load-file-quickly (pathname)
+  (with-open-file (stream pathname)
+    (let ((seq (make-array (file-length stream) :element-type 'character :fill-pointer t)))
+      (setf (fill-pointer seq) (read-sequence seq stream))
+      seq)))
+
 (defun load-page (file-or-string &key (type :XML) (builder (cxml-dom:make-dom-builder)))
   "Load the given file or string into a HTML DOM.
 If type is :HTML, the file is treated as a full HTML document.

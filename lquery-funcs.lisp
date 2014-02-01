@@ -312,9 +312,17 @@
   (if new-content
       (progn 
         (nodefun-empty node)
-        (buildnode:append-nodes node (build-elements (format NIL "~a" new-content)))
+        (buildnode:append-nodes node (build-elements new-content))
         node)
       (nodefun-serialize node :omit-self T :doctype NIL)))
+
+(define-node-list-function html-file (working-nodes pathname)
+  "Read an HTML file and insert its contents into each element."
+  (let ((document (build-elements (lquery::load-file-quickly pathname))))
+    (loop for node in working-nodes
+          do (nodefun-empty node)
+             (buildnode:append-nodes node document))
+    working-nodes))
 
 (define-node-function index (node)
   "Find the index of the node within its parent."
