@@ -54,6 +54,7 @@
    :nodefun-has-class
    :nodefun-hide
    :nodefun-html
+   :nodefun-html-file
    :nodefun-index
    :nodefun-initialize
    :nodefun-insert-after
