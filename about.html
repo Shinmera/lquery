@@ -17,7 +17,7 @@
   </head>
   <body>
     <header>
-      <img src="http://shinmera.tymoon.eu/public/lquery-logo.png" alt="lQuery"/>
+      <img src="lquery-logo.png" alt="lQuery"/>
       <h1>v2.0.0</h1>
     </header>
     <div id="content">
@@ -113,7 +113,7 @@
         <header><h2>Other Guff</h2></header>
         <p>
           lQuery is a sub-project of TyNETv5 ("Radiance"), licensed under the <a href="http://opensource.org/licenses/Artistic-2.0">Artistic License 2.0</a> and ©2013 TymoonNET/NexT, <a href="http://shinmera.com">Nicolas Hafner</a>.<br/>
-          This library can be obtained via git on <a href="git://git.tymoon.eu/lquery.git">git://git.tymoon.eu/lquery.git</a>. For questions, patches or suggestions, please contact me via <a href="mailto:shinmera@tymoon.eu">email</a>.
+          This library can be obtained via git on <a href="https://github.com/Shinmera/lquery.git">https://github.com/Shinmera/lquery.git</a>. For questions, patches or suggestions, please contact me via <a href="mailto:shinmera@tymoon.eu">email</a> or write a <a href="https://github.com/Shinmera/lquery/issues">github issue</a>.
         </p>
       </article>
       <article>
@@ -147,6 +147,18 @@ Symbols/Variables are handled at runtime (where they have a value) according to 
   * T         Any other value simply replaces the current list of nodes.
 
 Additional argument and symbol handlers can be defined with define-argument-handler and define-symbol-handler, respectively.</pre>
+            </article>
+          </li><li id="template">
+            <a class="anchor" name="*LQUERY-MASTER-DOCUMENT*"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL SPECIAL</span>
+                <code>
+                  <h3 class="funcname">*LQUERY-MASTER-DOCUMENT*</h3>
+                  <span class="funcargs"></span>
+                </code>
+              </header>
+              <pre class="funcdesc"></pre>
             </article>
           </li><li id="template">
             <a class="anchor" name="DEFINE-ARGUMENT-HANDLER"/>
@@ -217,10 +229,13 @@ All node list functions are automatically created in the lquery-funcs package.</
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
                   <h3 class="funcname">LOAD-PAGE</h3>
-                  <span class="funcargs">(FILE &amp;OPTIONAL (DTD NIL) (BUILDER (RUNE-DOM:MAKE-DOM-BUILDER)))</span>
+                  <span class="funcargs">(FILE-OR-STRING &amp;KEY (TYPE XML) (BUILDER (MAKE-DOM-BUILDER)))</span>
                 </code>
               </header>
-              <pre class="funcdesc">Load the given file into a HTML DOM. If dtd is set to non-NIL, the document is checked against the given DTD specification. Alternatively a cxml-dom builder can be specified as well.</pre>
+              <pre class="funcdesc">Load the given file or string into a HTML DOM.
+If type is :HTML, the file is treated as a full HTML document.
+If type is NIL or :XML, the file is treated as an XML document, which does not need to contain the HTML root nodes.
+Alternatively, the type can be a DTD specification that will be supplied to cxml:parse 's dtd keyword.</pre>
             </article>
           </li><li id="template">
             <a class="anchor" name="PARSE-HTML"/>
@@ -449,10 +464,10 @@ All node list functions are automatically created in the lquery-funcs package.</
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
                   <h3 class="funcname">NODEFUN-EACH</h3>
-                  <span class="funcargs">(WORKING-NODES FUN)</span>
+                  <span class="funcargs">(WORKING-NODES FUN &amp;KEY REPLACE)</span>
                 </code>
               </header>
-              <pre class="funcdesc">Execute the specified function on each element until NIL is returned or all elements have been processed. The original set of elements is always returned.</pre>
+              <pre class="funcdesc">Execute the specified function on each element until NIL is returned or all elements have been processed. The original set of elements is returned if replace is NIL.</pre>
             </article>
           </li><li id="template">
             <a class="anchor" name="NODEFUN-EMPTY"/>
@@ -587,6 +602,18 @@ All node list functions are automatically created in the lquery-funcs package.</
               <pre class="funcdesc">Get the HTML contents of the elements or set the HTML contents of every matched element.</pre>
             </article>
           </li><li id="template">
+            <a class="anchor" name="NODEFUN-HTML-FILE"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL FUNCTION</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-HTML-FILE</h3>
+                  <span class="funcargs">(WORKING-NODES PATHNAME)</span>
+                </code>
+              </header>
+              <pre class="funcdesc">Read an HTML file and insert its contents into each element.</pre>
+            </article>
+          </li><li id="template">
             <a class="anchor" name="NODEFUN-INDEX"/>
             <article>
               <header>
@@ -605,7 +632,7 @@ All node list functions are automatically created in the lquery-funcs package.</
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
                   <h3 class="funcname">NODEFUN-INITIALIZE</h3>
-                  <span class="funcargs">(WORKING-NODES FILE)</span>
+                  <span class="funcargs">(WORKING-NODES DOCUMENT &amp;KEY (TYPE XML))</span>
                 </code>
               </header>
               <pre class="funcdesc">Re-initializes lQuery with a new page.</pre>
@@ -815,6 +842,18 @@ All node list functions are automatically created in the lquery-funcs package.</
               <pre class="funcdesc">Get the ancestors of each element, optionally filtered by a selector. Closest parent first.</pre>
             </article>
           </li><li id="template">
+            <a class="anchor" name="NODEFUN-PARENTS-UNTIL"/>
+            <article>
+              <header>
+                <span class="functype">EXTERNAL FUNCTION</span>
+                <code>
+                  <h3 class="funcname">NODEFUN-PARENTS-UNTIL</h3>
+                  <span class="funcargs">(NODE SELECTOR-OR-NODES)</span>
+                </code>
+              </header>
+              <pre class="funcdesc">Get the ancestors of each element, up to (excluding) the element matched by the selector or node list. Closest parent first</pre>
+            </article>
+          </li><li id="template">
             <a class="anchor" name="NODEFUN-PREPEND"/>
             <article>
               <header>
@@ -953,7 +992,7 @@ All node list functions are automatically created in the lquery-funcs package.</
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
                   <h3 class="funcname">NODEFUN-SERIALIZE</h3>
-                  <span class="funcargs">(NODE &amp;KEY (OMIT-SELF NIL) (DOCTYPE "html"))</span>
+                  <span class="funcargs">(NODE &amp;KEY (OMIT-SELF NIL) (DOCTYPE html))</span>
                 </code>
               </header>
               <pre class="funcdesc">Serialize the node into a string.</pre>
@@ -1013,10 +1052,10 @@ All node list functions are automatically created in the lquery-funcs package.</
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
                   <h3 class="funcname">NODEFUN-TEXT</h3>
-                  <span class="funcargs">(NODE &amp;OPTIONAL TEXT (DOCUMENT *LQUERY-MASTER-DOCUMENT*))</span>
+                  <span class="funcargs">(NODE &amp;OPTIONAL (TEXT NIL T-S-P) (DOCUMENT *LQUERY-MASTER-DOCUMENT*))</span>
                 </code>
               </header>
-              <pre class="funcdesc">Get the combined text contents of each element, including their descendants. If text is set, all text nodes are removed and a new text node is appended to the end of the node.</pre>
+              <pre class="funcdesc">Get the combined text contents of each element, including their descendants. If text is set, all text nodes are removed and a new text node is appended to the end of the node. If text is NIL, all text nodes are removed from the node.</pre>
             </article>
           </li><li id="template">
             <a class="anchor" name="NODEFUN-TOGGLE-CLASS"/>
@@ -1097,8 +1136,8 @@ All node list functions are automatically created in the lquery-funcs package.</
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
                   <h3 class="funcname">NODEFUN-WRITE-TO-FILE</h3>
-                  <span class="funcargs">(WORKING-NODES FILE &amp;KEY (DOCTYPE "html") (IF-DOES-NOT-EXIST :CREATE)
- (IF-EXISTS :SUPERSEDE))</span>
+                  <span class="funcargs">(WORKING-NODES FILE &amp;KEY (DOCTYPE html) (IF-DOES-NOT-EXIST CREATE)
+ (IF-EXISTS SUPERSEDE))</span>
                 </code>
               </header>
               <pre class="funcdesc">Write the serialized node to the file. Note that always only the first element is written.</pre>
