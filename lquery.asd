@@ -18,10 +18,7 @@
   :components ((:file "package")
                (:file "lquery")
                (:file "lquery-funcs"))
-  :depends-on (:cxml
-               :cxml-dom
-               :closure-html
-               :css-selectors
-               :buildnode
+  :depends-on (:plump
+               :clss
                :alexandria
                :split-sequence))
