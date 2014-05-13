@@ -56,7 +56,7 @@ All node list functions are automatically created in the lquery-funcs package."
     `(defun ,(intern (format NIL "NODEFUN-~a" name) :lquery-funcs) (,list-name ,@arguments)
        ,docstring
        ,@declarations
-       (unless (arrayp ,list-name) (setf ,list-name (make-array 1 :initial-element ,list-name)))
+       (unless (arrayp ,list-name) (setf ,list-name (make-array 1 :initial-element ,list-name :adjustable T :fill-pointer T)))
        ,@body)))
 
 (defmacro $ (&body actions)
@@ -92,7 +92,7 @@ define-symbol-handler, respectively.")
 
 (defun %$ (actions)
   (if (null actions)
-      `(make-array 1 :initial-element *lquery-master-document*)
+      `(make-array 1 :initial-element *lquery-master-document* :adjustable T :fill-pointer T)
       (let ((action (car actions))
             (rest (cdr actions)))
         (determine-argument action (%$ rest)))))
@@ -140,7 +140,7 @@ define-symbol-handler, respectively.")
 
 (define-symbol-handler plump:node (node nodes)
   (declare (ignorable nodes))
-  (make-array 1 :initial-element node))
+  (make-array 1 :initial-element node :adjustable T :fill-pointer T))
 
 (define-symbol-handler function (function nodes)
   (funcall function nodes))
