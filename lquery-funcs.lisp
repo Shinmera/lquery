@@ -179,16 +179,20 @@
              (vector-push-extend node result))
         finally (return result)))
 
-(define-node-function contents (node)
+(define-node-list-function contents (nodes)
   "Get the children of each element, including text and comment nodes."
-  (coerce (dom:child-nodes node) 'list))
+  (loop with result = (make-proper-vector)
+        for node across nodes
+        do (loop for child across (plump:children node)
+                 do (vector-push-extend child result))
+        finally (return result)))
 
 (define-node-function css (node &rest pairs)
   "Retrieve or set css style attributes on a node."
   (let ((css-styles (get-css-styles node)))
     (case (length pairs)
       (0 (error "CSS attribute arugments must be one or more attributes or one or more key-value pairs."))
-      (1 (gethash (symb (assure-attribute (first pairs))) css-styles))
+      (1 (gethash (assure-attribute (first pairs)) css-styles))
       (otherwise
        (if (and (symbolp (first pairs)) (symbolp (second pairs)))
            (loop for key in pairs
