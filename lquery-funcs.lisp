@@ -598,22 +598,18 @@ If no matching element can be found the root is entered instead."
   (setf (fill-pointer working-nodes) (- end start))
   working-nodes)
 
-(define-node-function text (node &optional (text NIL t-s-p) (document *lquery-master-document*))
-  "Get the combined text contents of each element, including their descendants. If text is set, all text nodes are removed and a new text node is appended to the end of the node. If text is NIL, all text nodes are removed from the node."
-  (unless (dom:document-p document) (setf document (slot-value document 'rune-dom::owner)))
+(define-node-function text (node &optional (text NIL t-s-p))
+  "Get the combined text contents of each element, including their descendants. If text is set, all text nodes are removed and a new text node is appended to the end of the node. If text is NIL, all direct text nodes are removed from the node."
   (if t-s-p
       (if text 
           (progn
-            (vector-push-extend 
-             (dom:create-text-node document (format NIL "~a" text))
-             (setf (slot-value node 'rune-dom::children)
-                   (delete-if #'dom:text-node-p (slot-value node 'rune-dom::children))))
+            (replace-vector (plump:children node) #'(lambda (el) (not (plump:text-node-p el))))
+            (plump:make-text-node node text)
             node)
           (progn
-            (setf (slot-value node 'rune-dom::children)
-                  (delete-if #'dom:text-node-p (slot-value node 'rune-dom::children)))
+            (replace-vector (plump:children node) #'(lambda (el) (not (plump:text-node-p el))))
             node))
-      (buildnode:text-of-dom-snippet node #\space)))
+      (plump:text node)))
 
 (define-node-function toggle-class (node &rest classes)
   "Add or remove one or more classes from each element, depending on their presence within the element."
