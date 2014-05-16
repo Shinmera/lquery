@@ -8,6 +8,26 @@
 
 (defvar *lquery-master-document* NIL)
 
+(defun make-proper-vector (&key (size 0) initial-element initial-contents (fill-pointer T))
+  (make-array size :initial-element initial-element :initial-contents initial-contents
+                   :adjustable T :fill-pointer fill-pointer :element-type 'plump:node))
+
+(defgeneric copy-proper-vector (sequence &key transform)
+  (:method ((vector sequence) &key (transform #'identity))
+    (loop with result = (make-proper-vector :size (length vector) :fill-pointer T)
+          for i from 0 below (length vector)
+          do (setf (aref result i)
+                   (funcall transform (aref vector i)))
+          finally (return result)))
+  (:method ((list list) &key (transform #'identity))
+    (loop with length = (length list)
+          with result = (make-proper-vector :size length :fill-pointer T)
+          for i from 0 below length
+          for item in list
+          do (setf (aref result i)
+                   (funcall transform item))
+          finally (return result))))
+
 (defun load-page (file-or-string)
   "Load the given file or string into a HTML DOM."
   (plump:parse file-or-string))
@@ -32,14 +52,14 @@ All node functions are automatically created in the lquery-funcs package."
                           collect (if (listp arg) (first arg) arg)))
         (funsymb (gensym "FUN"))
         (i (gensym "I")))
-        
+    
     `(defun ,(intern (format NIL "NODEFUN-~a" name) :lquery-funcs) (,node-name ,@arguments)
        ,docstring
        (flet ((,funsymb ,argslist ,@body))
          (if (arrayp ,node-name)
              (loop for ,i from 0 below (length ,node-name)
                    do (setf (aref ,node-name ,i)
-                            (,funsym (aref ,node-name ,i) ,@argslist))
+                            (,funsymb (aref ,node-name ,i) ,@argslist))
                    finally (return ,node-name))
              (,funsymb ,node-name ,@argslist))))))
 
@@ -56,7 +76,7 @@ All node list functions are automatically created in the lquery-funcs package."
     `(defun ,(intern (format NIL "NODEFUN-~a" name) :lquery-funcs) (,list-name ,@arguments)
        ,docstring
        ,@declarations
-       (unless (arrayp ,list-name) (setf ,list-name (make-array 1 :initial-element ,list-name :adjustable T :fill-pointer T)))
+       (unless (arrayp ,list-name) (setf ,list-name (make-proper-vector :size 1 :initial-element ,list-name :fill-pointer T)))
        ,@body)))
 
 (defmacro $ (&body actions)
@@ -92,7 +112,7 @@ define-symbol-handler, respectively.")
 
 (defun %$ (actions)
   (if (null actions)
-      `(make-array 1 :initial-element *lquery-master-document* :adjustable T :fill-pointer T)
+      `(make-proper-vector :size 1 :initial-element *lquery-master-document* :fill-pointer T)
       (let ((action (car actions))
             (rest (cdr actions)))
         (determine-argument action (%$ rest)))))
@@ -140,7 +160,7 @@ define-symbol-handler, respectively.")
 
 (define-symbol-handler plump:node (node nodes)
   (declare (ignorable nodes))
-  (make-array 1 :initial-element node :adjustable T :fill-pointer T))
+  (make-proper-vector :size 1 :initial-element node :fill-pointer T))
 
 (define-symbol-handler function (function nodes)
   (funcall function nodes))
