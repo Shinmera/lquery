@@ -435,8 +435,8 @@ If no matching element can be found the root is entered instead."
   (when (stringp selector)
     (setf selector (clss:parse-selector selector)))
   (replace-vector-if nodes #'(lambda (sibling)
-                            (and sibling (or (not selector) (clss:node-matches-p selector sibling))))
-                  :key #'plump:next-element))
+                               (and sibling (or (not selector) (clss:node-matches-p selector sibling))))
+                     :key #'plump:next-element))
 
 (define-node-list-function next-all (nodes &optional selector)
   "Get all following siblings of each element. If a selector is provided, the sibling is only included if it matches."
@@ -623,7 +623,7 @@ If no matching element can be found the root is entered instead."
 
 (define-node-list-function show (working-nodes)
   "Display the matched elements (short for (css :display 'block'))"
-  (nodefun-css working-nodes "show" "block"))
+  (nodefun-css working-nodes "display" "block"))
 
 (define-node-list-function siblings (nodes &optional selector)
   "Get the siblings of each element, optionally filtered by a selector."
