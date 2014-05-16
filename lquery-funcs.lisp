@@ -120,17 +120,31 @@
   (plump::vector-append (plump:family node) (nodes-or-build html-or-nodes))
   node)
 
-;;@todo
+(defun parent-lists (nodes)
+  (loop with parent-lists = (make-array (length nodes))
+        for node across nodes
+        for i from 0
+        do (loop with list = ()
+                 for parent = (plump:parent node)
+                   then (plump:parent parent)
+                 until (plump:root-p parent)
+                 do (push parent list)
+                 finally (setf (aref parent-lists i) list))
+        finally (return parent-lists)))
+
 (define-node-list-function ancestor (working-nodes)
   "Find the common ancestor of all elements."
-  (loop with parentlists = (loop for node in working-nodes 
-                              collect (reverse (nodefun-parents node)))
-     for i = 0 then (1+ i)
-     for prevparents = NIL then parents
-     for parents = (loop for list in parentlists for el = (nth i list) if el collect el)
-     until (or (not (every #'eql (list (first parents)) parents)) 
-               (not (= (length parents) (length parentlists))))
-     finally (return (list (first prevparents)))))
+  (loop with parent-lists = (parent-lists working-nodes)
+        with previous = NIL
+        with current = NIL
+        while (when (loop for i from 1 below (length working-nodes)
+                          for a = (setf current (pop (aref parent-lists i)))
+                            then (pop (aref parent-lists i))
+                          for b = (pop (aref parent-lists 0))
+                            then a
+                          always (eq a b))
+                (setf previous current))
+        finally (return previous)))
 
 (define-node-function append (node html-or-nodes)
   "Insert content (in html-string or node-list form) to the end of each element."
