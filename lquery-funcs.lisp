@@ -6,8 +6,9 @@
 
 (in-package :lquery-funcs)
 
-(import '(lquery::make-proper-vector
-          lquery::copy-proper-vector))
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (import '(lquery::make-proper-vector
+            lquery::copy-proper-vector)))
 
 (defun trim (string &optional (chars '(#\Space #\Tab #\Newline)))
   (string-trim chars string))
@@ -643,7 +644,7 @@ If no matching element can be found the root is entered instead."
 
 (define-node-function unwrap (node)
   "Remove the parents of the set of matched elements from the DOM, leaving the matched elements in their place. The parent is removed if it is empty after unwrapping."
-  (let ((parent (dom:parent-node node)))
+  (let ((parent (plump:parent node)))
     (nodefun-insert-before node parent)
     (nodefun-remove node)
     (if (nodefun-is-empty parent)
