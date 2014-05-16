@@ -163,19 +163,21 @@
   "Create a deep copy of the set of matched elements."
   (plump:clone-node node))
 
+;;@todo
 (define-node-function closest (node selector)
   "For each element in the set, get the first element that matches the selector by testing the element itself and traversing up through its ancestors in the DOM tree."
   (if (css:node-matches? node selector)
       node
       (nodefun-closest (dom:parent-node node) selector)))
 
-(define-node-function contains (node string)
+(define-node-list-function contains (nodes string)
   "Select all elements that contain the specified text."
-  (if (string-equal
-       (trim string)
-       (trim (buildnode:text-of-dom-snippet node)))
-      node
-      NIL))
+  (loop with string = (trim string)
+        with result = (make-proper-vector)
+        for node across nodes
+        do (when (string= string (trim (plump:text node)))
+             (vector-push-extend node result))
+        finally (return result)))
 
 (define-node-function contents (node)
   "Get the children of each element, including text and comment nodes."
