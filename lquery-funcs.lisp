@@ -94,9 +94,10 @@
                 unless (= (length val) 0)
                   do (format s "~a: ~a;" (assure-attribute key) val)))))
 
-(defun replace-vector (vector condition)
+(defun replace-vector-if (vector condition &key (key #'identity))
   (loop with i = 0
-        for element across vector
+        for item across vector
+        for element = (funcall key item)
         do (when (funcall condition element)
              (setf (aref vector i) element)
              (incf i))
@@ -271,14 +272,7 @@ If no matching element can be found the root is entered instead."
 
 (define-node-list-function filter (nodes selector-or-function)
   "Reduce the set of matched elements to those that match the selector or pass the function's test."
-  (loop with i = 0
-        with fun = (funcs-or-select selector-or-function)
-        for node across nodes
-        do (when (funcall fun node)
-             (setf (aref nodes i) node)
-             (incf i))
-        finally (setf (fill-pointer nodes) i))
-  nodes)
+  (replace-vector-if nodes fun))
 
 (define-node-list-function find (nodes selector-or-function &key (test-self NIL))
   "Get the descendants of each element filtered by selector or function."
@@ -309,13 +303,9 @@ If no matching element can be found the root is entered instead."
 
 (define-node-list-function has (nodes selector-or-nodes)
   "Reduce the set of matched elements to those that have a descendant that matches the selector or element."
-  (loop with i = 0
-        with find-fun = (list-or-selector-func selector-or-nodes)
-        for node across nodes
-        do (unless (= 0 (length (nodefun-find node find-fun)))
-             (setf (aref nodes i) node))
-        finally (setf (fill-pointer nodes) i))
-  nodes)
+  (let ((find-fun (list-or-selector-func selector-or-nodes)))
+    (replace-vector-if nodes #'(lambda (node)
+                                 (< 0 (length (nodefun-find node find-fun)))))))
 
 (define-node-list-function has-class (working-nodes class)
   "Determine whether any of the matched elements are assigned to the given class."
@@ -393,25 +383,15 @@ If no matching element can be found the root is entered instead."
 
 (define-node-list-function map (working-nodes function)
   "Pass each element through a function (which has to accept one argument, the node), returning the list of all results."
-  (loop with i = 0
-        for node across working-nodes
-        do (when (funcall function node)
-             (setf (aref working-nodes i) node))
-        finally (setf (fill-pointer working-nodes) i))
-  working-nodes)
+  (replace-vector-if working-nodes function))
 
 (define-node-list-function next (nodes &optional selector)
   "Get the immediately following sibling of each element (if there is one). If a selector is provided, the sibling is only included if it matches."
   (when (stringp selector)
     (setf selector (clss:parse-selector selector)))
-  (loop with i = 0
-        for node across nodes
-        for sibling = (plump:next-element node)
-        do (when (and sibling (or (not selector) (clss:node-matches-p selector sibling)))
-             (setf (aref nodes i) sibling)
-             (incf i))
-        finally (setf (fill-pointer nodes) i))
-  nodes)
+  (replace-vector-if nodes #'(lambda (sibling)
+                            (and sibling (or (not selector) (clss:node-matches-p selector sibling))))
+                  :key #'plump:next-element))
 
 (define-node-list-function next-all (nodes &optional selector)
   "Get all following siblings of each element. If a selector is provided, the sibling is only included if it matches."
@@ -449,7 +429,7 @@ If no matching element can be found the root is entered instead."
 (define-node-list-function not (working-nodes selector-or-nodes)
   "Remove elements from the set of matched elements."
   (let ((fun (nodes-or-select selector-or-nodes)))
-    (replace-vector working-nodes #'(lambda (el) (not (funcall fun el))))))
+    (replace-vector-if working-nodes #'(lambda (el) (not (funcall fun el))))))
 
 (define-node-function not-empty (node)
   "Check if the node contains no children and/or only empty (whitespace) text nodes. If the node is effectively empty, NIL is returned. Otherwise a list of all non-empty children and text-nodes is returned."
