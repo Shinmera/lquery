@@ -538,11 +538,10 @@ If no matching element can be found the root is entered instead."
 
 (define-node-function remove-class (node &rest classes)
   "Remove classes from each element."
-  (loop for classlist = (split-sequence:split-sequence #\space (trim (dom:get-attribute node "class")))
-     then (remove class classlist :test #'string-equal) 
-     for class in classes
-     do (setf class (assure-attribute class))
-     finally (dom:set-attribute node "class" (format nil "~{~A~^ ~}" classlist)))
+  (setf (plump:attribute node "class")
+        (format NIL "~{~a~^ ~}"
+                (remove-if #'(lambda (a) (find a classes :test #'string=))
+                           (split-sequence #\Space (plump:attribute node "class") :remove-empty-subseqs T))))
   node)
 
 (define-node-list-function remove-data (working-nodes &rest data)
