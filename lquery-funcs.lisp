@@ -94,6 +94,14 @@
                 unless (= (length val) 0)
                   do (format s "~a: ~a;" (assure-attribute key) val)))))
 
+(defun replace-vector (vector condition)
+  (loop with i = 0
+        for element across vector
+        do (when (funcall condition element)
+             (setf (aref vector i) element)
+             (incf i))
+        finally (setf (fill-pointer vector) i))
+  vector)
 
 (define-node-list-function add (working-nodes selector-or-nodes)
   "Add elements to the set of matched elements."
@@ -440,14 +448,8 @@ If no matching element can be found the root is entered instead."
 
 (define-node-list-function not (working-nodes selector-or-nodes)
   "Remove elements from the set of matched elements."
-  (loop with fun = (list-or-selector-func selector-or-nodes)
-        with i = 0
-        for node across working-nodes
-        do (when (not (funcall fun node))
-             (setf (aref working-nodes i) node)
-             (incf i))
-        finally (setf (fill-pointer working-nodes) i))
-  working-nodes)
+  (let ((fun (nodes-or-select selector-or-nodes)))
+    (replace-vector working-nodes #'(lambda (el) (not (funcall fun el))))))
 
 (define-node-function not-empty (node)
   "Check if the node contains no children and/or only empty (whitespace) text nodes. If the node is effectively empty, NIL is returned. Otherwise a list of all non-empty children and text-nodes is returned."
