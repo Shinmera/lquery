@@ -385,7 +385,12 @@ If no matching element can be found the root is entered instead."
 
 (define-node-list-function map (working-nodes function)
   "Pass each element through a function (which has to accept one argument, the node), returning the list of all results."
-  (mapcar function working-nodes))
+  (loop with i = 0
+        for node across working-nodes
+        do (when (funcall function node)
+             (setf (aref working-nodes i) node))
+        finally (setf (fill-pointer working-nodes) i))
+  working-nodes)
 
 (define-node-function next (node &optional selector)
   "Get the immediately following sibling of each element (if there is one). If a selector is provided, the sibling is only included if it matches."
