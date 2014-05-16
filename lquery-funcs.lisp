@@ -299,10 +299,15 @@ If no matching element can be found the root is entered instead."
         finally (setf (fill-pointer working-nodes) (- (length working-nodes) index)))
   working-nodes)
 
-(define-node-function has (node selector-or-nodes)
+(define-node-list-function has (nodes selector-or-nodes)
   "Reduce the set of matched elements to those that have a descendant that matches the selector or element."
-  (let ((find-fun (list-or-selector-func selector-or-nodes)))
-    (if (alexandria:flatten (nodefun-find node find-fun)) node NIL)))
+  (loop with i = 0
+        with find-fun = (list-or-selector-func selector-or-nodes)
+        for node across nodes
+        do (unless (= 0 (length (nodefun-find node find-fun)))
+             (setf (aref nodes i) node))
+        finally (setf (fill-pointer nodes) i))
+  nodes)
 
 (define-node-list-function has-class (working-nodes class)
   "Determine whether any of the matched elements are assigned to the given class."
