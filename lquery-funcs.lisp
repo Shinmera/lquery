@@ -245,7 +245,9 @@
 
 (define-node-list-function eq (working-nodes index)
   "Reduce the set of matched elements to the one at the specified index"
-  (list (nth index working-nodes)))
+  (setf (aref working-nodes 0) (aref working-nodes index)
+        (fill-pointer working-nodes) 1)
+  working-nodes)
 
 (define-node-list-function even (working-nodes)
   "Selects even elements."
