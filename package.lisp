@@ -6,7 +6,7 @@
 
 (defpackage org.tymoonnext.radiance.lib.lquery
   (:nicknames :lquery :radiance-lib-lquery)
-  (:use :cl :css :buildnode :alexandria :split-sequence)
+  (:use :cl)
   (:export
    
    :*lquery-master-document*
@@ -22,7 +22,7 @@
    :define-argument-handler))
 
 (defpackage org.tymoonnext.radiance.lib.lquery.funcs
-  (:use :cl :lquery :buildnode :css :alexandria :split-sequence)
+  (:use :cl :lquery :alexandria :split-sequence)
   (:nicknames :lquery-funcs)
   (:export
    :nodefun-add
