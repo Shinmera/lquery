@@ -147,15 +147,18 @@
                 (setf previous current))
         finally (return (make-proper-vector :size 1 :initial-element previous))))
 
-(define-node-function append (node html-or-nodes)
+(define-node-list-function append (nodes html-or-nodes)
   "Insert content (in html-string or node-list form) to the end of each element."
-  (plump::vector-append (plump:children node) (nodes-or-build html-or-nodes)) 
-  node)
+  (let ((inserts (nodes-or-build html-or-nodes)))
+    (loop for node across nodes
+          do (loop for insert across inserts
+                   do (plump:append-child node (plump:clone-node insert)))))
+  nodes)
 
 (define-node-list-function append-to (working-nodes selector-or-nodes)
   "Insert every element to the end of the target(s)."
-  (loop for target across (nodes-or-select selector-or-nodes)
-        do (plump::vector-append (plump:children target) working-nodes))
+  (let ((targets (nodes-or-select selector-or-nodes)))
+    (nodefun-append targets working-nodes))
   working-nodes)
 
 (define-node-function attr (node &rest pairs)
