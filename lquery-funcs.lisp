@@ -194,14 +194,10 @@
       (0 (error "CSS attribute arugments must be one or more attributes or one or more key-value pairs."))
       (1 (gethash (assure-attribute (first pairs)) css-styles))
       (otherwise
-       (if (and (symbolp (first pairs)) (symbolp (second pairs)))
-           (loop for key in pairs
-              collecting (gethash (symb (assure-attribute key)) css-styles))
-           (loop for (key val) on pairs by #'cddr
-              do (setf (gethash (symb (assure-attribute key)) css-styles) val)
-              finally (progn
-                        (set-css-styles node css-styles)
-                        (return node))))))))
+       (set-css-styles node
+                       (loop for (key val) on pairs by #'cddr
+                             do (setf (gethash (assure-attribute key) css-styles) val)))
+       node))))
 
 (define-node-function data (node &rest pairs)
   "Retrieve or set data attributes on a node. This is a convenience method and uses attr in the back."
