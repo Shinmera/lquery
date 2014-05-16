@@ -253,11 +253,13 @@ If no matching element can be found the root is entered instead."
   working-nodes)
 
 (define-node-list-function even (working-nodes)
-  "Selects even elements."
-  (loop for node in working-nodes 
-        for i from 1 upto (length working-nodes)
-        if (evenp i)
-          collect node))
+  "Selects even elements, 1-indexed"
+  (loop for i from 0
+        while (< (1+ (* i 2)) (length working-nodes))
+        do (setf (aref working-nodes i)
+                 (aref working-nodes (1+ (* i 2))))
+        finally (setf (fill-pointer working-nodes) i))
+  working-nodes)
 
 (define-node-function filter (node selector-or-function)
   "Reduce the set of matched elements to those that match the selector or pass the function's test."
