@@ -436,7 +436,7 @@ If no matching element can be found the root is entered instead."
 
 (define-node-list-function node (working-nodes &optional (n 0))
   "Return the specified node (default first) directly, without encompassing it into a list."
-  (nth n working-nodes))
+  (elt working-nodes n))
 
 (define-node-list-function not (working-nodes selector-or-nodes)
   "Remove elements from the set of matched elements."
