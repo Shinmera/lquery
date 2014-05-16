@@ -551,10 +551,17 @@ If no matching element can be found the root is entered instead."
   node)
 
 (define-node-list-function replace-all (working-nodes selector-or-nodes)
-  "Replace each target element with the set of matched elements."
+  "Replace each in the set of matched elements with the current nodes."
   (let ((targets (nodes-or-select selector-or-nodes)))
-    (nodefun-after targets working-nodes)
-    (nodefun-remove targets)
+    (unless (= 0 (length working-nodes))
+      (loop for target across targets
+            for position = (plump:child-position target)
+            for family = (plump:family target)
+            do (plump::array-shift family :n (1- (length working-nodes)) :from position)
+               (loop for i from 0 below (length working-nodes)
+                     do (setf (aref family (+ i position))
+                              (aref working-nodes i)))
+               (setf (plump:parent target) NIL)))
     working-nodes))
 
 (define-node-list-function replace-with (working-nodes html-or-nodes)
