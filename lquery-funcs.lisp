@@ -636,11 +636,13 @@ If no matching element can be found the root is entered instead."
         (nodefun-remove parent)))
   node)
 
-(define-node-list-function val (working-nodes &optional value)
-  "Get the current values or set the value of every matched element. This uses (attr :value val) in the back."
-  (if value
-      (nodefun-attr working-nodes :value value)
-      (nodefun-attr working-nodes :value)))
+(define-node-function val (node &optional (value NIL v-p))
+  "Get the current values or set the value of every matched element."
+  (if v-p
+      (if value
+          (setf (plump:attribute node "value") value)
+          (plump:remove-attribute node "value"))
+      (plump:attribute node "value")))
 
 (define-node-function wrap (node html-or-nodes)
   "Wrap an HTML structure around each element. Note that always the first subnode is chosen."
