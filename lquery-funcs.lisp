@@ -432,19 +432,20 @@ If no matching element can be found the root is entered instead."
     (replace-vector-if working-nodes #'(lambda (el) (not (funcall fun el))))))
 
 (define-node-function not-empty (node)
-  "Check if the node contains no children and/or only empty (whitespace) text nodes. If the node is effectively empty, NIL is returned. Otherwise a list of all non-empty children and text-nodes is returned."
-  (loop for child across (dom:child-nodes node)
-     unless (or (and (dom:text-node-p child)
-                     (= 0 (length (trim (dom:data child)))))
-                (dom:comment-p child))
-     collect child))
+  "Check if the node contains no children and/or only empty (whitespace) text nodes. If the node is effectively empty NIL is returned, otherwise T"
+  (loop for child across (plump:children node)
+        thereis (or (plump:element-p child)
+                    (and (plump:text-node-p child)
+                         (< 0 (length (trim (plump:text child))))))))
 
 (define-node-list-function odd (working-nodes)
-  "Select all odd elements from the current set."
-  (loop for node in working-nodes
-       for i from 1 upto (length working-nodes)
-       if (oddp i)
-       collect node))
+  "Select all odd elements from the current set, 1-indexed."
+  (loop for i from 0
+        while (< (* i 2) (length working-nodes))
+        do (setf (aref working-nodes i)
+                 (aref working-nodes (* i 2)))
+        finally (setf (fill-pointer working-nodes) i))
+  working-nodes)
 
 (define-node-function parent (node &optional selector)
   "Get the parent of each element, optionally filtered by a selector."
