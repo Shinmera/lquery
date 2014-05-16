@@ -146,9 +146,7 @@
 
 (define-node-function before (node html-or-nodes)
   "Insert content (in html-string or node-list form) before each element."
-  (buildnode:insert-children (dom:parent-node node)
-                             (nodefun-child-index node)
-                             (nodes-or-build html-or-nodes))
+  (plump::vector-append (plump:family node) (nodes-or-build html-or-nodes) (plump:child-position node))
   node)
 
 (define-node-function children (node &optional selector)
