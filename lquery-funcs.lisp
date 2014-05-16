@@ -368,7 +368,11 @@ If no matching element can be found the root is entered instead."
 
 (define-node-list-function last (working-nodes)
   "Reduce the set of matched elements to the final one in the set."
-  (last working-nodes))
+  (when (< 0 (length working-nodes))
+    (setf (aref working-nodes 0)
+          (aref working-nodes (1- (length working-nodes)))
+          (fill-pointer working-nodes) 1))
+  working-nodes)
 
 (define-node-list-function length (working-nodes)
   "Returns the number of elements in the list."
