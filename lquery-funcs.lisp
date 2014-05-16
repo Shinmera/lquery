@@ -93,7 +93,7 @@
           (loop for key being the hash-keys of css-styles
                 for val being the hash-values of css-styles
                 unless (= (length val) 0)
-                  do (format s "~a: ~a;" (assure-attribute key) val)))))
+                  do (format s "~a:~a;" (assure-attribute key) val)))))
 
 (defun replace-vector-if (vector condition &key (key #'identity))
   (loop with i = 0
@@ -226,9 +226,9 @@ If no matching element can be found the root is entered instead."
       (0 (error "CSS attribute arugments must be one or more attributes or one or more key-value pairs."))
       (1 (gethash (assure-attribute (first pairs)) css-styles))
       (otherwise
-       (set-css-styles node
-                       (loop for (key val) on pairs by #'cddr
-                             do (setf (gethash (assure-attribute key) css-styles) val)))
+       (loop for (key val) on pairs by #'cddr
+             do (setf (gethash (assure-attribute key) css-styles) val))
+       (set-css-styles node css-styles)
        node))))
 
 (define-node-function data (node &rest pairs)
