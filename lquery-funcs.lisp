@@ -469,7 +469,10 @@ If no matching element can be found the root is entered instead."
 
 (define-node-list-function parent (nodes &optional selector)
   "Get the parent of each element, optionally filtered by a selector."
-  (replace-vector-if nodes (nodes-or-selector-func selector) :key #'plump:parent))
+  (when (stringp selector)
+    (setf selector (clss:parse-selector selector)))
+  (replace-vector-if nodes #'(lambda (el)
+                               (or (not selector) (clss:node-matches-p selector el))) :key #'plump:parent))
 
 (define-node-list-function parents (nodes &optional selector)
   "Get the ancestors of each element, optionally filtered by a selector. Closest parent first."
