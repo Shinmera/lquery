@@ -138,14 +138,14 @@
   (loop with parent-lists = (parent-lists working-nodes)
         with previous = NIL
         with current = NIL
-        while (when (loop for i from 1 below (length working-nodes)
+        while (when (loop for i from 1 below (length parent-lists)
                           for a = (setf current (pop (aref parent-lists i)))
                             then (pop (aref parent-lists i))
                           for b = (pop (aref parent-lists 0))
                             then a
-                          always (eq a b))
+                          always (and a (eq a b)))
                 (setf previous current))
-        finally (return previous)))
+        finally (return (make-proper-vector :size 1 :initial-element previous))))
 
 (define-node-function append (node html-or-nodes)
   "Insert content (in html-string or node-list form) to the end of each element."
