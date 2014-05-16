@@ -413,19 +413,26 @@ If no matching element can be found the root is entered instead."
         for node across nodes
         do (loop for i from (1+ (plump:child-position node))
                    below (length (plump:family node))
-                 do (let ((sibling (aref (plump:family node) i)))
-                      (when (and (plump:element-p sibling)
-                                 (clss:node-matches-p selector sibling))
-                        (vector-push-extend sibling result))))
+                 for sibling = (aref (plump:family node) i)
+                 do (when (and (plump:element-p sibling)
+                               (or (not selector)
+                                   (clss:node-matches-p selector sibling)))
+                      (vector-push-extend sibling result)))
         finally (return result)))
 
-(define-node-function next-until (node selector-or-nodes)
+(define-node-list-function next-until (nodes selector-or-nodes)
   "Get all following silings of each element up to (excluding) the element matched by the selector or node list."
-  (let ((family (nodefun-next-all node))
-        (find-fun (list-or-selector-func selector-or-nodes)))
-    (loop for sibling in family
-       until (funcall find-fun sibling)
-       collect sibling)))
+  (loop with fun = (list-or-selector-func selector-or-nodes)
+        with result = (make-proper-vector)
+        for node across nodes
+        do (loop for i from (1+ (plump:child-position node))
+                   below (length (plump:family node))
+                 for sibling = (aref (plump:family node) i)
+                 until (and (plump:element-p sibling)
+                            (funcall fun sibling))
+                 do (when (plump:element-p sibling)
+                      (vector-push-extend sibling result)))
+        finally (return result)))
 
 (define-node-list-function node (working-nodes &optional (n 0))
   "Return the specified node (default first) directly, without encompassing it into a list."
