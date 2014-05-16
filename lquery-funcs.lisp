@@ -593,7 +593,10 @@ If no matching element can be found the root is entered instead."
 
 (define-node-list-function slice (working-nodes start &optional end)
   "Reduce the set of matched elements to a subset specified by a range of indices"
-  (subseq working-nodes start end))
+  (unless end (setf end (length working-nodes)))
+  (plump::array-shift working-nodes :from start :to end :n (- start) :adjust NIL)
+  (setf (fill-pointer working-nodes) (- end start))
+  working-nodes)
 
 (define-node-function text (node &optional (text NIL t-s-p) (document *lquery-master-document*))
   "Get the combined text contents of each element, including their descendants. If text is set, all text nodes are removed and a new text node is appended to the end of the node. If text is NIL, all text nodes are removed from the node."
