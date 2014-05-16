@@ -197,7 +197,7 @@
 If no matching element can be found the root is entered instead."
   (when (stringp selector)
     (setf selector (clss:parse-selector selector)))
-  (loop for node = (plump:parent node)
+  (loop do (setf node (plump:parent node))
         until (or (plump:root-p node)
                   (clss:node-matches-p selector node)))
   node)
