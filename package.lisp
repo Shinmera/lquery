@@ -4,8 +4,8 @@
   Author: Nicolas Hafner <shinmera@tymoon.eu>
 |#
 
-(defpackage org.tymoonnext.radiance.lib.lquery
-  (:nicknames :lquery :radiance-lib-lquery)
+(defpackage lquery
+  (:nicknames #:org.tymoonnext.radiance.lib.lquery #:radiance-lib-lquery)
   (:use :cl)
   (:export
    
@@ -21,9 +21,9 @@
    :define-symbol-handler
    :define-argument-handler))
 
-(defpackage org.tymoonnext.radiance.lib.lquery.funcs
+(defpackage lquery-funcs
   (:use :cl :lquery :alexandria :split-sequence)
-  (:nicknames :lquery-funcs)
+  (:nicknames #:org.tymoonnext.radiance.lib.lquery.funcs)
   (:export
    :nodefun-add
    :nodefun-add-class
