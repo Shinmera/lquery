@@ -212,10 +212,16 @@
 
 (define-node-function deepest (node)
   "Returns the innermost (left-bound) child element."
-  (let ((children (nodefun-children node)))
-    (if (= (length children) 0)
-        node
-        (nodefun-deepest (first children))))) 
+  (labels ((r (node)
+             (loop with elp = NIL
+                   for child across (plump:children node)
+                   when (plump:element-p child)
+                     do (setf elp child)
+                   until elp
+                   finally (if elp
+                               (r elp)
+                               node))))
+    (r node))) 
 
 (define-node-function detach (node &optional selector)
   "Removes the node (optionally filtered by the selector) from the document. Alias for remove()"
