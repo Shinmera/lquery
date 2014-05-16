@@ -681,30 +681,6 @@ If no matching element can be found the root is entered instead."
     (write-string (nodefun-serialize (first working-nodes) :doctype doctype) stream))
   working-nodes)
 
-(define-node-function serialize (node &key (omit-self NIL) (doctype "html"))
+(define-node-function serialize (node &optional (stream NIL))
   "Serialize the node into a string."
-  (labels ((parse (node) (trim (dom:map-document (cxml:make-string-sink :omit-xml-declaration-p T :canonical NIL) node))))
-    (concatenate 
-     'string
-     (if doctype (format nil "<!DOCTYPE ~a>" doctype))
-     (if (or (dom:document-p node) omit-self)
-         (parse node)
-         (let ((clone (dom:clone-node node T))
-               (pseudo (first (build-elements "<div></div>"))))
-           (buildnode:insert-nodes pseudo 0 clone)
-           (parse pseudo))))))
-
-; Urngh. To avoid copying and creating, there seems to be no other choice but to build the root tag ourselves.
-(define-node-function serialize2 (node)
-  "Serialize the node into a string. Might be faster than serialize(), but builds parts of the string itself."
-  (let ((name (dom:node-name node))
-        (attrs (mapcar 
-                (lambda (attr) (concatenate 'string " " (dom:name attr) "=\"" (dom:value attr) "\"" ))
-                (dom:items (dom:attributes node)))))
-  (concatenate 
-   'string
-   "<" name (apply #'concatenate 'string attrs) ">"
-   (trim (dom:map-document 
-          (cxml:make-string-sink :omit-xml-declaration-p T :canonical NIL) 
-          node))
-   "</" name ">")))
+  (plump:serialize node stream))
