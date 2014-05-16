@@ -95,12 +95,9 @@
                   do (format s "~a: ~a;" (assure-attribute key) val)))))
 
 
-
-
-
 (define-node-list-function add (working-nodes selector-or-nodes)
   "Add elements to the set of matched elements."
-  (append working-nodes (nodes-or-select selector-or-nodes)))
+  (plump::vector-append working-nodes (nodes-or-select selector-or-nodes)))
 
 (define-node-function add-class (node &rest classes)
   "Adds the specified class(es) to the set of matched elements."
