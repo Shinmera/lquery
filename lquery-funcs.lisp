@@ -675,10 +675,10 @@ If no matching element can be found the root is entered instead."
     (nodefun-append node inner-wrapper))
   node)
 
-(define-node-list-function write-to-file (working-nodes file &key (doctype "html") (if-does-not-exist :CREATE) (if-exists :SUPERSEDE))
+(define-node-list-function write-to-file (working-nodes file &key (if-does-not-exist :CREATE) (if-exists :SUPERSEDE))
   "Write the serialized node to the file. Note that always only the first element is written."
   (with-open-file (stream file :direction :OUTPUT :if-does-not-exist if-does-not-exist :if-exists if-exists)
-    (write-string (nodefun-serialize (first working-nodes) :doctype doctype) stream))
+    (plump:serialize (aref working-nodes 0) stream))
   working-nodes)
 
 (define-node-function serialize (node &optional (stream NIL))
