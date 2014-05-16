@@ -116,10 +116,18 @@
           (format stream "~@[~a ~]~{~a~^ ~}" (plump:attribute node "class") classes)))
   node)
 
-(define-node-function after (node html-or-nodes)
+(define-node-list-function after (nodes html-or-nodes)
   "Insert content (in html-string or node-list form) after each element."
-  (plump::vector-append (plump:family node) (nodes-or-build html-or-nodes))
-  node)
+  (let ((inserts (nodes-or-build html-or-nodes)))
+    (loop for node across nodes
+          for position = (plump:child-position node)
+          do (plump::array-shift (plump:family node) :n (length inserts) :from (1+ position))
+             (loop for i from (1+ position)
+                   for insert across inserts
+                   do (let ((insert (plump:clone-node insert)))
+                        (setf (plump:parent insert) node 
+                              (aref (plump:family node) i) insert)))))
+  nodes)
 
 (defun parent-lists (nodes)
   (loop with parent-lists = (make-array (length nodes))
@@ -171,10 +179,18 @@
            do (setf (plump:attribute node key) val))
      node)))
 
-(define-node-function before (node html-or-nodes)
+(define-node-list-function before (nodes html-or-nodes)
   "Insert content (in html-string or node-list form) before each element."
-  (plump::vector-append (plump:family node) (nodes-or-build html-or-nodes) (plump:child-position node))
-  node)
+  (let ((inserts (nodes-or-build html-or-nodes)))
+    (loop for node across nodes
+          for position = (plump:child-position node)
+          do (plump::array-shift (plump:family node) :n (length inserts) :from position)
+             (loop for i from position
+                   for insert across inserts
+                   do (let ((insert (plump:clone-node insert)))
+                        (setf (plump:parent insert) node 
+                              (aref (plump:family node) i) insert)))))
+  nodes)
 
 (define-node-list-function children (nodes &optional selector)
   "Get the children of each element, optionally filtered by a selector."
