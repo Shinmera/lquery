@@ -532,10 +532,8 @@ If no matching element can be found the root is entered instead."
 
 (define-node-function remove-attr (node &rest attributes)
   "Remove attributes from each element."
-  (loop for attr in attributes
-     do (setf attr (assure-attribute attr))
-     if (dom:has-attribute node attr)
-       do (dom:remove-attribute node attr))
+  (dolist (attr attributes)
+    (plump:remove-attribute node (assure-attribute attr)))
   node)
 
 (define-node-function remove-class (node &rest classes)
