@@ -451,9 +451,9 @@ If no matching element can be found the root is entered instead."
   (elt working-nodes n))
 
 (define-node-list-function not (working-nodes selector-or-nodes)
-  "Remove elements from the set of matched elements."
-  (let ((fun (nodes-or-select selector-or-nodes)))
-    (replace-vector-if working-nodes #'(lambda (el) (not (funcall fun el))))))
+  "Remove matching elements from the working elements."
+  (let ((fun (nodes-or-selector-func selector-or-nodes)))
+    (replace-vector-if working-nodes fun)))
 
 (define-node-function not-empty (node)
   "Check if the node contains no children and/or only empty (whitespace) text nodes. If the node is effectively empty NIL is returned, otherwise T"
@@ -647,7 +647,8 @@ If no matching element can be found the root is entered instead."
           else
             collect class into to-add
           finally (setf (plump:attribute node "class")
-                        (with-output-to-string (stream (format NIL "~{~a~^ ~}" to-add))
+                        (with-output-to-string (stream)
+                          (format stream "~{~a~^ ~}" to-add)
                           (loop for item in list
                                 do (unless (member item to-remove :test #'string=)
                                      (write-char #\Space)
@@ -707,5 +708,8 @@ If no matching element can be found the root is entered instead."
   working-nodes)
 
 (define-node-function serialize (node &optional (stream NIL))
-  "Serialize the node into a string."
-  (plump:serialize node stream))
+                      "Serialize the node into a string."
+  (if stream
+      (plump:serialize node stream)
+      (with-output-to-string (stream)
+        (plump:serialize node stream))))
