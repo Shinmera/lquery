@@ -287,7 +287,7 @@ If no matching element can be found the root is entered instead."
 
 (define-node-list-function filter (nodes selector-or-function)
   "Reduce the set of matched elements to those that match the selector or pass the function's test."
-  (replace-vector-if nodes fun))
+  (replace-vector-if nodes (funcs-or-select selector-or-function)))
 
 (define-node-list-function find (nodes selector-or-function &key (test-self NIL))
   "Get the descendants of each element filtered by selector or function."
@@ -618,11 +618,11 @@ If no matching element can be found the root is entered instead."
   (if t-s-p
       (if text 
           (progn
-            (replace-vector (plump:children node) #'(lambda (el) (not (plump:text-node-p el))))
+            (replace-vector-if (plump:children node) #'(lambda (el) (not (plump:text-node-p el))))
             (plump:make-text-node node text)
             node)
           (progn
-            (replace-vector (plump:children node) #'(lambda (el) (not (plump:text-node-p el))))
+            (replace-vector-if (plump:children node) #'(lambda (el) (not (plump:text-node-p el))))
             node))
       (plump:text node)))
 
