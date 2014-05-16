@@ -67,7 +67,7 @@
   (:method ((function function))
     function))
 
-(defgeneric list-or-selector-func (object)
+(defgeneric nodes-or-selector-func (object)
   (:documentation "Build a function matching the selector or checking the equality/inclusion of the object.")
   (:method ((selector string))
     (let ((selector (clss:parse-selector selector)))
@@ -303,7 +303,7 @@ If no matching element can be found the root is entered instead."
 
 (define-node-list-function has (nodes selector-or-nodes)
   "Reduce the set of matched elements to those that have a descendant that matches the selector or element."
-  (let ((find-fun (list-or-selector-func selector-or-nodes)))
+  (let ((find-fun (nodes-or-selector-func selector-or-nodes)))
     (replace-vector-if nodes #'(lambda (node)
                                  (< 0 (length (nodefun-find node find-fun)))))))
 
@@ -356,7 +356,7 @@ If no matching element can be found the root is entered instead."
 
 (define-node-list-function is (working-nodes selector-or-nodes)
   "Check the current elements against a selector or list of elements and return true if at least one of them matches."
-  (let ((find-fun (list-or-selector-func selector-or-nodes)))
+  (let ((find-fun (nodes-or-selector-func selector-or-nodes)))
     (loop for node across working-nodes
           thereis (funcall find-fun node))))
 
@@ -410,7 +410,7 @@ If no matching element can be found the root is entered instead."
 
 (define-node-list-function next-until (nodes selector-or-nodes)
   "Get all following silings of each element up to (excluding) the element matched by the selector or node list."
-  (loop with fun = (list-or-selector-func selector-or-nodes)
+  (loop with fun = (nodes-or-selector-func selector-or-nodes)
         with result = (make-proper-vector)
         for node across nodes
         do (loop for i from (1+ (plump:child-position node))
@@ -447,11 +447,9 @@ If no matching element can be found the root is entered instead."
         finally (setf (fill-pointer working-nodes) i))
   working-nodes)
 
-(define-node-function parent (node &optional selector)
+(define-node-list-function parent (nodes &optional selector)
   "Get the parent of each element, optionally filtered by a selector."
-  (let ((parent (dom:parent-node node)))
-    (if (or (not selector) (css:node-matches? parent selector))
-        parent)))
+  (replace-vector-if nodes (nodes-or-selector-func selector) :key #'plump:parent))
 
 (define-node-function parents (node &optional selector)
   "Get the ancestors of each element, optionally filtered by a selector. Closest parent first."
@@ -463,7 +461,7 @@ If no matching element can be found the root is entered instead."
 (define-node-function parents-until (node selector-or-nodes)
   "Get the ancestors of each element, up to (excluding) the element matched by the selector or node list. Closest parent first"
   (loop for parent = (dom:parent-node node) then (dom:parent-node parent)
-     with find-fun = (list-or-selector-func selector-or-nodes)
+     with find-fun = (nodes-or-selector-func selector-or-nodes)
      while (and (not (dom:document-p parent))
                 (not (funcall find-fun parent)))
      collect parent))
@@ -501,7 +499,7 @@ If no matching element can be found the root is entered instead."
 (define-node-function prev-until (node selector-or-nodes)
   "Get all preceeding silings of each element down to (excluding) the element matched by the selector or node list."
   (let ((family (nodefun-prev-all node))
-        (find-fun (list-or-selector-func selector-or-nodes)))
+        (find-fun (nodes-or-selector-func selector-or-nodes)))
     (loop for sibling in family
        until (funcall find-fun sibling)
        collect sibling)))
