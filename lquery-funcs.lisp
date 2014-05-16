@@ -461,16 +461,21 @@ If no matching element can be found the root is entered instead."
                    then (plump:parent parent)
                  until (or (not parent) (plump:root-p parent))
                  do (when (or (not selector) (clss:node-matches-p selector parent))
-                      (vector-push-extend selector result)))
+                      (vector-push-extend parent result)))
         finally (return result)))
 
-(define-node-function parents-until (node selector-or-nodes)
+(define-node-list-function parents-until (nodes selector-or-nodes)
   "Get the ancestors of each element, up to (excluding) the element matched by the selector or node list. Closest parent first"
-  (loop for parent = (dom:parent-node node) then (dom:parent-node parent)
-     with find-fun = (nodes-or-selector-func selector-or-nodes)
-     while (and (not (dom:document-p parent))
-                (not (funcall find-fun parent)))
-     collect parent))
+  (loop with result = (make-proper-vector)
+        with func = (nodes-or-selector-func selector-or-nodes)
+        for node across nodes
+        do (loop for parent = (plump:parent node)
+                   then (plump:parent parent)
+                 until (or (not parent)
+                           (plump:root-p parent)
+                           (funcall func parent))
+                 do (vector-push-extend parent result))
+        finally (return result)))
 
 (define-node-function prepend (node html-or-nodes)
   "Insert content, specified by the parameter, to the beginning of each element."
