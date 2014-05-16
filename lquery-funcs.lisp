@@ -319,8 +319,8 @@ If no matching element can be found the root is entered instead."
             return T)))
 
 (define-node-list-function hide (working-nodes )
-  "Hide the matched elements (short for (css :display 'none'))."
-  (nodefun-css working-nodes :display "none"))
+  "Hide the matched elements (short for (css \"display\" \"none\"))."
+  (nodefun-css working-nodes "display" "none"))
 
 (define-node-function html (node &optional new-content)
   "Get the HTML contents of the elements or set the HTML contents of every matched element."
