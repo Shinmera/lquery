@@ -574,16 +574,22 @@ If no matching element can be found the root is entered instead."
   "Display the matched elements (short for (css :display 'block'))"
   (nodefun-css working-nodes "show" "block"))
 
-(define-node-function siblings (node &optional selector)
+(define-node-list-function siblings (nodes &optional selector)
   "Get the siblings of each element, optionally filtered by a selector."
-  (let ((siblings (remove node (nodefun-children (nodefun-parent node)))))
-    (if selector
-        (remove-if-not (lambda (node) (css:node-matches? node selector)) siblings)
-        siblings)))
+  (when (stringp selector)
+    (setf selector (clss:parse-selector selector)))
+  (loop with result = (make-proper-vector)
+        for node across nodes
+        do (loop for sibling across (plump:family node)
+                 unless (or (eq node sibling)
+                            (and selector
+                                 (clss:node-matches-p selector sibling)))
+                   do (vector-push-extend sibling result))
+        finally (return result)))
 
 (define-node-list-function size (working-nodes)
   "Return the number of elements in the list."
-  (nodefun-length working-nodes))
+  (length working-nodes))
 
 (define-node-list-function slice (working-nodes start &optional end)
   "Reduce the set of matched elements to a subset specified by a range of indices"
