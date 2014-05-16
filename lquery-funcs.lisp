@@ -380,7 +380,8 @@ If no matching element can be found the root is entered instead."
 
 (define-node-list-function lt (working-nodes index)
   "Select all elements at an index less than the index within the matched set."
-  (subseq working-nodes 0 index))
+  (setf (fill-pointer working-nodes) index)
+  working-nodes)
 
 (define-node-list-function map (working-nodes function)
   "Pass each element through a function (which has to accept one argument, the node), returning the list of all results."
