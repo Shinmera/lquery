@@ -223,9 +223,9 @@
                                node))))
     (r node))) 
 
-(define-node-function detach (node &optional selector)
+(define-node-list-function detach (nodes &optional selector)
   "Removes the node (optionally filtered by the selector) from the document. Alias for remove()"
-  (funcall #'nodefun-remove node selector))
+  (nodefun-remove nodes selector))
 
 (define-node-list-function each (working-nodes fun &key replace)
   "Execute the specified function on each element until NIL is returned or all elements have been processed. The original set of elements is returned if replace is NIL."
@@ -466,11 +466,8 @@
 
 (define-node-function remove (node &optional selector)
   "Remove the set of matched elements from the DOM."
-  (when (or (not selector) (css:node-matches? node selector))
-    (let ((parent (dom:parent-node node)))
-      (if parent
-          (dom:remove-child parent node)))
-    node))
+  (when (or (not selector) (clss:node-matches-p selector node))
+    (plump:remove-child node)))
 
 (define-node-function remove-attr (node &rest attributes)
   "Remove attributes from each element."
