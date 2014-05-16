@@ -173,11 +173,16 @@
   (plump::vector-append (plump:family node) (nodes-or-build html-or-nodes) (plump:child-position node))
   node)
 
-(define-node-function children (node &optional selector)
+(define-node-list-function children (nodes &optional selector)
   "Get the children of each element, optionally filtered by a selector."
-  (if selector
-      (clss:select selector node)
-      (plump:child-elements node)))
+  (loop with result = (make-proper-vector)
+        for node across nodes
+        do (loop for child across (plump:children node)
+                 do (when (and (plump:element-p child)
+                               (or (not selector)
+                                   (clss:node-matches-p selector child)))
+                      (vector-push-extend child result)))
+        finally (return result)))
 
 (define-node-function child-index (node)
   "Returns the index of the element within its parent, also counting text nodes. See index() otherwise."
