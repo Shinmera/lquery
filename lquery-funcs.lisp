@@ -735,7 +735,7 @@ If no matching element can be found the root is entered instead."
           for wrapper = (plump:clone-node base)
           do (loop for child across (plump:children node)
                    do (setf (plump:parent child) wrapper)
-                      (vector-push-extend child wrapper))
+                      (vector-push-extend child (plump:children wrapper)))
              (setf (plump:children node) (make-proper-vector :size 1 :initial-element wrapper)
                    (plump:parent wrapper) node)))
   nodes)
