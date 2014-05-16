@@ -269,9 +269,9 @@ If no matching element can be found the root is entered instead."
                    when (plump:element-p child)
                      do (setf elp child)
                    until elp
-                   finally (if elp
-                               (r elp)
-                               node))))
+                   finally (return (if elp
+                                       (r elp)
+                                       node)))))
     (r node))) 
 
 (define-node-list-function detach (nodes &optional selector)
