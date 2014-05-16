@@ -261,9 +261,16 @@ If no matching element can be found the root is entered instead."
         finally (setf (fill-pointer working-nodes) i))
   working-nodes)
 
-(define-node-function filter (node selector-or-function)
+(define-node-list-function filter (nodes selector-or-function)
   "Reduce the set of matched elements to those that match the selector or pass the function's test."
-  (if (funcall (funcs-or-select selector-or-function) node) node NIL))
+  (loop with i = 0
+        with fun = (funcs-or-select selector-or-function)
+        for node across nodes
+        do (when (funcall fun node)
+             (setf (aref nodes i) node)
+             (incf i))
+        finally (setf (fill-pointer nodes) i))
+  nodes)
 
 (define-node-function find (node selector-or-function &key (test-self NIL))
   "Get the descendants of each element filtered by selector or function."
