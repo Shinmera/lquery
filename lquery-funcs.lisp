@@ -661,13 +661,17 @@ If no matching element can be found the root is entered instead."
     (plump:append-child wrapper parent))
   working-nodes)  
 
-(define-node-function wrap-inner (node html-or-nodes)
+(define-node-list-function wrap-inner (nodes html-or-nodes)
   "Wrap an HTML structure around the contents of each element."
-  (let ((inner-wrapper (nodes-or-build html-or-nodes)))
-    (nodefun-prepend (nodefun-deepest inner-wrapper) (coerce (dom:child-nodes node) 'list))
-    (nodefun-empty node)
-    (nodefun-append node inner-wrapper))
-  node)
+  (let ((base (aref (nodes-or-build html-or-nodes) 0)))
+    (loop for node across nodes
+          for wrapper = (plump:clone-node base)
+          do (loop for child across (plump:children node)
+                   do (setf (plump:parent child) wrapper)
+                      (vector-push-extend child wrapper))
+             (setf (plump:children node) (make-proper-vector :size 1 :initial-element wrapper)
+                   (plump:parent wrapper) node)))
+  nodes)
 
 (define-node-list-function write-to-file (working-nodes file &key (if-does-not-exist :CREATE) (if-exists :SUPERSEDE))
   "Write the serialized node to the file. Note that always only the first element is written."
