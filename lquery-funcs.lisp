@@ -312,11 +312,11 @@ If no matching element can be found the root is entered instead."
 (define-node-list-function has-class (working-nodes class)
   "Determine whether any of the matched elements are assigned to the given class."
   (let ((class (assure-attribute class)))
-    (loop for node in working-nodes
-       if (find class
-                (split-sequence:split-sequence #\space (dom:get-attribute node "class")) 
-                :test #'string-equal)
-       return T)))
+    (loop for node across working-nodes
+          if (find class
+                   (split-sequence:split-sequence #\space (plump:attribute node "class")) 
+                   :test #'string-equal)
+            return T)))
 
 (define-node-list-function hide (working-nodes )
   "Hide the matched elements (short for (css :display 'none'))."
