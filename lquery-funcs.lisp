@@ -633,6 +633,7 @@ If no matching element can be found the root is entered instead."
         for node across nodes
         do (loop for sibling across (plump:family node)
                  unless (or (eq node sibling)
+                            (not (plump:element-p sibling))
                             (and selector
                                  (clss:node-matches-p selector sibling)))
                    do (vector-push-extend sibling result))
@@ -680,20 +681,27 @@ If no matching element can be found the root is entered instead."
   node)
 
 (define-node-function unwrap (node)
-  "Remove the parents of the set of matched elements from the DOM, leaving the matched elements in their place. The parent is removed if it is empty after unwrapping."
-  (let ((parent (plump:parent node)))
-    (nodefun-insert-before node parent)
-    (nodefun-remove node)
-    (if (nodefun-is-empty parent)
-        (nodefun-remove parent)))
+  "Remove the parents of the set of matched elements from the DOM, inserting the parents children in place of it."
+  (let* ((parent (plump:parent node))
+         (pparent (plump:parent parent))
+         (parentpos (plump:child-position parent)))
+    (plump::array-shift (plump:children pparent) :n (1- (length (plump:children parent))) :from parentpos)
+    (loop for child across (plump:children parent)
+          for i from parentpos
+          do (setf (aref (plump:children pparent) i) child
+                   (plump:parent child) pparent))
+    (setf (plump:parent parent) NIL
+          (fill-pointer (plump:children parent)) 0))
   node)
 
 (define-node-function val (node &optional (value NIL v-p))
   "Get the current values or set the value of every matched element."
   (if v-p
-      (if value
-          (setf (plump:attribute node "value") value)
-          (plump:remove-attribute node "value"))
+      (progn
+        (if value
+            (setf (plump:attribute node "value") value)
+            (plump:remove-attribute node "value"))
+        node)
       (plump:attribute node "value")))
 
 (define-node-list-function wrap (nodes html-or-nodes)
