@@ -342,10 +342,7 @@ If no matching element can be found the root is entered instead."
 
 (define-node-function index (node)
   "Find the index of the node within its parent."
-  (let ((children (nodefun-children (nodefun-parent node))))
-    (loop for i from 0 upto (length children)
-         until (equal (nth i children) node)
-         finally (return i))))
+  (plump:element-position node))
 
 (define-node-list-function initialize (working-nodes document &key (type :XML))
   "Re-initializes lQuery with a new page."
