@@ -333,10 +333,11 @@ If no matching element can be found the root is entered instead."
 
 (define-node-list-function html-file (working-nodes pathname)
   "Read an HTML file and insert its contents into each element."
-  (let ((document (build-elements (lquery::load-file-quickly pathname))))
-    (loop for node in working-nodes
-          do (nodefun-empty node)
-             (buildnode:append-nodes node document))
+  (let ((document (plump:parse pathname)))
+    (loop for node across working-nodes
+          do (plump:clear node)
+             (loop for child across (plump:children document)
+                   do (plump:append-child node (plump:clone-node child))))
     working-nodes))
 
 (define-node-function index (node)
