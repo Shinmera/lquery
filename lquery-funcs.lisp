@@ -567,8 +567,7 @@ If no matching element can be found the root is entered instead."
 (define-node-list-function replace-with (working-nodes html-or-nodes)
   "Replace each element with the provided new content and return the set of elements that was removed."
   (let ((new-nodes (nodes-or-build html-or-nodes)))
-    (nodefun-after working-nodes new-nodes)
-    (nodefun-remove working-nodes)
+    (nodefun-replace-all new-nodes working-nodes)
     working-nodes))
 
 (define-node-list-function show (working-nodes)
