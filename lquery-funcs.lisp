@@ -368,7 +368,8 @@ If no matching element can be found the root is entered instead."
         (plump:clear node)
         (plump:parse new-content :root node)
         node)
-      (plump:serialize node NIL)))
+      (with-output-to-string (stream)
+        (plump:serialize (plump:children node) stream))))
 
 (define-node-list-function html-file (working-nodes pathname)
   "Read an HTML file and insert its contents into each element."
