@@ -108,10 +108,7 @@
 
 (define-node-function after (node html-or-nodes)
   "Insert content (in html-string or node-list form) after each element."
-  (buildnode:insert-children 
-   (dom:parent-node node) 
-   (1+ (nodefun-child-index node))
-   (nodes-or-build html-or-nodes))
+  (plump::vector-append (plump:family node) (nodes-or-build html-or-nodes))
   node)
 
 (define-node-list-function ancestor (working-nodes)
