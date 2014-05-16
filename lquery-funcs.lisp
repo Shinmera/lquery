@@ -6,6 +6,9 @@
 
 (in-package :lquery-funcs)
 
+(import '(lquery::make-proper-vector
+          lquery::copy-proper-vector))
+
 (defun trim (string &optional (chars '(#\Space #\Tab #\Newline)))
   (string-trim chars string))
 
@@ -16,92 +19,80 @@
 
 (defun symb (&rest args)
   "Interns the mkstr output/returns as symbol."
-  (values (intern (apply #'mkstr args))))
+  (let ((name (apply #'mkstr args)))
+    (values (or (find-symbol name)
+                (intern name)))))
 
 (defun assure-attribute (symbol-or-string)
   (trim
    (string-downcase
-    (if (symbolp symbol-or-string)
-        (symbol-name symbol-or-string)
-        symbol-or-string))))
+    (etypecase symbol-or-string
+      (string symbol-or-string)
+      (symbol (symbol-name symbol-or-string))))))
 
-(defun build-elements (html &optional (document *lquery-master-document*))
-  (let ((buildnode:*document* document))
-    (coerce (dom:child-nodes (buildnode:inner-html html)) 'list)))
+(defun build-elements (html)
+  (plump:parse html))
 
 (defgeneric nodes-or-select (object &optional root)
-  (:documentation "Return the object as a node list or use it to form a select query."))
+  (:documentation "Return the object as a node list or use it to form a select query.")
+  (:method ((string string) &optional (root *lquery-master-document*))
+    (clss:select string root))
+  (:method ((vector vector) &optional (root *lquery-master-document*))
+    (declare (ignore root))
+    vector)
+  (:method ((list list) &optional (root *lquery-master-document*))
+    (declare (ignore root))
+    (copy-proper-vector list))
+  (:method ((node plump:node) &optional (root *lquery-master-document*))
+    (declare (ignore root))
+    (make-proper-vector :size 1 :initial-element node)))
 
-(defmethod nodes-or-select ((selector-or-nodes string) &optional (root *lquery-master-document*))
-  (css:query selector-or-nodes root))
-
-(defmethod nodes-or-select ((selector-or-nodes list) &optional (root *lquery-master-document*))
-  (declare (ignore root))
-  selector-or-nodes)
-
-(defmethod nodes-or-select ((selector-or-nodes dom:node) &optional (root *lquery-master-document*))
-  (declare (ignore root))
-  (list selector-or-nodes))
-
-
-(defgeneric nodes-or-build (object &optional root)
-  (:documentation "Clone the object as a node list or use it to build a new HTML node."))
-
-(defmethod nodes-or-build ((html-or-nodes string) &optional (root *lquery-master-document*))
-  (build-elements html-or-nodes root))
-
-(defmethod nodes-or-build ((html-or-nodes list) &optional (root *lquery-master-document*))
-  (declare (ignore root))
-  (loop for node in html-or-nodes collect (dom:clone-node node T)))
-
-(defmethod nodes-or-build ((html-or-nodes dom:node) &optional (root *lquery-master-document*))
-  (declare (ignore root))
-  (list (dom:clone-node html-or-nodes T)))
-
+(defgeneric nodes-or-build (object)
+  (:documentation "Clone the object as a node list or use it to build a new HTML node.")
+  (:method ((html string))
+    (build-elements html))
+  (:method ((vector vector))
+    (copy-proper-vector vector :transform #'plump:clone-node))
+  (:method ((list list))
+    (copy-proper-vector list :transform #'plump:clone-node))
+  (:method ((node plump:node))
+    (make-proper-vector :size 1 :initial-element (plump:clone-node node))))
 
 (defgeneric funcs-or-select (object)
-  (:documentation "Return the object as a function or use it to construct a node-matches? function."))
-
-(defmethod funcs-or-select ((selector-or-function string))
-  (lambda (node) (funcall #'css:node-matches? node selector-or-function)))
-
-(defmethod funcs-or-select ((selector-or-function function))
-  selector-or-function)
+  (:documentation "Return the object as a function or use it to construct a node-matches? function.")
+  (:method ((selector string))
+    (let ((selector (clss:parse-selector selector)))
+      #'(lambda (node)
+          (clss:select selector node))))
+  (:method ((function function))
+    function))
 
 (defgeneric list-or-selector-func (object)
-  (:documentation "Build a function matching the selector or checking the equality/inclusion of the object."))
-
-(defmethod list-or-selector-func ((selector string))
-  (lambda (node) (css:node-matches? node selector)))
-
-(defmethod list-or-selector-func ((nodes list))
-  (lambda (node) (find node nodes)))
-
-(defmethod list-or-selector-func ((checknode dom:node))
-  (lambda (node) (eql node checknode)))
+  (:documentation "Build a function matching the selector or checking the equality/inclusion of the object.")
+  (:method ((selector string))
+    (let ((selector (clss:parse-selector selector)))
+      #'(lambda (node)
+          (clss:select selector node))))
+  (:method ((nodes list))
+    #'(lambda (node) (find node nodes)))
+  (:method ((checknode plump:node))
+    #'(lambda (node) (eql node checknode))))
 
 (defun get-css-styles (node)
-  (let ((statements (split-sequence:split-sequence #\; (dom:get-attribute node "style")))
-        (css-styles (make-hash-table)))
-    (loop for statement in statements
-         unless (= (length statement) 0)
-         do (let ((keyval (split-sequence:split-sequence #\: statement)))
-              (setf (gethash (symb (assure-attribute (first keyval))) css-styles) (second keyval))))
-    css-styles))
+  (loop with table = (make-hash-table :test 'equalp)
+        for statement in (split-sequence:split-sequence #\; (plump:attribute node "style"))
+        unless (= (length statement) 0)
+          do (let ((keyval (split-sequence:split-sequence #\: statement)))
+               (setf (gethash (assure-attribute (first keyval)) table) (second keyval)))
+        finally (return table)))
 
 (defun set-css-styles (node css-styles)
-  (dom:set-attribute node "style"
-                     (with-output-to-string (s)
-                       (loop for key being the hash-keys of css-styles
-                            for val being the hash-values of css-styles
-                            unless (= (length val) 0)
-                            do (format s "~a:~a;" (assure-attribute key) val)))))
-
-
-
-
-
-
+  (setf (plump:attribute node "style")
+        (with-output-to-string (s)
+          (loop for key being the hash-keys of css-styles
+                for val being the hash-values of css-styles
+                unless (= (length val) 0)
+                  do (format s "~a: ~a;" (assure-attribute key) val)))))
 
 
 
