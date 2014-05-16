@@ -10,7 +10,7 @@
 
 (defun make-proper-vector (&key (size 0) initial-element initial-contents (fill-pointer T))
   (make-array size :initial-element initial-element :initial-contents initial-contents
-                   :adjustable T :fill-pointer fill-pointer :element-type 'plump:node))
+                   :adjustable T :fill-pointer fill-pointer))
 
 (defgeneric copy-proper-vector (sequence &key transform)
   (:method ((vector sequence) &key (transform #'identity))
