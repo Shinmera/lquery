@@ -488,32 +488,42 @@ If no matching element can be found the root is entered instead."
         do (plump::vector-append (plump:children node) working-nodes 0))
   working-nodes)
 
-(define-node-function prev (node &optional selector)
+(define-node-list-function prev (nodes &optional selector)
   "Get the immediately preceding sibling of each element (if there is one). If a selector is provided, the sibling is only included if it matches."
-  (let ((family (nodefun-children (nodefun-parent node)))
-        (index (nodefun-index node)))
-    (if (> index 0)
-        (let ((sibling (nth (1- index) family)))
-          (if (or (not selector) (css:node-matches? sibling selector))
-              sibling)))))
+  (when (stringp selector)
+    (setf selector (clss:parse-selector selector)))
+  (replace-vector-if nodes #'(lambda (sibling)
+                               (and sibling (or (not selector) (clss:node-matches-p selector sibling))))
+                     :key #'plump:previous-element))
 
-(define-node-function prev-all (node &optional selector)
+(define-node-list-function prev-all (nodes &optional selector)
   "Get all preceeding siblings of each element. If a selector is provided, the sibling is only included if it matches."
-  (let ((family (nodefun-children (nodefun-parent node)))
-        (index (nodefun-index node)))
-    (if (> index 0)
-        (let ((family (reverse (subseq family 0 index))))
-          (if selector 
-              (remove-if-not (lambda (node) (css:node-matches? node selector)) family)
-              family)))))
+  (when (stringp selector)
+    (setf selector (clss:parse-selector selector)))
+  (loop with result = (make-proper-vector)
+        for node across nodes
+        do (loop for i downfrom (1- (plump:child-position node))
+                   above 0
+                 for sibling = (aref (plump:family node) i)
+                 do (when (and (plump:element-p sibling)
+                               (or (not selector)
+                                   (clss:node-matches-p selector sibling)))
+                      (vector-push-extend sibling result)))
+        finally (return result)))
 
-(define-node-function prev-until (node selector-or-nodes)
+(define-node-list-function prev-until (nodes selector-or-nodes)
   "Get all preceeding silings of each element down to (excluding) the element matched by the selector or node list."
-  (let ((family (nodefun-prev-all node))
-        (find-fun (nodes-or-selector-func selector-or-nodes)))
-    (loop for sibling in family
-       until (funcall find-fun sibling)
-       collect sibling)))
+  (loop with fun = (nodes-or-selector-func selector-or-nodes)
+        with result = (make-proper-vector)
+        for node across nodes
+        do (loop for i downfrom (1- (plump:child-position node))
+                   above 0
+                 for sibling = (aref (plump:family node) i)
+                 until (and (plump:element-p sibling)
+                            (funcall fun sibling))
+                 do (when (plump:element-p sibling)
+                      (vector-push-extend sibling result)))
+        finally (return result)))
 
 (define-node-function remove (node &optional selector)
   "Remove the set of matched elements from the DOM."
