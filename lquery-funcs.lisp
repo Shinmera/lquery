@@ -613,10 +613,18 @@ If no matching element can be found the root is entered instead."
 
 (define-node-function toggle-class (node &rest classes)
   "Add or remove one or more classes from each element, depending on their presence within the element."
-  (loop for class in classes
-     do (if (nodefun-has-class node class)
-            (nodefun-remove-class node class)
-            (nodefun-add-class node class)))
+  (let ((list (split-sequence #\Space (plump:attribute node "class") :remove-empty-subseqs T)))
+    (loop for class in classes
+          if (member class list :test #'string=)
+            collect class into to-remove
+          else
+            collect class into to-add
+          finally (setf (plump:attribute node "class")
+                        (with-output-to-string (stream (format NIL "~{~a~^ ~}" to-add))
+                          (loop for item in list
+                                do (unless (member item to-remove :test #'string=)
+                                     (write-char #\Space)
+                                     (write-string item stream)))))))
   node)
 
 (define-node-function unwrap (node)
