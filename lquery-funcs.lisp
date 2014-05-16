@@ -101,12 +101,10 @@
 
 (define-node-function add-class (node &rest classes)
   "Adds the specified class(es) to the set of matched elements."
-  (let ((attribute (dom:get-attribute node "class")))
-    (loop for class in classes
-         do (setf class (assure-attribute class)
-                  attribute (concatenate 'string attribute " " class)))
-    (dom:set-attribute node "class" (trim attribute))
-    node))
+  (setf (plump:attribute node "class")
+        (with-output-to-string (stream (plump:attribute node "class"))
+          (format stream "~{ ~a~}" classes)))
+  node)
 
 (define-node-function after (node html-or-nodes)
   "Insert content (in html-string or node-list form) after each element."
