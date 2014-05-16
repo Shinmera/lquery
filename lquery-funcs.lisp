@@ -325,11 +325,11 @@ If no matching element can be found the root is entered instead."
 (define-node-function html (node &optional new-content)
   "Get the HTML contents of the elements or set the HTML contents of every matched element."
   (if new-content
-      (progn 
-        (nodefun-empty node)
-        (buildnode:append-nodes node (build-elements new-content))
+      (progn
+        (plump:clear node)
+        (plump:parse new-content :root node)
         node)
-      (nodefun-serialize node :omit-self T :doctype NIL)))
+      (plump:serialize node NIL)))
 
 (define-node-list-function html-file (working-nodes pathname)
   "Read an HTML file and insert its contents into each element."
