@@ -31,7 +31,7 @@
       (symbol (symbol-name symbol-or-string))))))
 
 (defun build-elements (html)
-  (plump:parse html))
+  (plump:children (plump:parse html)))
 
 (defgeneric nodes-or-select (object &optional root)
   (:documentation "Return the object as a node list or use it to form a select query.")
@@ -130,8 +130,8 @@
 
 (define-node-list-function append-to (working-nodes selector-or-nodes)
   "Insert every element to the end of the target(s)."
-  (loop for target in (nodes-or-select selector-or-nodes)
-       do (nodefun-append target working-nodes))
+  (loop for target across (nodes-or-select selector-or-nodes)
+        do (plump::vector-append (plump:children target) working-nodes))
   working-nodes)
 
 (define-node-function attr (node &rest pairs)
