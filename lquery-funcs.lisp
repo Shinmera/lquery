@@ -289,11 +289,15 @@ If no matching element can be found the root is entered instead."
 
 (define-node-list-function first (working-nodes)
   "Reduce the set of matched elements to the first in the set."
-  (list (first working-nodes)))
+  (setf (fill-pointer working-nodes) 1))
 
 (define-node-list-function gt (working-nodes index)
   "Select all elements at a greater than index(0) within the matched set."
-  (subseq working-nodes index))
+  (loop for i from 0 below (- (length working-nodes) index)
+        do (setf (aref working-nodes i)
+                 (aref working-nodes (+ i index)))
+        finally (setf (fill-pointer working-nodes) (- (length working-nodes) index)))
+  working-nodes)
 
 (define-node-function has (node selector-or-nodes)
   "Reduce the set of matched elements to those that have a descendant that matches the selector or element."
