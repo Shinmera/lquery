@@ -451,12 +451,18 @@ If no matching element can be found the root is entered instead."
   "Get the parent of each element, optionally filtered by a selector."
   (replace-vector-if nodes (nodes-or-selector-func selector) :key #'plump:parent))
 
-(define-node-function parents (node &optional selector)
+(define-node-list-function parents (nodes &optional selector)
   "Get the ancestors of each element, optionally filtered by a selector. Closest parent first."
-    (loop for parent = (dom:parent-node node) then (dom:parent-node parent)
-       while (not (dom:document-p parent))
-       if (or (not selector) (css:node-matches? parent selector))
-       collect parent))
+  (when (stringp selector)
+    (setf selector (clss:parse-selector selector)))
+  (loop with result = (make-proper-vector)
+        for node across nodes
+        do (loop for parent = (plump:parent node)
+                   then (plump:parent parent)
+                 until (or (not parent) (plump:root-p parent))
+                 do (when (or (not selector) (clss:node-matches-p selector parent))
+                      (vector-push-extend selector result)))
+        finally (return result)))
 
 (define-node-function parents-until (node selector-or-nodes)
   "Get the ancestors of each element, up to (excluding) the element matched by the selector or node list. Closest parent first"
