@@ -544,11 +544,11 @@ If no matching element can be found the root is entered instead."
                            (split-sequence #\Space (plump:attribute node "class") :remove-empty-subseqs T))))
   node)
 
-(define-node-list-function remove-data (working-nodes &rest data)
+(define-node-function remove-data (node &rest data)
   "Remove data attributes from each element. This is a convenience method and uses remove-attr in the back."
-  (apply #'nodefun-remove-attr 
-         working-nodes 
-         (mapcar (lambda (it) (concatenate 'string "data-" (assure-attribute it))) data)))
+  (loop for dat in data
+        do (plump:remove-attribute node (concatenate 'string "data-" dat)))
+  node)
 
 (define-node-list-function replace-all (working-nodes selector-or-nodes)
   "Replace each target element with the set of matched elements."
