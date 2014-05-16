@@ -9,8 +9,10 @@
 (defvar *lquery-master-document* NIL)
 
 (defun make-proper-vector (&key (size 0) initial-element initial-contents (fill-pointer T))
-  (make-array size :initial-element initial-element :initial-contents initial-contents
-                   :adjustable T :fill-pointer fill-pointer))
+  (cond
+    (initial-element  (make-array size :initial-element initial-element :adjustable T :fill-pointer fill-pointer))
+    (initial-contents (make-array size :initial-contents initial-contents :adjustable T :fill-pointer fill-pointer))
+    (T                (make-array size :adjustable T :fill-pointer fill-pointer))))
 
 (defgeneric copy-proper-vector (sequence &key transform)
   (:method ((vector sequence) &key (transform #'identity))
