@@ -16,6 +16,4 @@
   :description "A library to allow jQuery-like HTML/DOM manipulation. Unit tests package."
   :components ((:file "lquery-test"))
   :depends-on (:lquery
-               :fiveam
-               :cxml-dom
-               :buildnode))
+               :fiveam))
