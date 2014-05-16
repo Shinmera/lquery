@@ -203,11 +203,12 @@
   "Retrieve or set data attributes on a node. This is a convenience method and uses attr in the back."
   (case (length pairs)
     (0 (error "Data attribute arguments must be one or more attributes or one or more key-value pairs."))
-    (otherwise (loop for attr in pairs
-                  for i = 0 then (1+ i)
-                  do (if (symbolp attr)
-                         (setf (nth i pairs) (symb "data-" attr)))
-                  finally (return (apply #'nodefun-attr node pairs))))))
+    (1 (plump:attribute node (concatenate 'string "data-" (assure-attribute (first pairs)))))
+    (otherwise
+     (loop for (key val) on pairs by #'cddr
+           do (setf (plump:attribute node (concatenate 'string "data-" (assure-attribute (first pairs))))
+                    val))
+     node)))
 
 (define-node-function deepest (node)
   "Returns the innermost (left-bound) child element."
