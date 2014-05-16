@@ -484,8 +484,8 @@ If no matching element can be found the root is entered instead."
 
 (define-node-list-function prepend-to (working-nodes selector-or-nodes)
   "Insert every element to the beginning of the target(s)."
-  (loop for target in (nodes-or-select selector-or-nodes)
-     do (nodefun-prepend target working-nodes))
+  (loop for node across (nodes-or-select selector-or-nodes)
+        do (plump::vector-append (plump:children node) working-nodes 0))
   working-nodes)
 
 (define-node-function prev (node &optional selector)
