@@ -60,7 +60,8 @@ All node functions are automatically created in the lquery-funcs package."
                    do (setf (aref ,node-name ,i)
                             (,funsymb (aref ,node-name ,i)))
                    finally (return ,node-name))
-             (,funsymb ,node-name))))))
+             (,funsymb ,node-name)))
+       ,node-name)))
 
 (defmacro define-node-list-function (name (list-name &rest arguments) &optional docstring &body body)
   "Defines a new function that operates on the current node array instead of individual elements.
@@ -140,7 +141,7 @@ define-symbol-handler, respectively.")
   `(determine-symbol ,symbol ,nodes))
 
 (define-argument-handler string (string nodes)
-  `(clss:select ',(clss:parse-selector string) ,nodes))
+  `(clss:select ,(clss:parse-selector string) ,nodes))
 
 (defgeneric determine-symbol (symbol nodes)
   (:documentation "Determines what to do with a given symbol at run-time (variable type)."))
