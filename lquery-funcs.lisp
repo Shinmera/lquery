@@ -152,22 +152,16 @@
 (define-node-function children (node &optional selector)
   "Get the children of each element, optionally filtered by a selector."
   (if selector
-      (css:query selector node)
-      (loop for child across (dom:child-nodes node)
-           unless (or (dom:text-node-p child) (dom:comment-p child))
-           collect child)))
+      (clss:select selector node)
+      (plump:child-elements node)))
 
 (define-node-function child-index (node)
   "Returns the index of the element within its parent, also counting text nodes. See index() otherwise."
-  (loop with children = (dom:child-nodes (dom:parent-node node))
-     for child across children
-     for i upto (length children)
-     until (eql node child)
-     finally (return i)))
+  (plump:child-position node))
 
 (define-node-function clone (node)
   "Create a deep copy of the set of matched elements."
-  (dom:clone-node node T))
+  (plump:clone-node node))
 
 (define-node-function closest (node selector)
   "For each element in the set, get the first element that matches the selector by testing the element itself and traversing up through its ancestors in the DOM tree."
