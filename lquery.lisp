@@ -141,7 +141,7 @@ define-symbol-handler, respectively.")
   `(determine-symbol ,symbol ,nodes))
 
 (define-argument-handler string (string nodes)
-  `(clss:select ,(clss:parse-selector string) ,nodes))
+  `(clss:select ,string ,nodes))
 
 (defgeneric determine-symbol (symbol nodes)
   (:documentation "Determines what to do with a given symbol at run-time (variable type)."))
