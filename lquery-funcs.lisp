@@ -138,11 +138,11 @@
   "Retrieve or set attributes on a node"
   (case (length pairs)
     (0 (error "Attribute arguments must be one or more attributes or one or more key-value pairs."))
-    (1 (dom:get-attribute node (assure-attribute (first pairs))))
+    (1 (plump:attribute node (assure-attribute (first pairs))))
     (otherwise 
      (loop for (key val) on pairs by #'cddr
-        do (buildnode:set-attribute node key val)
-        finally (return node)))))
+           do (setf (plump:attribute node key) val))
+     node)))
 
 (define-node-function before (node html-or-nodes)
   "Insert content (in html-string or node-list form) before each element."
