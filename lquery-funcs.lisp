@@ -714,11 +714,18 @@ If no matching element can be found the root is entered instead."
   nodes)
 
 (define-node-list-function wrap-all (working-nodes html-or-nodes)
-  "Wrap an HTML structure around all elements inside their next (common) ancestor."
-  (let ((parent (nodefun-ancestor working-nodes))
-        (wrapper (aref (nodes-or-build html-or-nodes) 0)))
-    (setf (aref (plump:family parent) (plump:child-position parent)) wrapper)
-    (plump:append-child wrapper parent))
+  "Wrap an HTML structure around all elements and put it in place of the first element, removing all other elements from their position."
+  (let* ((first (aref working-nodes 0))
+         (parent (plump:parent first))
+         (position (plump:child-position first))
+         (wrapper (aref (nodes-or-build html-or-nodes) 0)))
+    (plump:append-child wrapper first)
+    (loop for i from 1 below (length working-nodes)
+          for node = (aref working-nodes i)
+          do (plump:remove-child node)
+             (plump:append-child wrapper node))
+    (setf (aref (plump:children parent) position) wrapper
+          (plump:parent wrapper) parent))
   working-nodes)  
 
 (define-node-list-function wrap-inner (nodes html-or-nodes)
