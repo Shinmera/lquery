@@ -163,12 +163,15 @@
   "Create a deep copy of the set of matched elements."
   (plump:clone-node node))
 
-;;@todo
 (define-node-function closest (node selector)
-  "For each element in the set, get the first element that matches the selector by testing the element itself and traversing up through its ancestors in the DOM tree."
-  (if (css:node-matches? node selector)
-      node
-      (nodefun-closest (dom:parent-node node) selector)))
+  "For each element in the set, get the first element that matches the selector by testing the element itself and traversing up through its ancestors in the DOM tree.
+If no matching element can be found the root is entered instead."
+  (when (stringp selector)
+    (setf selector (clss:parse-selector selector)))
+  (loop for node = (plump:parent node)
+        until (or (plump:root-p node)
+                  (clss:node-matches-p selector node)))
+  node)
 
 (define-node-list-function contains (nodes string)
   "Select all elements that contain the specified text."
@@ -252,9 +255,9 @@
 (define-node-list-function even (working-nodes)
   "Selects even elements."
   (loop for node in working-nodes 
-     for i from 1 upto (length working-nodes)
-     if (evenp i)
-     collect node))
+        for i from 1 upto (length working-nodes)
+        if (evenp i)
+          collect node))
 
 (define-node-function filter (node selector-or-function)
   "Reduce the set of matched elements to those that match the selector or pass the function's test."
