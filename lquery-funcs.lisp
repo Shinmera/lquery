@@ -111,6 +111,7 @@
   (plump::vector-append (plump:family node) (nodes-or-build html-or-nodes))
   node)
 
+;;@todo
 (define-node-list-function ancestor (working-nodes)
   "Find the common ancestor of all elements."
   (loop with parentlists = (loop for node in working-nodes 
@@ -124,7 +125,7 @@
 
 (define-node-function append (node html-or-nodes)
   "Insert content (in html-string or node-list form) to the end of each element."
-  (mapc #'(lambda (new-child) (dom:append-child node new-child)) (nodes-or-build html-or-nodes)) 
+  (plump::vector-append (plump:children node) (nodes-or-build html-or-nodes)) 
   node)
 
 (define-node-list-function append-to (working-nodes selector-or-nodes)
