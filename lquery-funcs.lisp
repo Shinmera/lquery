@@ -392,14 +392,18 @@ If no matching element can be found the root is entered instead."
         finally (setf (fill-pointer working-nodes) i))
   working-nodes)
 
-(define-node-function next (node &optional selector)
+(define-node-list-function next (nodes &optional selector)
   "Get the immediately following sibling of each element (if there is one). If a selector is provided, the sibling is only included if it matches."
-  (let ((family (nodefun-children (nodefun-parent node)))
-        (index (nodefun-index node)))
-    (if (< index (1- (length family)))
-        (let ((sibling (nth (1+ index) family)))
-          (if (or (not selector) (css:node-matches? sibling selector))
-              sibling)))))
+  (when (stringp selector)
+    (setf selector (clss:parse-selector selector)))
+  (loop with i = 0
+        for node across nodes
+        for sibling = (plump:next-element node)
+        do (when (and sibling (or (not selector) (clss:node-matches-p selector sibling)))
+             (setf (aref nodes i) sibling)
+             (incf i))
+        finally (setf (fill-pointer nodes) i))
+  nodes)
 
 (define-node-function next-all (node &optional selector)
   "Get all following siblings of each element. If a selector is provided, the sibling is only included if it matches."
