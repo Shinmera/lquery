@@ -644,12 +644,14 @@ If no matching element can be found the root is entered instead."
           (plump:remove-attribute node "value"))
       (plump:attribute node "value")))
 
-(define-node-function wrap (node html-or-nodes)
-  "Wrap an HTML structure around each element. Note that always the first subnode is chosen."
-  (let ((outer-wrapper (nodes-or-build html-or-nodes)))
-    (nodefun-prepend (nodefun-deepest outer-wrapper) node)
-    (nodefun-replace-all outer-wrapper node))
-  node)
+(define-node-list-function wrap (nodes html-or-nodes)
+  "Wrap an HTML structure around each element. Note that always the first node of the structure to wrap is chosen."
+  (let ((base (aref (nodes-or-build html-or-nodes) 0)))
+    (loop for node across nodes
+          for wrapper = (plump:clone-node base)
+          do (setf (aref (plump:family node) (plump:child-position node)) wrapper)
+             (plump:append-child wrapper node)))
+  nodes)
 
 (define-node-list-function wrap-all (working-nodes html-or-nodes)
   "Wrap an HTML structure around all elements inside their next (common) parent."
