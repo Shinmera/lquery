@@ -479,7 +479,7 @@ If no matching element can be found the root is entered instead."
 
 (define-node-function prepend (node html-or-nodes)
   "Insert content, specified by the parameter, to the beginning of each element."
-  (apply #'buildnode:insert-nodes node 0 (nodes-or-build html-or-nodes))
+  (plump::vector-append (plump:children node) (nodes-or-build html-or-nodes) 0)
   node)
 
 (define-node-list-function prepend-to (working-nodes selector-or-nodes)
