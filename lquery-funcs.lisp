@@ -566,7 +566,7 @@ If no matching element can be found the root is entered instead."
 
 (define-node-list-function show (working-nodes)
   "Display the matched elements (short for (css :display 'block'))"
-  (nodefun-css working-nodes :display "block"))
+  (nodefun-css working-nodes "show" "block"))
 
 (define-node-function siblings (node &optional selector)
   "Get the siblings of each element, optionally filtered by a selector."
