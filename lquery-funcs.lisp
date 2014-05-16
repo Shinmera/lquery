@@ -654,19 +654,11 @@ If no matching element can be found the root is entered instead."
   nodes)
 
 (define-node-list-function wrap-all (working-nodes html-or-nodes)
-  "Wrap an HTML structure around all elements inside their next (common) parent."
-  (loop with wrapper-template = (first (nodes-or-build html-or-nodes))
-     with parentmap = (make-hash-table)
-     for node in working-nodes
-     for parent = (dom:parent-node node)
-     do (setf (gethash parent parentmap)
-              (append (gethash parent parentmap) (list node))) 
-     finally (loop for parent being the hash-keys of parentmap
-                for children being the hash-values of parentmap
-                for wrapper = (dom:clone-node wrapper-template T)
-                for index = (first (sort (nodefun-child-index children) #'<))
-                do (buildnode:insert-nodes (nodefun-deepest wrapper) 0 children)
-                   (buildnode:insert-nodes parent index wrapper)))
+  "Wrap an HTML structure around all elements inside their next (common) ancestor."
+  (let ((parent (nodefun-ancestor working-nodes))
+        (wrapper (aref (nodes-or-build html-or-nodes) 0)))
+    (setf (aref (plump:family parent) (plump:child-position parent)) wrapper)
+    (plump:append-child wrapper parent))
   working-nodes)  
 
 (define-node-function wrap-inner (node html-or-nodes)
