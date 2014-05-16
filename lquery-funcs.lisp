@@ -507,15 +507,18 @@ If no matching element can be found the root is entered instead."
                  do (vector-push-extend parent result))
         finally (return result)))
 
-(define-node-function prepend (node html-or-nodes)
+(define-node-list-function prepend (nodes html-or-nodes)
   "Insert content, specified by the parameter, to the beginning of each element."
-  (plump::vector-append (plump:children node) (nodes-or-build html-or-nodes) 0)
-  node)
+  (let ((inserts (nodes-or-build html-or-nodes)))
+    (loop for node across nodes
+          do (loop for insert across inserts
+                   do (plump:prepend-child node (plump:clone-node insert)))))
+  nodes)
 
 (define-node-list-function prepend-to (working-nodes selector-or-nodes)
   "Insert every element to the beginning of the target(s)."
-  (loop for node across (nodes-or-select selector-or-nodes)
-        do (plump::vector-append (plump:children node) working-nodes 0))
+  (let ((targets (nodes-or-select selector-or-nodes)))
+    (nodefun-prepend targets working-nodes))
   working-nodes)
 
 (define-node-list-function prev (nodes &optional selector)
