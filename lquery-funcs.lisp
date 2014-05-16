@@ -320,9 +320,10 @@ If no matching element can be found the root is entered instead."
         for node across nodes
         do (labels ((r (node)
                       (loop for child across (plump:children node)
-                            do (r child)
-                            when (funcall func child)
-                              do (vector-push-extend child result))))
+                            do (when (plump:element-p child)
+                                 (r child)
+                                 (when (funcall func child)
+                                   (vector-push-extend child result))))))
              (r node))
            (when (and test-self (funcall func node))
              (vector-push-extend node result))
