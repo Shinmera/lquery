@@ -359,9 +359,8 @@ If no matching element can be found the root is entered instead."
 (define-node-list-function is (working-nodes selector-or-nodes)
   "Check the current elements against a selector or list of elements and return true if at least one of them matches."
   (let ((find-fun (list-or-selector-func selector-or-nodes)))
-    (loop for node in working-nodes
-       if (funcall find-fun node)
-       return T)))
+    (loop for node across working-nodes
+          thereis (funcall find-fun node))))
 
 (define-node-list-function is-empty (working-nodes)
   "Check if the node contains no children and/or only empty (whitespace) text nodes. If it is empty, T is returned, otherwise NIL."
