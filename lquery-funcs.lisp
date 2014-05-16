@@ -241,8 +241,7 @@
 
 (define-node-function empty (node)
   "Remove all child nodes from the set of matched elements."
-  (buildnode:remove-all-children node)
-  node)
+  (plump:clear node))
 
 (define-node-list-function eq (working-nodes index)
   "Reduce the set of matched elements to the one at the specified index"
