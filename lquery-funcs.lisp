@@ -112,8 +112,8 @@
 (define-node-function add-class (node &rest classes)
   "Adds the specified class(es) to the set of matched elements."
   (setf (plump:attribute node "class")
-        (with-output-to-string (stream (plump:attribute node "class"))
-          (format stream "~{ ~a~}" classes)))
+        (with-output-to-string (stream)
+          (format stream "~@[~a ~]~{~a~^ ~}" (plump:attribute node "class") classes)))
   node)
 
 (define-node-function after (node html-or-nodes)
