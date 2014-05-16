@@ -63,7 +63,7 @@
   (:method ((selector string))
     (let ((selector (clss:parse-selector selector)))
       #'(lambda (node)
-          (clss:select selector node))))
+          (clss:node-matches-p selector node))))
   (:method ((function function))
     function))
 
@@ -72,7 +72,7 @@
   (:method ((selector string))
     (let ((selector (clss:parse-selector selector)))
       #'(lambda (node)
-          (clss:select selector node))))
+          (clss:node-matches-p selector node))))
   (:method ((nodes list))
     #'(lambda (node) (find node nodes)))
   (:method ((checknode plump:node))
@@ -272,13 +272,20 @@ If no matching element can be found the root is entered instead."
         finally (setf (fill-pointer nodes) i))
   nodes)
 
-(define-node-function find (node selector-or-function &key (test-self NIL))
+(define-node-list-function find (nodes selector-or-function &key (test-self NIL))
   "Get the descendants of each element filtered by selector or function."
-  (loop for child in (nodefun-children (list node))
-       collect (nodefun-find child selector-or-function :test-self T) into matched
-       finally (return (if (and test-self (nodefun-filter node selector-or-function))
-                           (concatenate 'list (list node) matched)
-                           matched))))
+  (loop with result = (make-proper-vector)
+        with func = (funcs-or-select selector-or-function)
+        for node across nodes
+        do (labels ((r (node)
+                      (loop for child across (plump:children node)
+                            do (r child)
+                            when (funcall func child)
+                              do (vector-push-extend child result))))
+             (r node))
+           (when (and test-self (funcall func node))
+             (vector-push-extend node result))
+        finally (return result)))
 
 (define-node-list-function first (working-nodes)
   "Reduce the set of matched elements to the first in the set."
