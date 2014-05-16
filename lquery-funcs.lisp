@@ -311,7 +311,8 @@ If no matching element can be found the root is entered instead."
 
 (define-node-list-function first (working-nodes)
   "Reduce the set of matched elements to the first in the set."
-  (setf (fill-pointer working-nodes) 1))
+  (setf (fill-pointer working-nodes) 1)
+  working-nodes)
 
 (define-node-list-function gt (working-nodes index)
   "Select all elements at a greater than index(0) within the matched set."
