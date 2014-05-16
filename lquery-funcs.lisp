@@ -53,9 +53,9 @@
   (:method ((html string))
     (build-elements html))
   (:method ((vector vector))
-    (copy-proper-vector vector :transform #'plump:clone-node))
+    (copy-proper-vector vector))
   (:method ((list list))
-    (copy-proper-vector list :transform #'plump:clone-node))
+    (copy-proper-vector list))
   (:method ((node plump:node))
     (make-proper-vector :size 1 :initial-element (plump:clone-node node))))
 
