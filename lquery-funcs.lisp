@@ -344,9 +344,9 @@ If no matching element can be found the root is entered instead."
   "Find the index of the node within its parent."
   (plump:element-position node))
 
-(define-node-list-function initialize (working-nodes document &key (type :XML))
+(define-node-list-function initialize (working-nodes document)
   "Re-initializes lQuery with a new page."
-  (list (initialize (load-page document :type type))))
+  (make-proper-vector :size 1 :initial-element (initialize (load-page document))))
 
 (define-node-list-function insert-after (working-nodes selector-or-nodes)
   "Insert every element after the target."
