@@ -381,9 +381,12 @@ If no matching element can be found the root is entered instead."
     (loop for node across working-nodes
           thereis (funcall find-fun node))))
 
-(define-node-list-function is-empty (working-nodes)
+(define-node-function is-empty (node)
   "Check if the node contains no children and/or only empty (whitespace) text nodes. If it is empty, T is returned, otherwise NIL."
-  (not (nodefun-not-empty working-nodes)))
+  (loop for child across (plump:children node)
+        never (or (plump:element-p child)
+                  (and (plump:text-node-p child)
+                       (< 0 (length (trim (plump:text child))))))))
 
 (define-node-list-function last (working-nodes)
   "Reduce the set of matched elements to the final one in the set."
