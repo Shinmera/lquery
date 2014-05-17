@@ -16,6 +16,7 @@
   :description "A library to allow jQuery-like HTML/DOM manipulation."
   :serial T
   :components ((:file "package")
+               (:file "toolkit")
                (:file "lquery")
                (:file "lquery-funcs"))
   :depends-on (:plump

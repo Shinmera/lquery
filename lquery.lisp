@@ -6,56 +6,6 @@
 
 (in-package :lquery)
 
-(defvar *lquery-master-document* NIL
-  "The master document used at the beginning of a chain.")
-
-(defun make-proper-vector (&key (size 0) initial-element initial-contents (fill-pointer T))
-  "Creates a new proper vector."
-  (cond
-    (initial-element  (make-array size :initial-element initial-element :adjustable T :fill-pointer fill-pointer))
-    (initial-contents (make-array size :initial-contents initial-contents :adjustable T :fill-pointer fill-pointer))
-    (T                (make-array size :adjustable T :fill-pointer fill-pointer))))
-
-(defgeneric copy-proper-vector (sequence &key transform)
-  (:documentation "Copies the sequence into a new proper vector.")
-  (:method ((vector sequence) &key (transform #'identity))
-    (loop with result = (make-proper-vector :size (length vector) :fill-pointer T)
-          for i from 0 below (length vector)
-          do (setf (aref result i)
-                   (funcall transform (aref vector i)))
-          finally (return result)))
-  (:method ((list list) &key (transform #'identity))
-    (loop with length = (length list)
-          with result = (make-proper-vector :size length :fill-pointer T)
-          for i from 0 below length
-          for item in list
-          do (setf (aref result i)
-                   (funcall transform item))
-          finally (return result))))
-
-(defun ensure-proper-vector (var)
-  "Ensure that the variable is a proper vector."
-  (typecase var
-    (vector (if (adjustable-array-p var)
-                var
-                (copy-proper-vector var)))
-    (array (copy-proper-vector var))
-    (list (copy-proper-vector var))
-    (T (make-proper-vector :size 1 :initial-element var))))
-
-(defun load-page (file-or-string)
-  "Load the given file or string into a HTML DOM."
-  (plump:parse file-or-string))
-
-(defun initialize (document)
-  "Sets the *lquery-master-document* variable to the provided document."
-  (setf *lquery-master-document* document)
-  document)
-
-(defun parse-html (html)
-  "Build the given string into DOM objects related to the master document."
-  (lquery-funcs::build-elements html))
-
 (defmacro define-node-function (name (node-name &rest arguments) &body body)
   "Defines a new node function. This is the main mechanism by which node manipulations are defined.
 All node functions are automatically created in the lquery-funcs package.
