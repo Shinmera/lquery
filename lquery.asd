@@ -10,7 +10,7 @@
 
 (defsystem lquery
   :name "lQuery"
-  :version "2.0.6"
+  :version "2.5.1"
   :author "Nicolas Hafner <shinmera@tymoon.eu>"
   :license "Artistic"
   :description "A library to allow jQuery-like HTML/DOM manipulation."
