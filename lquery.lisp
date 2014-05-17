@@ -104,6 +104,9 @@ symbol-handlers. By default, the following cases are handled at run time:
   * STRING    Performs a CLSS:QUERY on the current elements.
   * DOM:NODE  Replaces the current set of nodes with just this node.  
   * FUNCTION  Calls the given function with the current set of nodes as argument.
+  * LIST      Lists are transformed into a proper vector.
+  * ARRAY     Arrays are transformed into a proper vector.
+  * VECTOR    Vectors that are not adjustable are transformed into a proper vector.
   * T         Any other value simply replaces the current list of nodes.
 
 Additional argument and symbol handlers can be defined with define-argument-handler and ~
@@ -152,14 +155,28 @@ define-symbol-handler, respectively.")
      ,@body))
 
 (define-symbol-handler T (variable nodes)
-  (declare (ignorable nodes))
+  (declare (ignore nodes))
   variable)
+
+(define-symbol-handler list (list nodes)
+  (declare (ignore nodes))
+  (copy-proper-vector list))
+
+(define-symbol-handler array (array nodes)
+  (declare (ignore nodes))
+  (copy-proper-vector array))
+
+(define-symbol-handler vector (vector nodes)
+  (declare (ignore nodes))
+  (if (adjustable-array-p vector)
+      vector
+      (copy-proper-vector vector)))
 
 (define-symbol-handler string (selector nodes)
   (clss:select selector nodes))
 
 (define-symbol-handler plump:node (node nodes)
-  (declare (ignorable nodes))
+  (declare (ignore nodes))
   (make-proper-vector :size 1 :initial-element node :fill-pointer T))
 
 (define-symbol-handler function (function nodes)
