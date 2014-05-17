@@ -7,8 +7,9 @@
 
 (defpackage lquery-test
   (:use :cl :lquery :5am)
+  (:shadow :run)
   (:nicknames #:org.tymoonnext.radiance.lib.lquery.test)
-  (:export :lquery))
+  (:export :lquery :run))
 
 (in-package :org.tymoonnext.radiance.lib.lquery.test)
 
@@ -17,6 +18,9 @@
 (defun init-test-environment (&optional (testfile *test-file*))
   "Initializes lQuery with a test HTML file."
   (lquery:initialize (lquery:load-page testfile)))
+
+(defun run ()
+  (5am:run! 'lquery))
 
 (defun vlast (vector)
   (if (= 0 (length vector))
@@ -56,8 +60,7 @@
   (is (eq T
           (labels ((root-p (nodes) (plump:root-p (vfirst nodes))))
             ($ #'root-p))))
-  (is (eq NIL
-          ($ ())))
+  (is (typep ($ ()) 'vector))
   (is (eq T
           ($ (inline T))))
   (is (eq (vfirst ($ "ul"))
