@@ -76,10 +76,7 @@ symbol-handlers. By default, the following cases are handled at run time:
   * LIST      Lists are transformed into a proper vector.
   * ARRAY     Arrays are transformed into a proper vector.
   * VECTOR    Vectors that are not adjustable are transformed into a proper vector.
-  * T         Any other value simply replaces the current list of nodes.
-
-Additional argument and symbol handlers can be defined with define-argument-handler and ~
-define-symbol-handler, respectively.")
+  * T         Any other value simply replaces the current list of nodes.")
   (%$ (reverse actions)))
 
 (defun %$ (actions)
