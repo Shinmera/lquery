@@ -1,30 +1,34 @@
-<!DOCTYPE html><!--
+<!--
   This file is a part of lQuery
-  (c) 2013 TymoonNET/NexT http://tymoon.eu (shinmera@tymoon.eu)
+  (c) 2014 TymoonNET/NexT http://tymoon.eu (shinmera@tymoon.eu)
   Author: Nicolas Hafner <shinmera@tymoon.eu>
-  !--><html xmlns="http://www.w3.org/1999/xhtml">
+  !-->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8"/>
-    <title>lQuery - About</title>
+    <title>lQuery - About - 3.0.0</title>
     <style type="text/css">
       code{font-family: Consolas, Inconsolata, monospace;}
+      code.line{margin-left: 20px;}
+      code a{text-decoration: none; color: blue;}
       h3{display: inline-block;margin:0;padding:0;}
-      .version-diff{color:red;}
       .docs{list-style: none;}
       .docs li{margin-bottom: 20px;}
       .docs pre{margin: 0 0 0 10px; white-space: pre-wrap;}
+      .version-diff{color:red;}
     </style>
   </head>
   <body>
     <header>
       <img src="lquery-logo.png" alt="lQuery"/>
-      <h1>v2.0.0</h1>
+      <h1>v3.0.0</h1>
     </header>
     <div id="content">
       <article>
         <header><h2>What is lQuery?</h2></header>
         <p>
-          lQuery is a DOM manipulation library written in Common Lisp, inspired by and based on the <a href="http://jquery.com/">jQuery</a> syntax and functions. It uses <a href="http://common-lisp.net/project/cxml/">Closure-XML</a> and <a href="https://github.com/AccelerationNet/css-selectors">CSS-Selectors</a> in the background to achieve its work. Its main idea is to replace HTML templating systems and allow generated HTML for websites while relying on pure HTML files. This achieves a much cleaner separation of static and dynamic page parts.
+          lQuery is a DOM manipulation library written in Common Lisp, inspired by and based on the <a href="http://jquery.com/">jQuery</a> syntax and functions. It uses <a href="http://shinmera.github.io/plump">Plump</a> and <a href="http://shinmera.github.io/CLSS/">CLSS</a> as DOM and selector engines. The main idea behind lQuery is to provide a simple interface for crawling and modifying HTML sites, as well as to allow for an alternative approach to templating.
         </p>
       </article>
       <article>
@@ -32,106 +36,143 @@
         <p>
           Load lQuery with ASDF or Quicklisp.
         </p>
-        <code>(ql:quickload :lquery)</code>
+        <code class="line">(ql:quickload :lquery)</code>
         <p>
           First, lQuery needs to be initialized with a document to work on:
         </p>
-        <code>($ (initialize #p"/path/to/input.html"))</code>
+        <code class="line">(<a href="#$">lquery:$</a> (<a href="#INITIALIZE">initialize</a> #p&quot;/path/to/input.html&quot;))</code>
         <p>
           After that, you can use the $ function to select and manipulate the DOM:
         </p>
-        <code>($ "article")</code><br/>
-        <code>($ "article" (add-class "fancy") (attr :foo "bar"))</code>
+        <code class="line">(<a href="#$">lquery:$</a> &quot;article&quot;)</code><br/>
+        <pre><code class="line">(<a href="#$">lquery:$</a> &quot;article&quot;
+    (<a href="#ADD-CLASS">add-class</a> &quot;fancy&quot;)
+    (<a href="#ATTR">attr</a> &quot;foo&quot; &quot;bar&quot;))</code></pre>
         <p>
           To render the HTML to a string use <code>serialize</code>. If you want to save it to a file directly, there's also <code>write-to-file</code>.
         </p>
-        <code>($ (serialize))</code><br/>
-        <code>($ (write-to-file #p"/path/to/output.html"))</code>
+        <code class="line">(<a href="#$">lquery:$</a> (<a href="#SERIALIZE">serialize</a>))</code><br/>
+        <code class="line">(<a href="#$">lquery:$</a> (<a href="#WRITE-TO-FILE">write-to-file</a> #p&quot;/path/to/output.html&quot;))</code>
         <p>
           So a quick file manipulation could look something like this:
         </p>
-        <code>($ (initialize #p"/path/to/input.html") "article" (append-to "content") (add-class "foo") (write-to-file #p"/path/to/output.html"))</code>
+        <pre><code class="line">(<a href="#$">lquery:$</a> (<a href="#INITIALIZE">initialize</a> #p&quot;/path/to/input.html&quot;)
+    &quot;article&quot;
+    (<a href="#APPEND-TO">append-to</a> &quot;content&quot;)
+    (<a href="#ADD-CLASS">add-class</a> &quot;foo&quot;)
+    (<a href="#WRITE-TO-FILE">write-to-file</a> #p&quot;/path/to/output.html&quot;))</code></pre>
         <p>
-          Aside from using selectors as the first step, it's also possible to use any other variable or list and operate on it.
-          <span class="version-diff">Since 2.0</span>: Literal function calls need to be added with (inline).
+          Aside from using selectors as the first step, it's also possible to use any other variable or list and operate on it.<br/>
+          <a href="#2.0.0"><span class="version-diff">2.0</span></a>: Literal function calls need to be added with <code>INLINE</code>.
           Note that the result of the inline function will be used as if literally put in place. For example, an inlined function that evaluates
           to a string will result in a CSS-select.
         </p>
-        <code>($ (inline (list node-a node-b)) "article" (serialize))</code>
+        <pre><code class="line">(<a href="#$">lquery:$</a> (inline (list node-a node-b))
+    &quot;article&quot;
+    (<a href="#SERIALIZE">serialize</a>))</code></pre>
         <p>
           Selectors can come at any point in the sequence of lQuery operations and will always act on the current set of elements.
-          If an operation evaluates to a list or a single node, the current set of elements is set to this result.
+          If an operation evaluates to a list, array, vector or a single node, the current set of elements is set to this result.
         </p>
-        <code>($ "a" (text "Link") ($ "p") (text "Paragraph"))</code>
+        <pre><code class="line">(<a href="#$">lquery:$</a> &quot;a&quot;
+    (<a href="#TEXT">text</a> &quot;Link&quot;)
+    (inline (<a href="#$">lquery:$</a> &quot;p&quot;))
+    (<a href="#TEXT">text</a> &quot;Paragraph&quot;))</code></pre>
         <p>
           This is equivalent to the following:
         </p>
-        <code>($ "a" (text "Link"))</code><br/>
-        <code>($ "p" (text "Paragraph"))</code>
-        <p>
-          While this sort of chaining is possible, it is discouraged and multiple statements should be used instead to ensure proper readability.
-        </p>
+        <pre><code class="line">(<a href="#$">lquery:$</a> &quot;a&quot;
+    (<a href="#TEXT">text</a> &quot;Link&quot;))</code></pre>
+        <pre><code class="line">(<a href="#$">lquery:$</a> &quot;p&quot;
+    (<a href="#TEXT">text</a> &quot;Paragraph&quot;))</code></pre>
         <p>
           Functions in the argument list will be translated to a function invocation with the current list of elements as their argument.
         </p>
-        <code>($ "a" #'(lambda (els) (first els)))</code>
+        <pre><code class="line">(<a href="#$">lquery:$</a> &quot;a&quot;
+    #'(lambda (els) (aref els 0)))</code></pre>
         <p>
-          lQuery<sup class="version-diff">Since 2.0</sup> also supports compile-time evaluation of forms, whose results are then put in place of their function calls:
+          lQuery<a href="#2.0.0"><sup class="version-diff">2.0</sup></a> also supports compile-time evaluation of forms, whose results are then put in place of their function calls:
         </p>
-        <code>($ (eval (format NIL "~a" *selector*)))</code>
+        <code class="line">(<a href="#$">lquery:$</a> (eval (format NIL &quot;~a&quot; *selector*)))</code>
         <p>
           Keep in mind that the lexical environment is not the same at compile-time as at run-time.
         </p>
+        <p>
+          lQuery uses vectors internally to modify and handle sets of nodes. These vectors are usually modified instead of copied to avoid unnecessary resource allocation. This however also means that lQuery functions are possibly side-effecting. If you pass an adjustable vector into lQuery through INLINE or similar, it will not be copied and therefore side-effects might occur. lQuery will automatically copy everything else that isn't an adjustable vector through <code><a href="#ENSURE-PROPER-VECTOR">ENSURE-PROPER-VECTOR</a></code>. If you do want to pass in an adjustable vector, but make sure it doesn't affect it, use <code><a href="#COPY-PROPER-VECTOR">COPY-PROPER-VECTOR</a></code>.
+        </p>
       </article>
       <article>
-        <header><h2>Extending lQuery <sup class="version-diff">For 2.0</sup></h2></header>
+        <header><h2>Test Suite</h2></header>
+        <p>
+          To ensure that functions are at least somewhat stable in their behaviour, lQuery includes a test suite. You can load this through Quicklisp/ASDF with
+        </p>
+        <code class="line">(ql:quickload :lquery-test)</code>
+        <p>
+          Running the suit is simply a matter of invoking <code>RUN</code>
+        </p>
+        <code class="line">(lquery-test:run)</code>
+        <p>
+          The tests are rather loose, but should cover all functions to at least behave mostly according to expectation.
+        </p>
+      </article>
+      <article>
+        <header><h2>Extending lQuery <a href="#3.0.0"><sup class="version-diff">3.0</sup></a></h2></header>
         <p>
           lQuery allows extension in a couple of ways. The most important of which are node operations themselves, which come in two flavours: node-funs and node-list-funs.
-          Any node operation resides in the package :lquery-funcs, which is automatically scanned by the $ macro. The two macros responsible for defining new node functions automatically
+          Any node operation resides in the package <code>LQUERY-FUNCS</code>, which is automatically scanned by the $ macro. The two macros responsible for defining new node functions automatically
           place the resulting operations in this package for you.
         </p>
-        <code>(define-node-function name (node-name &amp;rest arguments) &amp;optional docstring &amp;body body)</code><br/>
-        <code>(define-node-list-function name (list-name &amp;rest arguments) &amp;optional docstring &amp;body body)</code>
+        <code class="line">(<a href="#DEFINE-NODE-FUNCTION">define-node-function</a> name (node-name &amp;rest arguments) &amp;body body)</code><br/>
+        <code class="line">(<a href="#DEFINE-NODE-LIST-FUNCTION">define-node-list-function</a> name (vector-name &amp;rest arguments) &amp;body body)</code>
         <p>
-          Any function generated by these macros can be called either with a single node or a list of nodes. In the case of a regular node operation, if it receives a list of nodes, the
-          function is called once for each node and the results are collected into a list, which is then returned. If it receives a single node, only a single result is returned. In the
-          case of a node list function, the return value can be either a list or a single value, depending on what the goal of the operation is.
+          Any function generated by these macros can be called either with a single node or a vector of nodes. In the case of a regular node operation, if it receives a vector of nodes, the
+          function is called once for each node and the results are collected into a vector, which is then returned. If it receives a single node, only a single result is returned. In the
+          case of a node list function, the return value can be either a vector or a single value, depending on what the goal of the operation is. It is expected that node list functions will
+          modify the given vector directly in order to avoid unnecessary copying.
         </p>
         <p>
-          The $ macro itself can be extended as well by providing additional argument- or symbol-handlers. The following two macros make this possible:
+          The $ macro itself can be extended as well by providing additional argument- or value-handlers. The following two macros make this possible:
         </p>
-        <code>(define-argument-handler type (argsname nodesname) &amp;body body)</code>
+        <code class="line">(<a href="#DEFINE-ARGUMENT-HANDLER">define-argument-handler</a> type (argument-name operator-name) &amp;body body)</code>
         <p>
           Argument handlers transform the arguments at compile-time. For example, this would allow an extension to turn literal arrays into lists so they can be processed as well.
         </p>
-        <code>(define-symbol-handler type (symbolname nodesname) &amp;body body)</code>
+        <code class="line">(<a href="#DEFINE-VALUE-HANDLER">define-value-handler</a> type (variable-name operator-name) &amp;body body)</code>
         <p>
-          Symbol handlers on the other hand determine the action at run-time. This is mostly useful for defining special actions on certain variable values.
+          Value handlers on the other hand determine the action at run-time. This is mostly useful for defining special actions on certain variable values.
         </p>
+      </article>
+      <article>
+        <header><h2>What's New</h2></header>
+        <a name="3.0.0"/><h3>3.0.0</h3>
+        <p>Complete rewrite of everything. This version is <strong class="version-diff">compatibility breaking</strong>. While the node functions themselves perform just the same as before (with one or two exceptions), lQuery now uses vectors instead of lists internally. If you ever relied on lQuery return values, this version will most likely break your code. Effort has been made to keep upgrading as simple as possible though; passing lists into an lQuery chain automatically transforms it for example.</p>
+        <p>Thanks to the change to Plump, lQuery is now also able to parse almost any kind of X/HT/ML document, which was not well possible previously. And thanks to switching to CLSS, lQuery is now much faster at selecting nodes from the DOM.</p>
+        <a name="2.0.0"/><h3>2.0.0</h3>
+        <p>Added extension system and INLINE, EVAL handling. Revamped base macros to be more stable and simple.</p>
       </article>
       <article>
         <header><h2>Other Guff</h2></header>
         <p>
-          lQuery is a sub-project of TyNETv5 ("Radiance"), licensed under the <a href="http://opensource.org/licenses/Artistic-2.0">Artistic License 2.0</a> and ©2013 TymoonNET/NexT, <a href="http://shinmera.com">Nicolas Hafner</a>.<br/>
+          lQuery is a sub-project of TyNETv5 (&quot;Radiance&quot;), licensed under the <a href="http://opensource.org/licenses/Artistic-2.0">Artistic License 2.0</a> and ©2013 TymoonNET/NexT, <a href="http://shinmera.com">Nicolas Hafner</a>.<br/>
           This library can be obtained via git on <a href="https://github.com/Shinmera/lquery.git">https://github.com/Shinmera/lquery.git</a>. For questions, patches or suggestions, please contact me via <a href="mailto:shinmera@tymoon.eu">email</a> or write a <a href="https://github.com/Shinmera/lquery/issues">github issue</a>.
         </p>
       </article>
       <article>
         <header><h2>lQuery Package Function Index</h2></header>
         <ul id="docs" class="docs"><li id="template">
-            <a class="anchor" name="$"/>
             <article>
+              <a name="$" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL MACRO</span>
                 <code>
-                  <h3 class="funcname">$</h3>
+                  <h3><a href="#$" class="funcname">$</a></h3>
                   <span class="funcargs">(&amp;BODY ACTIONS)</span>
                 </code>
               </header>
               <pre class="funcdesc">Performs lQuery operations on the current document.
 
 Each argument is executed in sequence. The arguments are evaluated according to the defined argument-handlers. By default, the following cases are handled: 
-  * STRING    Translates to a CSS-select on the current elements.
+  * STRING    Translates to a CLSS:QUERY on the current elements.
   * LIST      What lists translate to is determined by their first element:
     * EVAL      The second value of the list is evaluated at compile-time and the result is inlined as if it had been there as a standard argument to $.
     * INLINE    The second value of the list is put in place and its run-time evaluation result will be handled as if by symbol. See the symbol-handlers for more information.
@@ -141,109 +182,165 @@ Each argument is executed in sequence. The arguments are evaluated according to 
   * SYMBOL    Delegates to the symbol handlers.
 
 Symbols/Variables are handled at runtime (where they have a value) according to the defined symbol-handlers. By default, the following cases are handled at run time:
-  * STRING    Performs a CSS-select on the current elements.
+  * STRING    Performs a CLSS:QUERY on the current elements.
   * DOM:NODE  Replaces the current set of nodes with just this node.  
   * FUNCTION  Calls the given function with the current set of nodes as argument.
+  * LIST      Lists are transformed into a proper vector.
+  * ARRAY     Arrays are transformed into a proper vector.
+  * VECTOR    Vectors that are not adjustable are transformed into a proper vector.
   * T         Any other value simply replaces the current list of nodes.
 
 Additional argument and symbol handlers can be defined with define-argument-handler and define-symbol-handler, respectively.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="*LQUERY-MASTER-DOCUMENT*"/>
             <article>
+              <a name="*LQUERY-MASTER-DOCUMENT*" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL SPECIAL</span>
                 <code>
-                  <h3 class="funcname">*LQUERY-MASTER-DOCUMENT*</h3>
+                  <h3><a href="#*LQUERY-MASTER-DOCUMENT*" class="funcname">*LQUERY-MASTER-DOCUMENT*</a></h3>
                   <span class="funcargs"></span>
                 </code>
               </header>
-              <pre class="funcdesc"></pre>
+              <pre class="funcdesc">The master document used at the beginning of a chain.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="DEFINE-ARGUMENT-HANDLER"/>
             <article>
+              <a name="COPY-PROPER-VECTOR" class="anchor"/>
               <header>
-                <span class="functype">EXTERNAL MACRO</span>
+                <span class="functype">EXTERNAL GENERIC</span>
                 <code>
-                  <h3 class="funcname">DEFINE-ARGUMENT-HANDLER</h3>
-                  <span class="funcargs">(TYPE (ARGNAME NODESNAME) &amp;BODY BODY)</span>
+                  <h3><a href="#COPY-PROPER-VECTOR" class="funcname">COPY-PROPER-VECTOR</a></h3>
+                  <span class="funcargs">(SEQUENCE &amp;KEY TRANSFORM (TRANSFORM #'IDENTITY))</span>
                 </code>
               </header>
-              <pre class="funcdesc">Defines a new argument handler that decides what to do with a certain type of argument at compile-time (static type).</pre>
+              <pre class="funcdesc">Copies the sequence into a new proper vector.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="DEFINE-NODE-FUNCTION"/>
             <article>
+              <a name="DEFINE-ARGUMENT-HANDLER" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL MACRO</span>
                 <code>
-                  <h3 class="funcname">DEFINE-NODE-FUNCTION</h3>
-                  <span class="funcargs">(NAME (NODE-NAME &amp;REST ARGUMENTS) &amp;OPTIONAL DOCSTRING &amp;BODY BODY)</span>
+                  <h3><a href="#DEFINE-ARGUMENT-HANDLER" class="funcname">DEFINE-ARGUMENT-HANDLER</a></h3>
+                  <span class="funcargs">(TYPE (ARGUMENT-NAME OPERATOR-NAME) &amp;BODY BODY)</span>
+                </code>
+              </header>
+              <pre class="funcdesc">Defines a new argument handler that decides what to do with a certain type of argument at compile-time.
+
+TYPE          --- A type or EQL specifier.
+ARGUMENT-NAME --- Symbol bound to the argument.
+OPERATOR-NAME --- Symbol bound to the object being operated on.
+BODY          ::= form*</pre>
+            </article>
+          </li><li id="template">
+            <article>
+              <a name="DEFINE-NODE-FUNCTION" class="anchor"/>
+              <header>
+                <span class="functype">EXTERNAL MACRO</span>
+                <code>
+                  <h3><a href="#DEFINE-NODE-FUNCTION" class="funcname">DEFINE-NODE-FUNCTION</a></h3>
+                  <span class="funcargs">(NAME (NODE-NAME &amp;REST ARGUMENTS) &amp;BODY BODY)</span>
                 </code>
               </header>
               <pre class="funcdesc">Defines a new node function. This is the main mechanism by which node manipulations are defined.
-All node functions are automatically created in the lquery-funcs package.</pre>
+All node functions are automatically created in the lquery-funcs package.
+
+NAME      --- A symbol naming the node function. Automatically interned in the LQUERY-FUNCS package.
+NODE-NAME --- Symbol bound to the current node.
+ARGUMENTS --- A lambda-list specifying the arguments for the function.
+BODY      ::= form*</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="DEFINE-NODE-LIST-FUNCTION"/>
             <article>
+              <a name="DEFINE-NODE-LIST-FUNCTION" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL MACRO</span>
                 <code>
-                  <h3 class="funcname">DEFINE-NODE-LIST-FUNCTION</h3>
-                  <span class="funcargs">(NAME (LIST-NAME &amp;REST ARGUMENTS) &amp;OPTIONAL DOCSTRING &amp;BODY BODY)</span>
+                  <h3><a href="#DEFINE-NODE-LIST-FUNCTION" class="funcname">DEFINE-NODE-LIST-FUNCTION</a></h3>
+                  <span class="funcargs">(NAME (VECTOR-NAME &amp;REST ARGUMENTS) &amp;BODY BODY)</span>
                 </code>
               </header>
-              <pre class="funcdesc">Defines a new function that operates on the current node list instead of individual elements.
-All node list functions are automatically created in the lquery-funcs package.</pre>
+              <pre class="funcdesc">Defines a new function that operates on the current node array instead of individual elements.
+All node list functions are automatically created in the lquery-funcs package.
+
+NAME        --- A symbol naming the node function. Automatically interned in the LQUERY-FUNCS package.
+VECTOR-NAME --- Symbol bound to the node vector.
+ARGUMENTS   --- A lambda-list specifying the arguments for the function.
+BODY        ::= form*</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="DEFINE-SYMBOL-HANDLER"/>
             <article>
+              <a name="DEFINE-VALUE-HANDLER" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL MACRO</span>
                 <code>
-                  <h3 class="funcname">DEFINE-SYMBOL-HANDLER</h3>
-                  <span class="funcargs">(TYPE (SYMBOLNAME NODESNAME) &amp;BODY BODY)</span>
+                  <h3><a href="#DEFINE-VALUE-HANDLER" class="funcname">DEFINE-VALUE-HANDLER</a></h3>
+                  <span class="funcargs">(TYPE (VARIABLE-NAME OPERATOR-NAME) &amp;BODY BODY)</span>
                 </code>
               </header>
-              <pre class="funcdesc">Defines a new symbol handler that decides what to do with a certain type of symbol at run-time (variable type).</pre>
+              <pre class="funcdesc">Defines a new symbol handler that decides what to do with a certain type of symbol at run-time (variable type).
+
+TYPE          --- A type or EQL specifier.
+VARIABLE-NAME --- Symbol bound to the argument.
+OPERATOR-NAME --- Symbol bound to the object being operated on.
+BODY          ::= form*</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="INITIALIZE"/>
             <article>
+              <a name="ENSURE-PROPER-VECTOR" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">INITIALIZE</h3>
+                  <h3><a href="#ENSURE-PROPER-VECTOR" class="funcname">ENSURE-PROPER-VECTOR</a></h3>
+                  <span class="funcargs">(VAR)</span>
+                </code>
+              </header>
+              <pre class="funcdesc">Ensure that the variable is a proper vector.</pre>
+            </article>
+          </li><li id="template">
+            <article>
+              <a name="INITIALIZE" class="anchor"/>
+              <header>
+                <span class="functype">EXTERNAL FUNCTION</span>
+                <code>
+                  <h3><a href="#INITIALIZE" class="funcname">INITIALIZE</a></h3>
                   <span class="funcargs">(DOCUMENT)</span>
                 </code>
               </header>
               <pre class="funcdesc">Sets the *lquery-master-document* variable to the provided document.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="LOAD-PAGE"/>
             <article>
+              <a name="LOAD-PAGE" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">LOAD-PAGE</h3>
-                  <span class="funcargs">(FILE-OR-STRING &amp;KEY (TYPE XML) (BUILDER (MAKE-DOM-BUILDER)))</span>
+                  <h3><a href="#LOAD-PAGE" class="funcname">LOAD-PAGE</a></h3>
+                  <span class="funcargs">(FILE-OR-STRING)</span>
                 </code>
               </header>
-              <pre class="funcdesc">Load the given file or string into a HTML DOM.
-If type is :HTML, the file is treated as a full HTML document.
-If type is NIL or :XML, the file is treated as an XML document, which does not need to contain the HTML root nodes.
-Alternatively, the type can be a DTD specification that will be supplied to cxml:parse 's dtd keyword.</pre>
+              <pre class="funcdesc">Load the given file or string into a HTML DOM.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="PARSE-HTML"/>
             <article>
+              <a name="MAKE-PROPER-VECTOR" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">PARSE-HTML</h3>
+                  <h3><a href="#MAKE-PROPER-VECTOR" class="funcname">MAKE-PROPER-VECTOR</a></h3>
+                  <span class="funcargs">(&amp;KEY (SIZE 0) INITIAL-ELEMENT INITIAL-CONTENTS (FILL-POINTER T))</span>
+                </code>
+              </header>
+              <pre class="funcdesc">Creates a new proper vector.</pre>
+            </article>
+          </li><li id="template">
+            <article>
+              <a name="PARSE-HTML" class="anchor"/>
+              <header>
+                <span class="functype">EXTERNAL FUNCTION</span>
+                <code>
+                  <h3><a href="#PARSE-HTML" class="funcname">PARSE-HTML</a></h3>
                   <span class="funcargs">(HTML)</span>
                 </code>
               </header>
@@ -254,890 +351,903 @@ Alternatively, the type can be a DTD specification that will be supplied to cxml
       <article>
         <header><h2>lQuery-Funcs Package Function Index</h2></header>
         <ul id="func-docs" class="docs"><li id="template">
-            <a class="anchor" name="NODEFUN-ADD"/>
             <article>
+              <a name="ADD" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-ADD</h3>
+                  <h3><a href="#ADD" class="funcname">ADD</a></h3>
                   <span class="funcargs">(WORKING-NODES SELECTOR-OR-NODES)</span>
                 </code>
               </header>
               <pre class="funcdesc">Add elements to the set of matched elements.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-ADD-CLASS"/>
             <article>
+              <a name="ADD-CLASS" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-ADD-CLASS</h3>
+                  <h3><a href="#ADD-CLASS" class="funcname">ADD-CLASS</a></h3>
                   <span class="funcargs">(NODE &amp;REST CLASSES)</span>
                 </code>
               </header>
               <pre class="funcdesc">Adds the specified class(es) to the set of matched elements.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-AFTER"/>
             <article>
+              <a name="AFTER" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-AFTER</h3>
-                  <span class="funcargs">(NODE HTML-OR-NODES)</span>
+                  <h3><a href="#AFTER" class="funcname">AFTER</a></h3>
+                  <span class="funcargs">(NODES HTML-OR-NODES)</span>
                 </code>
               </header>
               <pre class="funcdesc">Insert content (in html-string or node-list form) after each element.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-ANCESTOR"/>
             <article>
+              <a name="ANCESTOR" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-ANCESTOR</h3>
+                  <h3><a href="#ANCESTOR" class="funcname">ANCESTOR</a></h3>
                   <span class="funcargs">(WORKING-NODES)</span>
                 </code>
               </header>
               <pre class="funcdesc">Find the common ancestor of all elements.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-APPEND"/>
             <article>
+              <a name="APPEND" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-APPEND</h3>
-                  <span class="funcargs">(NODE HTML-OR-NODES)</span>
+                  <h3><a href="#APPEND" class="funcname">APPEND</a></h3>
+                  <span class="funcargs">(NODES HTML-OR-NODES)</span>
                 </code>
               </header>
               <pre class="funcdesc">Insert content (in html-string or node-list form) to the end of each element.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-APPEND-TO"/>
             <article>
+              <a name="APPEND-TO" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-APPEND-TO</h3>
+                  <h3><a href="#APPEND-TO" class="funcname">APPEND-TO</a></h3>
                   <span class="funcargs">(WORKING-NODES SELECTOR-OR-NODES)</span>
                 </code>
               </header>
               <pre class="funcdesc">Insert every element to the end of the target(s).</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-ATTR"/>
             <article>
+              <a name="ATTR" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-ATTR</h3>
+                  <h3><a href="#ATTR" class="funcname">ATTR</a></h3>
                   <span class="funcargs">(NODE &amp;REST PAIRS)</span>
                 </code>
               </header>
               <pre class="funcdesc">Retrieve or set attributes on a node</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-BEFORE"/>
             <article>
+              <a name="BEFORE" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-BEFORE</h3>
-                  <span class="funcargs">(NODE HTML-OR-NODES)</span>
+                  <h3><a href="#BEFORE" class="funcname">BEFORE</a></h3>
+                  <span class="funcargs">(NODES HTML-OR-NODES)</span>
                 </code>
               </header>
               <pre class="funcdesc">Insert content (in html-string or node-list form) before each element.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-CHILD-INDEX"/>
             <article>
+              <a name="CHILD-INDEX" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-CHILD-INDEX</h3>
+                  <h3><a href="#CHILD-INDEX" class="funcname">CHILD-INDEX</a></h3>
                   <span class="funcargs">(NODE)</span>
                 </code>
               </header>
               <pre class="funcdesc">Returns the index of the element within its parent, also counting text nodes. See index() otherwise.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-CHILDREN"/>
             <article>
+              <a name="CHILDREN" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-CHILDREN</h3>
-                  <span class="funcargs">(NODE &amp;OPTIONAL SELECTOR)</span>
+                  <h3><a href="#CHILDREN" class="funcname">CHILDREN</a></h3>
+                  <span class="funcargs">(NODES &amp;OPTIONAL SELECTOR)</span>
                 </code>
               </header>
               <pre class="funcdesc">Get the children of each element, optionally filtered by a selector.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-CLONE"/>
             <article>
+              <a name="CLONE" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-CLONE</h3>
+                  <h3><a href="#CLONE" class="funcname">CLONE</a></h3>
                   <span class="funcargs">(NODE)</span>
                 </code>
               </header>
               <pre class="funcdesc">Create a deep copy of the set of matched elements.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-CLOSEST"/>
             <article>
+              <a name="CLOSEST" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-CLOSEST</h3>
+                  <h3><a href="#CLOSEST" class="funcname">CLOSEST</a></h3>
                   <span class="funcargs">(NODE SELECTOR)</span>
                 </code>
               </header>
-              <pre class="funcdesc">For each element in the set, get the first element that matches the selector by testing the element itself and traversing up through its ancestors in the DOM tree.</pre>
+              <pre class="funcdesc">For each element in the set, get the first element that matches the selector by testing the element itself and traversing up through its ancestors in the DOM tree.
+If no matching element can be found the root is entered instead.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-CONTAINS"/>
             <article>
+              <a name="CONTAINS" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-CONTAINS</h3>
-                  <span class="funcargs">(NODE STRING)</span>
+                  <h3><a href="#CONTAINS" class="funcname">CONTAINS</a></h3>
+                  <span class="funcargs">(NODES STRING)</span>
                 </code>
               </header>
               <pre class="funcdesc">Select all elements that contain the specified text.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-CONTENTS"/>
             <article>
+              <a name="CONTENTS" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-CONTENTS</h3>
-                  <span class="funcargs">(NODE)</span>
+                  <h3><a href="#CONTENTS" class="funcname">CONTENTS</a></h3>
+                  <span class="funcargs">(NODES)</span>
                 </code>
               </header>
               <pre class="funcdesc">Get the children of each element, including text and comment nodes.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-CSS"/>
             <article>
+              <a name="CSS" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-CSS</h3>
+                  <h3><a href="#CSS" class="funcname">CSS</a></h3>
                   <span class="funcargs">(NODE &amp;REST PAIRS)</span>
                 </code>
               </header>
               <pre class="funcdesc">Retrieve or set css style attributes on a node.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-DATA"/>
             <article>
+              <a name="DATA" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-DATA</h3>
+                  <h3><a href="#DATA" class="funcname">DATA</a></h3>
                   <span class="funcargs">(NODE &amp;REST PAIRS)</span>
                 </code>
               </header>
               <pre class="funcdesc">Retrieve or set data attributes on a node. This is a convenience method and uses attr in the back.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-DEEPEST"/>
             <article>
+              <a name="DEEPEST" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-DEEPEST</h3>
+                  <h3><a href="#DEEPEST" class="funcname">DEEPEST</a></h3>
                   <span class="funcargs">(NODE)</span>
                 </code>
               </header>
               <pre class="funcdesc">Returns the innermost (left-bound) child element.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-EACH"/>
             <article>
+              <a name="EACH" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-EACH</h3>
-                  <span class="funcargs">(WORKING-NODES FUN &amp;KEY REPLACE)</span>
+                  <h3><a href="#EACH" class="funcname">EACH</a></h3>
+                  <span class="funcargs">(NODES FUN &amp;KEY REPLACE)</span>
                 </code>
               </header>
               <pre class="funcdesc">Execute the specified function on each element until NIL is returned or all elements have been processed. The original set of elements is returned if replace is NIL.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-EMPTY"/>
             <article>
+              <a name="EMPTY" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-EMPTY</h3>
+                  <h3><a href="#EMPTY" class="funcname">EMPTY</a></h3>
                   <span class="funcargs">(NODE)</span>
                 </code>
               </header>
               <pre class="funcdesc">Remove all child nodes from the set of matched elements.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-EQ"/>
             <article>
+              <a name="EMPTY-P" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-EQ</h3>
+                  <h3><a href="#EMPTY-P" class="funcname">EMPTY-P</a></h3>
+                  <span class="funcargs">(NODE)</span>
+                </code>
+              </header>
+              <pre class="funcdesc">Check if the node contains no children and/or only empty (whitespace) text nodes. If it is empty, T is returned, otherwise NIL.</pre>
+            </article>
+          </li><li id="template">
+            <article>
+              <a name="EQ" class="anchor"/>
+              <header>
+                <span class="functype">EXTERNAL FUNCTION</span>
+                <code>
+                  <h3><a href="#EQ" class="funcname">EQ</a></h3>
                   <span class="funcargs">(WORKING-NODES INDEX)</span>
                 </code>
               </header>
               <pre class="funcdesc">Reduce the set of matched elements to the one at the specified index</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-EVEN"/>
             <article>
+              <a name="EVEN" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-EVEN</h3>
+                  <h3><a href="#EVEN" class="funcname">EVEN</a></h3>
                   <span class="funcargs">(WORKING-NODES)</span>
                 </code>
               </header>
-              <pre class="funcdesc">Selects even elements.</pre>
+              <pre class="funcdesc">Selects even elements, 1-indexed</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-FILTER"/>
             <article>
+              <a name="FILTER" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-FILTER</h3>
-                  <span class="funcargs">(NODE SELECTOR-OR-FUNCTION)</span>
+                  <h3><a href="#FILTER" class="funcname">FILTER</a></h3>
+                  <span class="funcargs">(NODES SELECTOR-OR-FUNCTION)</span>
                 </code>
               </header>
               <pre class="funcdesc">Reduce the set of matched elements to those that match the selector or pass the function's test.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-FIND"/>
             <article>
+              <a name="FIND" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-FIND</h3>
-                  <span class="funcargs">(NODE SELECTOR-OR-FUNCTION &amp;KEY (TEST-SELF NIL))</span>
+                  <h3><a href="#FIND" class="funcname">FIND</a></h3>
+                  <span class="funcargs">(NODES SELECTOR-OR-FUNCTION &amp;KEY (TEST-SELF NIL))</span>
                 </code>
               </header>
               <pre class="funcdesc">Get the descendants of each element filtered by selector or function.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-FIRST"/>
             <article>
+              <a name="FIRST" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-FIRST</h3>
+                  <h3><a href="#FIRST" class="funcname">FIRST</a></h3>
                   <span class="funcargs">(WORKING-NODES)</span>
                 </code>
               </header>
               <pre class="funcdesc">Reduce the set of matched elements to the first in the set.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-GT"/>
             <article>
+              <a name="GT" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-GT</h3>
+                  <h3><a href="#GT" class="funcname">GT</a></h3>
                   <span class="funcargs">(WORKING-NODES INDEX)</span>
                 </code>
               </header>
               <pre class="funcdesc">Select all elements at a greater than index(0) within the matched set.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-HAS"/>
             <article>
+              <a name="HAS" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-HAS</h3>
-                  <span class="funcargs">(NODE SELECTOR-OR-NODES)</span>
+                  <h3><a href="#HAS" class="funcname">HAS</a></h3>
+                  <span class="funcargs">(NODES SELECTOR-OR-NODES)</span>
                 </code>
               </header>
               <pre class="funcdesc">Reduce the set of matched elements to those that have a descendant that matches the selector or element.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-HAS-CLASS"/>
             <article>
+              <a name="HAS-CLASS" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-HAS-CLASS</h3>
+                  <h3><a href="#HAS-CLASS" class="funcname">HAS-CLASS</a></h3>
                   <span class="funcargs">(WORKING-NODES CLASS)</span>
                 </code>
               </header>
               <pre class="funcdesc">Determine whether any of the matched elements are assigned to the given class.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-HIDE"/>
             <article>
+              <a name="HIDE" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-HIDE</h3>
+                  <h3><a href="#HIDE" class="funcname">HIDE</a></h3>
                   <span class="funcargs">(WORKING-NODES)</span>
                 </code>
               </header>
-              <pre class="funcdesc">Hide the matched elements (short for (css :display 'none')).</pre>
+              <pre class="funcdesc">Hide the matched elements (short for (css &quot;display&quot; &quot;none&quot;)).</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-HTML"/>
             <article>
+              <a name="HTML" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-HTML</h3>
+                  <h3><a href="#HTML" class="funcname">HTML</a></h3>
                   <span class="funcargs">(NODE &amp;OPTIONAL NEW-CONTENT)</span>
                 </code>
               </header>
               <pre class="funcdesc">Get the HTML contents of the elements or set the HTML contents of every matched element.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-HTML-FILE"/>
             <article>
+              <a name="HTML-FILE" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-HTML-FILE</h3>
+                  <h3><a href="#HTML-FILE" class="funcname">HTML-FILE</a></h3>
                   <span class="funcargs">(WORKING-NODES PATHNAME)</span>
                 </code>
               </header>
               <pre class="funcdesc">Read an HTML file and insert its contents into each element.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-INDEX"/>
             <article>
+              <a name="INDEX" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-INDEX</h3>
+                  <h3><a href="#INDEX" class="funcname">INDEX</a></h3>
                   <span class="funcargs">(NODE)</span>
                 </code>
               </header>
               <pre class="funcdesc">Find the index of the node within its parent.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-INITIALIZE"/>
             <article>
+              <a name="INITIALIZE" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-INITIALIZE</h3>
-                  <span class="funcargs">(WORKING-NODES DOCUMENT &amp;KEY (TYPE XML))</span>
+                  <h3><a href="#INITIALIZE" class="funcname">INITIALIZE</a></h3>
+                  <span class="funcargs">(WORKING-NODES DOCUMENT)</span>
                 </code>
               </header>
               <pre class="funcdesc">Re-initializes lQuery with a new page.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-INSERT-AFTER"/>
             <article>
+              <a name="INSERT-AFTER" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-INSERT-AFTER</h3>
+                  <h3><a href="#INSERT-AFTER" class="funcname">INSERT-AFTER</a></h3>
                   <span class="funcargs">(WORKING-NODES SELECTOR-OR-NODES)</span>
                 </code>
               </header>
               <pre class="funcdesc">Insert every element after the target.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-INSERT-BEFORE"/>
             <article>
+              <a name="INSERT-BEFORE" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-INSERT-BEFORE</h3>
+                  <h3><a href="#INSERT-BEFORE" class="funcname">INSERT-BEFORE</a></h3>
                   <span class="funcargs">(WORKING-NODES SELECTOR-OR-NODES)</span>
                 </code>
               </header>
               <pre class="funcdesc">Insert every element before the target.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-IS"/>
             <article>
+              <a name="IS" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-IS</h3>
+                  <h3><a href="#IS" class="funcname">IS</a></h3>
                   <span class="funcargs">(WORKING-NODES SELECTOR-OR-NODES)</span>
                 </code>
               </header>
               <pre class="funcdesc">Check the current elements against a selector or list of elements and return true if at least one of them matches.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-IS-EMPTY"/>
             <article>
+              <a name="IS-EMPTY" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-IS-EMPTY</h3>
-                  <span class="funcargs">(WORKING-NODES)</span>
+                  <h3><a href="#IS-EMPTY" class="funcname">IS-EMPTY</a></h3>
+                  <span class="funcargs">(NODE)</span>
                 </code>
               </header>
-              <pre class="funcdesc">Check if the node contains no children and/or only empty (whitespace) text nodes. If it is empty, T is returned, otherwise NIL.</pre>
+              <pre class="funcdesc">Check if the node contains no children and/or only empty (whitespace) text nodes. If it is empty, T is returned, otherwise NIL.
+Alias of EMPTY-P</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-LAST"/>
             <article>
+              <a name="LAST" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-LAST</h3>
+                  <h3><a href="#LAST" class="funcname">LAST</a></h3>
                   <span class="funcargs">(WORKING-NODES)</span>
                 </code>
               </header>
               <pre class="funcdesc">Reduce the set of matched elements to the final one in the set.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-LENGTH"/>
             <article>
+              <a name="LENGTH" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-LENGTH</h3>
+                  <h3><a href="#LENGTH" class="funcname">LENGTH</a></h3>
                   <span class="funcargs">(WORKING-NODES)</span>
                 </code>
               </header>
               <pre class="funcdesc">Returns the number of elements in the list.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-LT"/>
             <article>
+              <a name="LT" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-LT</h3>
+                  <h3><a href="#LT" class="funcname">LT</a></h3>
                   <span class="funcargs">(WORKING-NODES INDEX)</span>
                 </code>
               </header>
               <pre class="funcdesc">Select all elements at an index less than the index within the matched set.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-MAP"/>
             <article>
+              <a name="MAP" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-MAP</h3>
+                  <h3><a href="#MAP" class="funcname">MAP</a></h3>
                   <span class="funcargs">(WORKING-NODES FUNCTION)</span>
                 </code>
               </header>
               <pre class="funcdesc">Pass each element through a function (which has to accept one argument, the node), returning the list of all results.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-NEXT"/>
             <article>
+              <a name="NEXT" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-NEXT</h3>
-                  <span class="funcargs">(NODE &amp;OPTIONAL SELECTOR)</span>
+                  <h3><a href="#NEXT" class="funcname">NEXT</a></h3>
+                  <span class="funcargs">(NODES &amp;OPTIONAL SELECTOR)</span>
                 </code>
               </header>
               <pre class="funcdesc">Get the immediately following sibling of each element (if there is one). If a selector is provided, the sibling is only included if it matches.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-NEXT-ALL"/>
             <article>
+              <a name="NEXT-ALL" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-NEXT-ALL</h3>
-                  <span class="funcargs">(NODE &amp;OPTIONAL SELECTOR)</span>
+                  <h3><a href="#NEXT-ALL" class="funcname">NEXT-ALL</a></h3>
+                  <span class="funcargs">(NODES &amp;OPTIONAL SELECTOR)</span>
                 </code>
               </header>
               <pre class="funcdesc">Get all following siblings of each element. If a selector is provided, the sibling is only included if it matches.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-NEXT-UNTIL"/>
             <article>
+              <a name="NEXT-UNTIL" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-NEXT-UNTIL</h3>
-                  <span class="funcargs">(NODE SELECTOR-OR-NODES)</span>
+                  <h3><a href="#NEXT-UNTIL" class="funcname">NEXT-UNTIL</a></h3>
+                  <span class="funcargs">(NODES SELECTOR-OR-NODES)</span>
                 </code>
               </header>
               <pre class="funcdesc">Get all following silings of each element up to (excluding) the element matched by the selector or node list.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-NODE"/>
             <article>
+              <a name="NODE" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-NODE</h3>
+                  <h3><a href="#NODE" class="funcname">NODE</a></h3>
                   <span class="funcargs">(WORKING-NODES &amp;OPTIONAL (N 0))</span>
                 </code>
               </header>
               <pre class="funcdesc">Return the specified node (default first) directly, without encompassing it into a list.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-NOT"/>
             <article>
+              <a name="NOT" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-NOT</h3>
+                  <h3><a href="#NOT" class="funcname">NOT</a></h3>
                   <span class="funcargs">(WORKING-NODES SELECTOR-OR-NODES)</span>
                 </code>
               </header>
-              <pre class="funcdesc">Remove elements from the set of matched elements.</pre>
+              <pre class="funcdesc">Remove matching elements from the working elements.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-NOT-EMPTY"/>
             <article>
+              <a name="NOT-EMPTY" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-NOT-EMPTY</h3>
+                  <h3><a href="#NOT-EMPTY" class="funcname">NOT-EMPTY</a></h3>
                   <span class="funcargs">(NODE)</span>
                 </code>
               </header>
-              <pre class="funcdesc">Check if the node contains no children and/or only empty (whitespace) text nodes. If the node is effectively empty, NIL is returned. Otherwise a list of all non-empty children and text-nodes is returned.</pre>
+              <pre class="funcdesc">Check if the node contains no children and/or only empty (whitespace) text nodes. If the node is effectively empty NIL is returned, otherwise T</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-ODD"/>
             <article>
+              <a name="ODD" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-ODD</h3>
+                  <h3><a href="#ODD" class="funcname">ODD</a></h3>
                   <span class="funcargs">(WORKING-NODES)</span>
                 </code>
               </header>
-              <pre class="funcdesc">Select all odd elements from the current set.</pre>
+              <pre class="funcdesc">Select all odd elements from the current set, 1-indexed.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-PARENT"/>
             <article>
+              <a name="PARENT" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-PARENT</h3>
-                  <span class="funcargs">(NODE &amp;OPTIONAL SELECTOR)</span>
+                  <h3><a href="#PARENT" class="funcname">PARENT</a></h3>
+                  <span class="funcargs">(NODES &amp;OPTIONAL SELECTOR)</span>
                 </code>
               </header>
               <pre class="funcdesc">Get the parent of each element, optionally filtered by a selector.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-PARENTS"/>
             <article>
+              <a name="PARENTS" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-PARENTS</h3>
-                  <span class="funcargs">(NODE &amp;OPTIONAL SELECTOR)</span>
+                  <h3><a href="#PARENTS" class="funcname">PARENTS</a></h3>
+                  <span class="funcargs">(NODES &amp;OPTIONAL SELECTOR)</span>
                 </code>
               </header>
               <pre class="funcdesc">Get the ancestors of each element, optionally filtered by a selector. Closest parent first.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-PARENTS-UNTIL"/>
             <article>
+              <a name="PARENTS-UNTIL" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-PARENTS-UNTIL</h3>
-                  <span class="funcargs">(NODE SELECTOR-OR-NODES)</span>
+                  <h3><a href="#PARENTS-UNTIL" class="funcname">PARENTS-UNTIL</a></h3>
+                  <span class="funcargs">(NODES SELECTOR-OR-NODES)</span>
                 </code>
               </header>
               <pre class="funcdesc">Get the ancestors of each element, up to (excluding) the element matched by the selector or node list. Closest parent first</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-PREPEND"/>
             <article>
+              <a name="PREPEND" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-PREPEND</h3>
-                  <span class="funcargs">(NODE HTML-OR-NODES)</span>
+                  <h3><a href="#PREPEND" class="funcname">PREPEND</a></h3>
+                  <span class="funcargs">(NODES HTML-OR-NODES)</span>
                 </code>
               </header>
               <pre class="funcdesc">Insert content, specified by the parameter, to the beginning of each element.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-PREPEND-TO"/>
             <article>
+              <a name="PREPEND-TO" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-PREPEND-TO</h3>
+                  <h3><a href="#PREPEND-TO" class="funcname">PREPEND-TO</a></h3>
                   <span class="funcargs">(WORKING-NODES SELECTOR-OR-NODES)</span>
                 </code>
               </header>
               <pre class="funcdesc">Insert every element to the beginning of the target(s).</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-PREV"/>
             <article>
+              <a name="PREV" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-PREV</h3>
-                  <span class="funcargs">(NODE &amp;OPTIONAL SELECTOR)</span>
+                  <h3><a href="#PREV" class="funcname">PREV</a></h3>
+                  <span class="funcargs">(NODES &amp;OPTIONAL SELECTOR)</span>
                 </code>
               </header>
               <pre class="funcdesc">Get the immediately preceding sibling of each element (if there is one). If a selector is provided, the sibling is only included if it matches.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-PREV-ALL"/>
             <article>
+              <a name="PREV-ALL" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-PREV-ALL</h3>
-                  <span class="funcargs">(NODE &amp;OPTIONAL SELECTOR)</span>
+                  <h3><a href="#PREV-ALL" class="funcname">PREV-ALL</a></h3>
+                  <span class="funcargs">(NODES &amp;OPTIONAL SELECTOR)</span>
                 </code>
               </header>
               <pre class="funcdesc">Get all preceeding siblings of each element. If a selector is provided, the sibling is only included if it matches.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-PREV-UNTIL"/>
             <article>
+              <a name="PREV-UNTIL" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-PREV-UNTIL</h3>
-                  <span class="funcargs">(NODE SELECTOR-OR-NODES)</span>
+                  <h3><a href="#PREV-UNTIL" class="funcname">PREV-UNTIL</a></h3>
+                  <span class="funcargs">(NODES SELECTOR-OR-NODES)</span>
                 </code>
               </header>
               <pre class="funcdesc">Get all preceeding silings of each element down to (excluding) the element matched by the selector or node list.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-REMOVE"/>
             <article>
+              <a name="REMOVE" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-REMOVE</h3>
+                  <h3><a href="#REMOVE" class="funcname">REMOVE</a></h3>
                   <span class="funcargs">(NODE &amp;OPTIONAL SELECTOR)</span>
                 </code>
               </header>
               <pre class="funcdesc">Remove the set of matched elements from the DOM.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-REMOVE-ATTR"/>
             <article>
+              <a name="REMOVE-ATTR" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-REMOVE-ATTR</h3>
+                  <h3><a href="#REMOVE-ATTR" class="funcname">REMOVE-ATTR</a></h3>
                   <span class="funcargs">(NODE &amp;REST ATTRIBUTES)</span>
                 </code>
               </header>
               <pre class="funcdesc">Remove attributes from each element.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-REMOVE-CLASS"/>
             <article>
+              <a name="REMOVE-CLASS" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-REMOVE-CLASS</h3>
+                  <h3><a href="#REMOVE-CLASS" class="funcname">REMOVE-CLASS</a></h3>
                   <span class="funcargs">(NODE &amp;REST CLASSES)</span>
                 </code>
               </header>
               <pre class="funcdesc">Remove classes from each element.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-REMOVE-DATA"/>
             <article>
+              <a name="REMOVE-DATA" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-REMOVE-DATA</h3>
-                  <span class="funcargs">(WORKING-NODES &amp;REST DATA)</span>
+                  <h3><a href="#REMOVE-DATA" class="funcname">REMOVE-DATA</a></h3>
+                  <span class="funcargs">(NODE &amp;REST DATA)</span>
                 </code>
               </header>
               <pre class="funcdesc">Remove data attributes from each element. This is a convenience method and uses remove-attr in the back.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-REPLACE-ALL"/>
             <article>
+              <a name="REPLACE-ALL" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-REPLACE-ALL</h3>
+                  <h3><a href="#REPLACE-ALL" class="funcname">REPLACE-ALL</a></h3>
                   <span class="funcargs">(WORKING-NODES SELECTOR-OR-NODES)</span>
                 </code>
               </header>
-              <pre class="funcdesc">Replace each target element with the set of matched elements.</pre>
+              <pre class="funcdesc">Replace each in the set of matched elements with the current nodes.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-REPLACE-WITH"/>
             <article>
+              <a name="REPLACE-WITH" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-REPLACE-WITH</h3>
+                  <h3><a href="#REPLACE-WITH" class="funcname">REPLACE-WITH</a></h3>
                   <span class="funcargs">(WORKING-NODES HTML-OR-NODES)</span>
                 </code>
               </header>
               <pre class="funcdesc">Replace each element with the provided new content and return the set of elements that was removed.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-SERIALIZE"/>
             <article>
+              <a name="SERIALIZE" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-SERIALIZE</h3>
-                  <span class="funcargs">(NODE &amp;KEY (OMIT-SELF NIL) (DOCTYPE html))</span>
+                  <h3><a href="#SERIALIZE" class="funcname">SERIALIZE</a></h3>
+                  <span class="funcargs">(NODE &amp;OPTIONAL (STREAM NIL))</span>
                 </code>
               </header>
               <pre class="funcdesc">Serialize the node into a string.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-SHOW"/>
             <article>
+              <a name="SHOW" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-SHOW</h3>
+                  <h3><a href="#SHOW" class="funcname">SHOW</a></h3>
                   <span class="funcargs">(WORKING-NODES)</span>
                 </code>
               </header>
               <pre class="funcdesc">Display the matched elements (short for (css :display 'block'))</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-SIBLINGS"/>
             <article>
+              <a name="SIBLINGS" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-SIBLINGS</h3>
-                  <span class="funcargs">(NODE &amp;OPTIONAL SELECTOR)</span>
+                  <h3><a href="#SIBLINGS" class="funcname">SIBLINGS</a></h3>
+                  <span class="funcargs">(NODES &amp;OPTIONAL SELECTOR)</span>
                 </code>
               </header>
               <pre class="funcdesc">Get the siblings of each element, optionally filtered by a selector.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-SIZE"/>
             <article>
+              <a name="SIZE" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-SIZE</h3>
+                  <h3><a href="#SIZE" class="funcname">SIZE</a></h3>
                   <span class="funcargs">(WORKING-NODES)</span>
                 </code>
               </header>
               <pre class="funcdesc">Return the number of elements in the list.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-SLICE"/>
             <article>
+              <a name="SLICE" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-SLICE</h3>
+                  <h3><a href="#SLICE" class="funcname">SLICE</a></h3>
                   <span class="funcargs">(WORKING-NODES START &amp;OPTIONAL END)</span>
                 </code>
               </header>
               <pre class="funcdesc">Reduce the set of matched elements to a subset specified by a range of indices</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-TEXT"/>
             <article>
+              <a name="TEXT" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-TEXT</h3>
-                  <span class="funcargs">(NODE &amp;OPTIONAL (TEXT NIL T-S-P) (DOCUMENT *LQUERY-MASTER-DOCUMENT*))</span>
+                  <h3><a href="#TEXT" class="funcname">TEXT</a></h3>
+                  <span class="funcargs">(NODE &amp;OPTIONAL (TEXT NIL T-S-P))</span>
                 </code>
               </header>
-              <pre class="funcdesc">Get the combined text contents of each element, including their descendants. If text is set, all text nodes are removed and a new text node is appended to the end of the node. If text is NIL, all text nodes are removed from the node.</pre>
+              <pre class="funcdesc">Get the combined text contents of each element, including their descendants. If text is set, all text nodes are removed and a new text node is appended to the end of the node. If text is NIL, all direct text nodes are removed from the node.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-TOGGLE-CLASS"/>
             <article>
+              <a name="TOGGLE-CLASS" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-TOGGLE-CLASS</h3>
+                  <h3><a href="#TOGGLE-CLASS" class="funcname">TOGGLE-CLASS</a></h3>
                   <span class="funcargs">(NODE &amp;REST CLASSES)</span>
                 </code>
               </header>
               <pre class="funcdesc">Add or remove one or more classes from each element, depending on their presence within the element.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-UNWRAP"/>
             <article>
+              <a name="UNWRAP" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-UNWRAP</h3>
+                  <h3><a href="#UNWRAP" class="funcname">UNWRAP</a></h3>
                   <span class="funcargs">(NODE)</span>
                 </code>
               </header>
-              <pre class="funcdesc">Remove the parents of the set of matched elements from the DOM, leaving the matched elements in their place. The parent is removed if it is empty after unwrapping.</pre>
+              <pre class="funcdesc">Remove the parents of the set of matched elements from the DOM, inserting the parents children in place of it.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-VAL"/>
             <article>
+              <a name="VAL" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-VAL</h3>
-                  <span class="funcargs">(WORKING-NODES &amp;OPTIONAL VALUE)</span>
+                  <h3><a href="#VAL" class="funcname">VAL</a></h3>
+                  <span class="funcargs">(NODE &amp;OPTIONAL (VALUE NIL V-P))</span>
                 </code>
               </header>
-              <pre class="funcdesc">Get the current values or set the value of every matched element. This uses (attr :value val) in the back.</pre>
+              <pre class="funcdesc">Get the current values or set the value of every matched element.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-WRAP"/>
             <article>
+              <a name="WRAP" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-WRAP</h3>
-                  <span class="funcargs">(NODE HTML-OR-NODES)</span>
+                  <h3><a href="#WRAP" class="funcname">WRAP</a></h3>
+                  <span class="funcargs">(NODES HTML-OR-NODES)</span>
                 </code>
               </header>
-              <pre class="funcdesc">Wrap an HTML structure around each element. Note that always the first subnode is chosen.</pre>
+              <pre class="funcdesc">Wrap an HTML structure around each element. Note that always the first node of the structure to wrap is chosen.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-WRAP-ALL"/>
             <article>
+              <a name="WRAP-ALL" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-WRAP-ALL</h3>
+                  <h3><a href="#WRAP-ALL" class="funcname">WRAP-ALL</a></h3>
                   <span class="funcargs">(WORKING-NODES HTML-OR-NODES)</span>
                 </code>
               </header>
-              <pre class="funcdesc">Wrap an HTML structure around all elements inside their next (common) parent.</pre>
+              <pre class="funcdesc">Wrap an HTML structure around all elements and put it in place of the first element, removing all other elements from their position.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-WRAP-INNER"/>
             <article>
+              <a name="WRAP-INNER" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-WRAP-INNER</h3>
-                  <span class="funcargs">(NODE HTML-OR-NODES)</span>
+                  <h3><a href="#WRAP-INNER" class="funcname">WRAP-INNER</a></h3>
+                  <span class="funcargs">(NODES HTML-OR-NODES)</span>
                 </code>
               </header>
               <pre class="funcdesc">Wrap an HTML structure around the contents of each element.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-WRITE-TO-FILE"/>
             <article>
+              <a name="WRITE-TO-FILE" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
-                  <h3 class="funcname">NODEFUN-WRITE-TO-FILE</h3>
-                  <span class="funcargs">(WORKING-NODES FILE &amp;KEY (DOCTYPE html) (IF-DOES-NOT-EXIST CREATE)
- (IF-EXISTS SUPERSEDE))</span>
+                  <h3><a href="#WRITE-TO-FILE" class="funcname">WRITE-TO-FILE</a></h3>
+                  <span class="funcargs">(WORKING-NODES FILE &amp;KEY (IF-DOES-NOT-EXIST CREATE) (IF-EXISTS SUPERSEDE))</span>
                 </code>
               </header>
               <pre class="funcdesc">Write the serialized node to the file. Note that always only the first element is written.</pre>
