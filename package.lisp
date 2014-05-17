@@ -6,15 +6,21 @@
 
 (defpackage lquery
   (:nicknames #:org.tymoonnext.radiance.lib.lquery #:radiance-lib-lquery)
-  (:use :cl)
+  (:use :cl :alexandria :split-sequence)
   (:export
    
    :*lquery-master-document*
+
+   :make-proper-vector
+   :copy-proper-vector
+   :ensure-proper-vector
+   
    :parse-html
    :initialize
    :load-page
    :$
    :inline
+   :eval
 
    :define-node-function
    :define-node-list-function
@@ -22,80 +28,79 @@
    :define-argument-handler))
 
 (defpackage lquery-funcs
-  (:use :cl :lquery :alexandria :split-sequence)
   (:nicknames #:org.tymoonnext.radiance.lib.lquery.funcs)
   (:export
-   :nodefun-add
-   :nodefun-add-class
-   :nodefun-after
-   :nodefun-ancestor
-   :nodefun-append
-   :nodefun-append-to
-   :nodefun-attr
-   :nodefun-before
-   :nodefun-children
-   :nodefun-child-index
-   :nodefun-clone
-   :nodefun-closest
-   :nodefun-contains
-   :nodefun-contents
-   :nodefun-css
-   :nodefun-data
-   :nodefun-deepest
-   :nodefun-each
-   :nodefun-empty
-   :nodefun-eq
-   :nodefun-even
-   :nodefun-filter
-   :nodefun-find
-   :nodefun-first
-   :nodefun-gt
-   :nodefun-has
-   :nodefun-has-class
-   :nodefun-hide
-   :nodefun-html
-   :nodefun-html-file
-   :nodefun-index
-   :nodefun-initialize
-   :nodefun-insert-after
-   :nodefun-insert-before
-   :nodefun-is
-   :nodefun-is-empty
-   :nodefun-last
-   :nodefun-length
-   :nodefun-lt
-   :nodefun-map
-   :nodefun-next
-   :nodefun-next-all
-   :nodefun-next-until
-   :nodefun-node
-   :nodefun-not
-   :nodefun-not-empty
-   :nodefun-odd
-   :nodefun-parent
-   :nodefun-parents
-   :nodefun-parents-until
-   :nodefun-prepend
-   :nodefun-prepend-to
-   :nodefun-prev
-   :nodefun-prev-all
-   :nodefun-prev-until
-   :nodefun-remove
-   :nodefun-remove-attr
-   :nodefun-remove-class
-   :nodefun-remove-data
-   :nodefun-replace-all
-   :nodefun-replace-with
-   :nodefun-show
-   :nodefun-siblings
-   :nodefun-size
-   :nodefun-slice
-   :nodefun-text
-   :nodefun-toggle-class
-   :nodefun-unwrap
-   :nodefun-val
-   :nodefun-wrap
-   :nodefun-wrap-all
-   :nodefun-wrap-inner
-   :nodefun-write-to-file
-   :nodefun-serialize))
+   :add
+   :add-class
+   :after
+   :ancestor
+   :append
+   :append-to
+   :attr
+   :before
+   :children
+   :child-index
+   :clone
+   :closest
+   :contains
+   :contents
+   :css
+   :data
+   :deepest
+   :each
+   :empty
+   :eq
+   :even
+   :filter
+   :find
+   :first
+   :gt
+   :has
+   :has-class
+   :hide
+   :html
+   :html-file
+   :index
+   :initialize
+   :insert-after
+   :insert-before
+   :is
+   :is-empty
+   :last
+   :length
+   :lt
+   :map
+   :next
+   :next-all
+   :next-until
+   :node
+   :not
+   :not-empty
+   :odd
+   :parent
+   :parents
+   :parents-until
+   :prepend
+   :prepend-to
+   :prev
+   :prev-all
+   :prev-until
+   :remove
+   :remove-attr
+   :remove-class
+   :remove-data
+   :replace-all
+   :replace-with
+   :show
+   :siblings
+   :size
+   :slice
+   :text
+   :toggle-class
+   :unwrap
+   :val
+   :wrap
+   :wrap-all
+   :wrap-inner
+   :write-to-file
+   :serialize))

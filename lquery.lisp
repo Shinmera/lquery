@@ -6,15 +6,18 @@
 
 (in-package :lquery)
 
-(defvar *lquery-master-document* NIL)
+(defvar *lquery-master-document* NIL
+  "The master document used at the beginning of a chain.")
 
 (defun make-proper-vector (&key (size 0) initial-element initial-contents (fill-pointer T))
+  "Creates a new proper vector."
   (cond
     (initial-element  (make-array size :initial-element initial-element :adjustable T :fill-pointer fill-pointer))
     (initial-contents (make-array size :initial-contents initial-contents :adjustable T :fill-pointer fill-pointer))
     (T                (make-array size :adjustable T :fill-pointer fill-pointer))))
 
 (defgeneric copy-proper-vector (sequence &key transform)
+  (:documentation "Copies the sequence into a new proper vector.")
   (:method ((vector sequence) &key (transform #'identity))
     (loop with result = (make-proper-vector :size (length vector) :fill-pointer T)
           for i from 0 below (length vector)
@@ -30,6 +33,16 @@
                    (funcall transform item))
           finally (return result))))
 
+(defun ensure-proper-vector (var)
+  "Ensure that the variable is a proper vector."
+  (typecase var
+    (vector (if (adjustable-array-p var)
+                var
+                (copy-proper-vector var)))
+    (array (copy-proper-vector var))
+    (list (copy-proper-vector var))
+    (T (make-proper-vector :size 1 :initial-element var))))
+
 (defun load-page (file-or-string)
   "Load the given file or string into a HTML DOM."
   (plump:parse file-or-string))
@@ -43,41 +56,47 @@
   "Build the given string into DOM objects related to the master document."
   (lquery-funcs::build-elements html))
 
-(defmacro define-node-function (name (node-name &rest arguments) &optional docstring &body body)
+(defmacro define-node-function (name (node-name &rest arguments) &body body)
   "Defines a new node function. This is the main mechanism by which node manipulations are defined.
-All node functions are automatically created in the lquery-funcs package."
-  (unless (stringp docstring)
-    (setf body (append (list docstring) body))
-    (setf docstring (format NIL "lQuery node function ~a" name)))
-  (let ((funsymb (gensym "FUN"))
-        (i (gensym "I")))
-    
-    `(defun ,(intern (format NIL "NODEFUN-~a" name) :lquery-funcs) (,node-name ,@arguments)
-       ,docstring
-       (flet ((,funsymb (,node-name) ,@body))
-         (if (arrayp ,node-name)
-             (loop for ,i from 0 below (length ,node-name)
-                   do (setf (aref ,node-name ,i)
-                            (,funsymb (aref ,node-name ,i)))
-                   finally (return ,node-name))
-             (,funsymb ,node-name)))
-       ,node-name)))
+All node functions are automatically created in the lquery-funcs package.
 
-(defmacro define-node-list-function (name (list-name &rest arguments) &optional docstring &body body)
+NAME      --- A symbol naming the node function. Automatically interned in the LQUERY-FUNCS package.
+NODE-NAME --- Symbol bound to the current node.
+ARGUMENTS --- A lambda-list specifying the arguments for the function.
+BODY      ::= form*"
+  (let ((docstring (car body)))
+    (if (stringp docstring)
+        (setf body (cdr body))
+        (setf docstring (format NIL "lQuery node function ~a" name)))
+    (let ((funsymb (gensym "FUN"))
+          (i (gensym "I")))
+      `(defun ,(intern (symbol-name name) :lquery-funcs) (,node-name ,@arguments)
+         ,docstring
+         (flet ((,funsymb (,node-name) ,@body))
+           (if (arrayp ,node-name)
+               (loop for ,i from 0 below (length ,node-name)
+                     do (setf (aref ,node-name ,i)
+                              (,funsymb (aref ,node-name ,i)))
+                     finally (return ,node-name))
+               (,funsymb ,node-name)))
+         ,node-name))))
+
+(defmacro define-node-list-function (name (vector-name &rest arguments) &body body)
   "Defines a new function that operates on the current node array instead of individual elements.
-All node list functions are automatically created in the lquery-funcs package."
-  (unless (stringp docstring)
-    (setf body (append (list docstring) body))
-    (setf docstring (format NIL "lQuery node list function ~a" name)))
-  (let ((declarations (loop for expr = (first body)
-                         while (and expr (consp expr) (eql (first expr) 'DECLARE))
-                         do (setf body (cdr body))
-                         collect expr)))
-    `(defun ,(intern (format NIL "NODEFUN-~a" name) :lquery-funcs) (,list-name ,@arguments)
+All node list functions are automatically created in the lquery-funcs package.
+
+NAME        --- A symbol naming the node function. Automatically interned in the LQUERY-FUNCS package.
+VECTOR-NAME --- Symbol bound to the node vector.
+ARGUMENTS   --- A lambda-list specifying the arguments for the function.
+BODY        ::= form*"
+  (let ((docstring (car body)))
+    (if (stringp docstring)
+        (setf body (cdr body))
+        (setf docstring (format NIL "lQuery node list function ~a" name)))
+    `(defun ,(intern (symbol-name name) :lquery-funcs) (,vector-name ,@arguments)
        ,docstring
-       ,@declarations
-       (unless (arrayp ,list-name) (setf ,list-name (make-proper-vector :size 1 :initial-element ,list-name :fill-pointer T)))
-       ,@body)))
+       (let ((,vector-name (ensure-proper-vector ,vector-name)))
+         ,@body))))
 
 (defmacro $ (&body actions)
 #.(format NIL "Performs lQuery operations on the current document.
@@ -123,9 +142,14 @@ define-symbol-handler, respectively.")
 (defgeneric determine-argument (arg nodes)
   (:documentation "Determines what to do with a given argument at compile-time (static type)."))
 
-(defmacro define-argument-handler (type (argname nodesname) &body body)
-  "Defines a new argument handler that decides what to do with a certain type of argument at compile-time (static type)."
-  `(defmethod determine-argument ((,argname ,type) ,nodesname)
+(defmacro define-argument-handler (type (argument-name operator-name) &body body)
+  "Defines a new argument handler that decides what to do with a certain type of argument at compile-time.
+
+TYPE          --- A type or EQL specifier.
+ARGUMENT-NAME --- Symbol bound to the argument.
+OPERATOR-NAME --- Symbol bound to the object being operated on.
+BODY          ::= form*"
+  `(defmethod determine-argument ((,argument-name ,type) ,operator-name)
      ,@body))
 
 (define-argument-handler list (list nodes)
@@ -135,7 +159,7 @@ define-symbol-handler, respectively.")
         ((eq function 'FUNCTION) `(,(cadr list) ,nodes))
         ((eq function 'EVAL) `($ (inline ,nodes) ,(eval (second list))))
         ((eq function 'INLINE) `(determine-value ,(second list) ,nodes))
-        (T (multiple-value-bind (nodefun status) (find-symbol (format NIL "NODEFUN-~a" function) :lquery-funcs)
+        (T (multiple-value-bind (nodefun status) (find-symbol (symbol-name function) :lquery-funcs)
              (if (and nodefun (eq status :EXTERNAL))
                  (append `(,nodefun ,nodes) (cdr list))
                  (append `(,function ,nodes) (cdr list)))))))))
@@ -149,9 +173,14 @@ define-symbol-handler, respectively.")
 (defgeneric determine-value (symbol nodes)
   (:documentation "Determines what to do with a given symbol at run-time (variable type)."))
 
-(defmacro define-value-handler (type (symbolname nodesname) &body body)
-  "Defines a new symbol handler that decides what to do with a certain type of symbol at run-time (variable type)."
-  `(defmethod determine-value ((,symbolname ,type) ,nodesname)
+(defmacro define-value-handler (type (variable-name operator-name) &body body)
+  "Defines a new symbol handler that decides what to do with a certain type of symbol at run-time (variable type).
+
+TYPE          --- A type or EQL specifier.
+VARIABLE-NAME --- Symbol bound to the argument.
+OPERATOR-NAME --- Symbol bound to the object being operated on.
+BODY          ::= form*"
+  `(defmethod determine-value ((,variable-name ,type) ,operator-name)
      ,@body))
 
 (define-value-handler T (variable nodes)

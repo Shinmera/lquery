@@ -4,11 +4,7 @@
   Author: Nicolas Hafner <shinmera@tymoon.eu>
 |#
 
-(in-package :lquery-funcs)
-
-(eval-when (:compile-toplevel :load-toplevel :execute)
-  (import '(lquery::make-proper-vector
-            lquery::copy-proper-vector)))
+(in-package :lquery)
 
 (defun trim (string &optional (chars '(#\Space #\Tab #\Newline)))
   (string-trim chars string))
@@ -166,7 +162,7 @@
 (define-node-list-function append-to (working-nodes selector-or-nodes)
   "Insert every element to the end of the target(s)."
   (let ((targets (nodes-or-select selector-or-nodes)))
-    (nodefun-append targets working-nodes))
+    (lquery-funcs:append targets working-nodes))
   working-nodes)
 
 (define-node-function attr (node &rest pairs)
@@ -276,7 +272,7 @@ If no matching element can be found the root is entered instead."
 
 (define-node-list-function detach (nodes &optional selector)
   "Removes the node (optionally filtered by the selector) from the document. Alias for remove()"
-  (nodefun-remove nodes selector))
+  (lquery-funcs:remove nodes selector))
 
 (define-node-list-function each (nodes fun &key replace)
   "Execute the specified function on each element until NIL is returned or all elements have been processed. The original set of elements is returned if replace is NIL."
@@ -346,7 +342,7 @@ If no matching element can be found the root is entered instead."
   "Reduce the set of matched elements to those that have a descendant that matches the selector or element."
   (let ((find-fun (nodes-or-selector-func selector-or-nodes)))
     (replace-vector-if nodes #'(lambda (node)
-                                 (< 0 (length (nodefun-find node find-fun)))))))
+                                 (< 0 (length (lquery-funcs:find node find-fun)))))))
 
 (define-node-list-function has-class (working-nodes class)
   "Determine whether any of the matched elements are assigned to the given class."
@@ -359,7 +355,7 @@ If no matching element can be found the root is entered instead."
 
 (define-node-list-function hide (working-nodes )
   "Hide the matched elements (short for (css \"display\" \"none\"))."
-  (nodefun-css working-nodes "display" "none"))
+  (lquery-funcs:css working-nodes "display" "none"))
 
 (define-node-function html (node &optional new-content)
   "Get the HTML contents of the elements or set the HTML contents of every matched element."
@@ -390,11 +386,11 @@ If no matching element can be found the root is entered instead."
 
 (define-node-list-function insert-after (working-nodes selector-or-nodes)
   "Insert every element after the target."
-  (nodefun-after (nodes-or-select selector-or-nodes) working-nodes))
+  (lquery-funcs:after (nodes-or-select selector-or-nodes) working-nodes))
 
 (define-node-list-function insert-before (working-nodes selector-or-nodes)
   "Insert every element before the target."
-  (nodefun-before (nodes-or-select selector-or-nodes) working-nodes))
+  (lquery-funcs:before (nodes-or-select selector-or-nodes) working-nodes))
 
 (define-node-list-function is (working-nodes selector-or-nodes)
   "Check the current elements against a selector or list of elements and return true if at least one of them matches."
@@ -536,7 +532,7 @@ If no matching element can be found the root is entered instead."
 (define-node-list-function prepend-to (working-nodes selector-or-nodes)
   "Insert every element to the beginning of the target(s)."
   (let ((targets (nodes-or-select selector-or-nodes)))
-    (nodefun-prepend targets working-nodes))
+    (lquery-funcs:prepend targets working-nodes))
   working-nodes)
 
 (define-node-list-function prev (nodes &optional selector)
@@ -618,12 +614,12 @@ If no matching element can be found the root is entered instead."
 (define-node-list-function replace-with (working-nodes html-or-nodes)
   "Replace each element with the provided new content and return the set of elements that was removed."
   (let ((new-nodes (nodes-or-build html-or-nodes)))
-    (nodefun-replace-all new-nodes working-nodes)
+    (lquery-funcs:replace-all new-nodes working-nodes)
     working-nodes))
 
 (define-node-list-function show (working-nodes)
   "Display the matched elements (short for (css :display 'block'))"
-  (nodefun-css working-nodes "display" "block"))
+  (lquery-funcs:css working-nodes "display" "block"))
 
 (define-node-list-function siblings (nodes &optional selector)
   "Get the siblings of each element, optionally filtered by a selector."
