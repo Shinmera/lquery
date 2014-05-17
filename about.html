@@ -1,8 +1,10 @@
-<!DOCTYPE html><!--
+<!--
   This file is a part of lQuery
   (c) 2013 TymoonNET/NexT http://tymoon.eu (shinmera@tymoon.eu)
   Author: Nicolas Hafner <shinmera@tymoon.eu>
-  !--><html xmlns="http://www.w3.org/1999/xhtml">
+  !-->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8"/>
     <title>lQuery - About</title>
@@ -36,49 +38,49 @@
         <p>
           First, lQuery needs to be initialized with a document to work on:
         </p>
-        <code>($ (initialize #p"/path/to/input.html"))</code>
+        <code>($ (initialize #p&amp;quot;/path/to/input.html&amp;quot;))</code>
         <p>
           After that, you can use the $ function to select and manipulate the DOM:
         </p>
-        <code>($ "article")</code><br/>
-        <code>($ "article" (add-class "fancy") (attr :foo "bar"))</code>
+        <code>($ &amp;quot;article&amp;quot;)</code><br/>
+        <code>($ &amp;quot;article&amp;quot; (add-class &amp;quot;fancy&amp;quot;) (attr :foo &amp;quot;bar&amp;quot;))</code>
         <p>
           To render the HTML to a string use <code>serialize</code>. If you want to save it to a file directly, there's also <code>write-to-file</code>.
         </p>
         <code>($ (serialize))</code><br/>
-        <code>($ (write-to-file #p"/path/to/output.html"))</code>
+        <code>($ (write-to-file #p&amp;quot;/path/to/output.html&amp;quot;))</code>
         <p>
           So a quick file manipulation could look something like this:
         </p>
-        <code>($ (initialize #p"/path/to/input.html") "article" (append-to "content") (add-class "foo") (write-to-file #p"/path/to/output.html"))</code>
+        <code>($ (initialize #p&amp;quot;/path/to/input.html&amp;quot;) &amp;quot;article&amp;quot; (append-to &amp;quot;content&amp;quot;) (add-class &amp;quot;foo&amp;quot;) (write-to-file #p&amp;quot;/path/to/output.html&amp;quot;))</code>
         <p>
           Aside from using selectors as the first step, it's also possible to use any other variable or list and operate on it.
           <span class="version-diff">Since 2.0</span>: Literal function calls need to be added with (inline).
           Note that the result of the inline function will be used as if literally put in place. For example, an inlined function that evaluates
           to a string will result in a CSS-select.
         </p>
-        <code>($ (inline (list node-a node-b)) "article" (serialize))</code>
+        <code>($ (inline (list node-a node-b)) &amp;quot;article&amp;quot; (serialize))</code>
         <p>
           Selectors can come at any point in the sequence of lQuery operations and will always act on the current set of elements.
           If an operation evaluates to a list or a single node, the current set of elements is set to this result.
         </p>
-        <code>($ "a" (text "Link") ($ "p") (text "Paragraph"))</code>
+        <code>($ &amp;quot;a&amp;quot; (text &amp;quot;Link&amp;quot;) ($ &amp;quot;p&amp;quot;) (text &amp;quot;Paragraph&amp;quot;))</code>
         <p>
           This is equivalent to the following:
         </p>
-        <code>($ "a" (text "Link"))</code><br/>
-        <code>($ "p" (text "Paragraph"))</code>
+        <code>($ &amp;quot;a&amp;quot; (text &amp;quot;Link&amp;quot;))</code><br/>
+        <code>($ &amp;quot;p&amp;quot; (text &amp;quot;Paragraph&amp;quot;))</code>
         <p>
           While this sort of chaining is possible, it is discouraged and multiple statements should be used instead to ensure proper readability.
         </p>
         <p>
           Functions in the argument list will be translated to a function invocation with the current list of elements as their argument.
         </p>
-        <code>($ "a" #'(lambda (els) (first els)))</code>
+        <code>($ &amp;quot;a&amp;quot; #'(lambda (els) (first els)))</code>
         <p>
           lQuery<sup class="version-diff">Since 2.0</sup> also supports compile-time evaluation of forms, whose results are then put in place of their function calls:
         </p>
-        <code>($ (eval (format NIL "~a" *selector*)))</code>
+        <code>($ (eval (format NIL &amp;quot;~a&amp;quot; *selector*)))</code>
         <p>
           Keep in mind that the lexical environment is not the same at compile-time as at run-time.
         </p>
@@ -112,14 +114,14 @@
       <article>
         <header><h2>Other Guff</h2></header>
         <p>
-          lQuery is a sub-project of TyNETv5 ("Radiance"), licensed under the <a href="http://opensource.org/licenses/Artistic-2.0">Artistic License 2.0</a> and ©2013 TymoonNET/NexT, <a href="http://shinmera.com">Nicolas Hafner</a>.<br/>
+          lQuery is a sub-project of TyNETv5 (&amp;quot;Radiance&amp;quot;), licensed under the <a href="http://opensource.org/licenses/Artistic-2.0">Artistic License 2.0</a> and ©2013 TymoonNET/NexT, <a href="http://shinmera.com">Nicolas Hafner</a>.<br/>
           This library can be obtained via git on <a href="https://github.com/Shinmera/lquery.git">https://github.com/Shinmera/lquery.git</a>. For questions, patches or suggestions, please contact me via <a href="mailto:shinmera@tymoon.eu">email</a> or write a <a href="https://github.com/Shinmera/lquery/issues">github issue</a>.
         </p>
       </article>
       <article>
         <header><h2>lQuery Package Function Index</h2></header>
         <ul id="docs" class="docs"><li id="template">
-            <a class="anchor" name="$"/>
+            <a name="$" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL MACRO</span>
@@ -131,7 +133,7 @@
               <pre class="funcdesc">Performs lQuery operations on the current document.
 
 Each argument is executed in sequence. The arguments are evaluated according to the defined argument-handlers. By default, the following cases are handled: 
-  * STRING    Translates to a CSS-select on the current elements.
+  * STRING    Translates to a CLSS:QUERY on the current elements.
   * LIST      What lists translate to is determined by their first element:
     * EVAL      The second value of the list is evaluated at compile-time and the result is inlined as if it had been there as a standard argument to $.
     * INLINE    The second value of the list is put in place and its run-time evaluation result will be handled as if by symbol. See the symbol-handlers for more information.
@@ -141,7 +143,7 @@ Each argument is executed in sequence. The arguments are evaluated according to 
   * SYMBOL    Delegates to the symbol handlers.
 
 Symbols/Variables are handled at runtime (where they have a value) according to the defined symbol-handlers. By default, the following cases are handled at run time:
-  * STRING    Performs a CSS-select on the current elements.
+  * STRING    Performs a CLSS:QUERY on the current elements.
   * DOM:NODE  Replaces the current set of nodes with just this node.  
   * FUNCTION  Calls the given function with the current set of nodes as argument.
   * T         Any other value simply replaces the current list of nodes.
@@ -149,7 +151,7 @@ Symbols/Variables are handled at runtime (where they have a value) according to 
 Additional argument and symbol handlers can be defined with define-argument-handler and define-symbol-handler, respectively.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="*LQUERY-MASTER-DOCUMENT*"/>
+            <a name="*LQUERY-MASTER-DOCUMENT*" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL SPECIAL</span>
@@ -161,7 +163,7 @@ Additional argument and symbol handlers can be defined with define-argument-hand
               <pre class="funcdesc"></pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="DEFINE-ARGUMENT-HANDLER"/>
+            <a name="DEFINE-ARGUMENT-HANDLER" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL MACRO</span>
@@ -173,7 +175,7 @@ Additional argument and symbol handlers can be defined with define-argument-hand
               <pre class="funcdesc">Defines a new argument handler that decides what to do with a certain type of argument at compile-time (static type).</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="DEFINE-NODE-FUNCTION"/>
+            <a name="DEFINE-NODE-FUNCTION" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL MACRO</span>
@@ -186,7 +188,7 @@ Additional argument and symbol handlers can be defined with define-argument-hand
 All node functions are automatically created in the lquery-funcs package.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="DEFINE-NODE-LIST-FUNCTION"/>
+            <a name="DEFINE-NODE-LIST-FUNCTION" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL MACRO</span>
@@ -195,11 +197,11 @@ All node functions are automatically created in the lquery-funcs package.</pre>
                   <span class="funcargs">(NAME (LIST-NAME &amp;REST ARGUMENTS) &amp;OPTIONAL DOCSTRING &amp;BODY BODY)</span>
                 </code>
               </header>
-              <pre class="funcdesc">Defines a new function that operates on the current node list instead of individual elements.
+              <pre class="funcdesc">Defines a new function that operates on the current node array instead of individual elements.
 All node list functions are automatically created in the lquery-funcs package.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="DEFINE-SYMBOL-HANDLER"/>
+            <a name="DEFINE-SYMBOL-HANDLER" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL MACRO</span>
@@ -211,7 +213,7 @@ All node list functions are automatically created in the lquery-funcs package.</
               <pre class="funcdesc">Defines a new symbol handler that decides what to do with a certain type of symbol at run-time (variable type).</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="INITIALIZE"/>
+            <a name="INITIALIZE" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
@@ -223,22 +225,19 @@ All node list functions are automatically created in the lquery-funcs package.</
               <pre class="funcdesc">Sets the *lquery-master-document* variable to the provided document.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="LOAD-PAGE"/>
+            <a name="LOAD-PAGE" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
                   <h3 class="funcname">LOAD-PAGE</h3>
-                  <span class="funcargs">(FILE-OR-STRING &amp;KEY (TYPE XML) (BUILDER (MAKE-DOM-BUILDER)))</span>
+                  <span class="funcargs">(FILE-OR-STRING)</span>
                 </code>
               </header>
-              <pre class="funcdesc">Load the given file or string into a HTML DOM.
-If type is :HTML, the file is treated as a full HTML document.
-If type is NIL or :XML, the file is treated as an XML document, which does not need to contain the HTML root nodes.
-Alternatively, the type can be a DTD specification that will be supplied to cxml:parse 's dtd keyword.</pre>
+              <pre class="funcdesc">Load the given file or string into a HTML DOM.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="PARSE-HTML"/>
+            <a name="PARSE-HTML" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
@@ -254,7 +253,7 @@ Alternatively, the type can be a DTD specification that will be supplied to cxml
       <article>
         <header><h2>lQuery-Funcs Package Function Index</h2></header>
         <ul id="func-docs" class="docs"><li id="template">
-            <a class="anchor" name="NODEFUN-ADD"/>
+            <a name="NODEFUN-ADD" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
@@ -266,7 +265,7 @@ Alternatively, the type can be a DTD specification that will be supplied to cxml
               <pre class="funcdesc">Add elements to the set of matched elements.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-ADD-CLASS"/>
+            <a name="NODEFUN-ADD-CLASS" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
@@ -278,19 +277,19 @@ Alternatively, the type can be a DTD specification that will be supplied to cxml
               <pre class="funcdesc">Adds the specified class(es) to the set of matched elements.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-AFTER"/>
+            <a name="NODEFUN-AFTER" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
                   <h3 class="funcname">NODEFUN-AFTER</h3>
-                  <span class="funcargs">(NODE HTML-OR-NODES)</span>
+                  <span class="funcargs">(NODES HTML-OR-NODES)</span>
                 </code>
               </header>
               <pre class="funcdesc">Insert content (in html-string or node-list form) after each element.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-ANCESTOR"/>
+            <a name="NODEFUN-ANCESTOR" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
@@ -302,19 +301,19 @@ Alternatively, the type can be a DTD specification that will be supplied to cxml
               <pre class="funcdesc">Find the common ancestor of all elements.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-APPEND"/>
+            <a name="NODEFUN-APPEND" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
                   <h3 class="funcname">NODEFUN-APPEND</h3>
-                  <span class="funcargs">(NODE HTML-OR-NODES)</span>
+                  <span class="funcargs">(NODES HTML-OR-NODES)</span>
                 </code>
               </header>
               <pre class="funcdesc">Insert content (in html-string or node-list form) to the end of each element.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-APPEND-TO"/>
+            <a name="NODEFUN-APPEND-TO" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
@@ -326,7 +325,7 @@ Alternatively, the type can be a DTD specification that will be supplied to cxml
               <pre class="funcdesc">Insert every element to the end of the target(s).</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-ATTR"/>
+            <a name="NODEFUN-ATTR" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
@@ -338,19 +337,19 @@ Alternatively, the type can be a DTD specification that will be supplied to cxml
               <pre class="funcdesc">Retrieve or set attributes on a node</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-BEFORE"/>
+            <a name="NODEFUN-BEFORE" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
                   <h3 class="funcname">NODEFUN-BEFORE</h3>
-                  <span class="funcargs">(NODE HTML-OR-NODES)</span>
+                  <span class="funcargs">(NODES HTML-OR-NODES)</span>
                 </code>
               </header>
               <pre class="funcdesc">Insert content (in html-string or node-list form) before each element.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-CHILD-INDEX"/>
+            <a name="NODEFUN-CHILD-INDEX" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
@@ -362,19 +361,19 @@ Alternatively, the type can be a DTD specification that will be supplied to cxml
               <pre class="funcdesc">Returns the index of the element within its parent, also counting text nodes. See index() otherwise.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-CHILDREN"/>
+            <a name="NODEFUN-CHILDREN" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
                   <h3 class="funcname">NODEFUN-CHILDREN</h3>
-                  <span class="funcargs">(NODE &amp;OPTIONAL SELECTOR)</span>
+                  <span class="funcargs">(NODES &amp;OPTIONAL SELECTOR)</span>
                 </code>
               </header>
               <pre class="funcdesc">Get the children of each element, optionally filtered by a selector.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-CLONE"/>
+            <a name="NODEFUN-CLONE" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
@@ -386,7 +385,7 @@ Alternatively, the type can be a DTD specification that will be supplied to cxml
               <pre class="funcdesc">Create a deep copy of the set of matched elements.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-CLOSEST"/>
+            <a name="NODEFUN-CLOSEST" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
@@ -395,34 +394,35 @@ Alternatively, the type can be a DTD specification that will be supplied to cxml
                   <span class="funcargs">(NODE SELECTOR)</span>
                 </code>
               </header>
-              <pre class="funcdesc">For each element in the set, get the first element that matches the selector by testing the element itself and traversing up through its ancestors in the DOM tree.</pre>
+              <pre class="funcdesc">For each element in the set, get the first element that matches the selector by testing the element itself and traversing up through its ancestors in the DOM tree.
+If no matching element can be found the root is entered instead.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-CONTAINS"/>
+            <a name="NODEFUN-CONTAINS" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
                   <h3 class="funcname">NODEFUN-CONTAINS</h3>
-                  <span class="funcargs">(NODE STRING)</span>
+                  <span class="funcargs">(NODES STRING)</span>
                 </code>
               </header>
               <pre class="funcdesc">Select all elements that contain the specified text.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-CONTENTS"/>
+            <a name="NODEFUN-CONTENTS" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
                   <h3 class="funcname">NODEFUN-CONTENTS</h3>
-                  <span class="funcargs">(NODE)</span>
+                  <span class="funcargs">(NODES)</span>
                 </code>
               </header>
               <pre class="funcdesc">Get the children of each element, including text and comment nodes.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-CSS"/>
+            <a name="NODEFUN-CSS" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
@@ -434,7 +434,7 @@ Alternatively, the type can be a DTD specification that will be supplied to cxml
               <pre class="funcdesc">Retrieve or set css style attributes on a node.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-DATA"/>
+            <a name="NODEFUN-DATA" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
@@ -446,7 +446,7 @@ Alternatively, the type can be a DTD specification that will be supplied to cxml
               <pre class="funcdesc">Retrieve or set data attributes on a node. This is a convenience method and uses attr in the back.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-DEEPEST"/>
+            <a name="NODEFUN-DEEPEST" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
@@ -458,19 +458,19 @@ Alternatively, the type can be a DTD specification that will be supplied to cxml
               <pre class="funcdesc">Returns the innermost (left-bound) child element.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-EACH"/>
+            <a name="NODEFUN-EACH" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
                   <h3 class="funcname">NODEFUN-EACH</h3>
-                  <span class="funcargs">(WORKING-NODES FUN &amp;KEY REPLACE)</span>
+                  <span class="funcargs">(NODES FUN &amp;KEY REPLACE)</span>
                 </code>
               </header>
               <pre class="funcdesc">Execute the specified function on each element until NIL is returned or all elements have been processed. The original set of elements is returned if replace is NIL.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-EMPTY"/>
+            <a name="NODEFUN-EMPTY" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
@@ -482,7 +482,7 @@ Alternatively, the type can be a DTD specification that will be supplied to cxml
               <pre class="funcdesc">Remove all child nodes from the set of matched elements.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-EQ"/>
+            <a name="NODEFUN-EQ" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
@@ -494,7 +494,7 @@ Alternatively, the type can be a DTD specification that will be supplied to cxml
               <pre class="funcdesc">Reduce the set of matched elements to the one at the specified index</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-EVEN"/>
+            <a name="NODEFUN-EVEN" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
@@ -503,34 +503,34 @@ Alternatively, the type can be a DTD specification that will be supplied to cxml
                   <span class="funcargs">(WORKING-NODES)</span>
                 </code>
               </header>
-              <pre class="funcdesc">Selects even elements.</pre>
+              <pre class="funcdesc">Selects even elements, 1-indexed</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-FILTER"/>
+            <a name="NODEFUN-FILTER" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
                   <h3 class="funcname">NODEFUN-FILTER</h3>
-                  <span class="funcargs">(NODE SELECTOR-OR-FUNCTION)</span>
+                  <span class="funcargs">(NODES SELECTOR-OR-FUNCTION)</span>
                 </code>
               </header>
               <pre class="funcdesc">Reduce the set of matched elements to those that match the selector or pass the function's test.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-FIND"/>
+            <a name="NODEFUN-FIND" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
                   <h3 class="funcname">NODEFUN-FIND</h3>
-                  <span class="funcargs">(NODE SELECTOR-OR-FUNCTION &amp;KEY (TEST-SELF NIL))</span>
+                  <span class="funcargs">(NODES SELECTOR-OR-FUNCTION &amp;KEY (TEST-SELF NIL))</span>
                 </code>
               </header>
               <pre class="funcdesc">Get the descendants of each element filtered by selector or function.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-FIRST"/>
+            <a name="NODEFUN-FIRST" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
@@ -542,7 +542,7 @@ Alternatively, the type can be a DTD specification that will be supplied to cxml
               <pre class="funcdesc">Reduce the set of matched elements to the first in the set.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-GT"/>
+            <a name="NODEFUN-GT" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
@@ -554,19 +554,19 @@ Alternatively, the type can be a DTD specification that will be supplied to cxml
               <pre class="funcdesc">Select all elements at a greater than index(0) within the matched set.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-HAS"/>
+            <a name="NODEFUN-HAS" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
                   <h3 class="funcname">NODEFUN-HAS</h3>
-                  <span class="funcargs">(NODE SELECTOR-OR-NODES)</span>
+                  <span class="funcargs">(NODES SELECTOR-OR-NODES)</span>
                 </code>
               </header>
               <pre class="funcdesc">Reduce the set of matched elements to those that have a descendant that matches the selector or element.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-HAS-CLASS"/>
+            <a name="NODEFUN-HAS-CLASS" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
@@ -578,7 +578,7 @@ Alternatively, the type can be a DTD specification that will be supplied to cxml
               <pre class="funcdesc">Determine whether any of the matched elements are assigned to the given class.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-HIDE"/>
+            <a name="NODEFUN-HIDE" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
@@ -587,10 +587,10 @@ Alternatively, the type can be a DTD specification that will be supplied to cxml
                   <span class="funcargs">(WORKING-NODES)</span>
                 </code>
               </header>
-              <pre class="funcdesc">Hide the matched elements (short for (css :display 'none')).</pre>
+              <pre class="funcdesc">Hide the matched elements (short for (css &amp;quot;display&amp;quot; &amp;quot;none&amp;quot;)).</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-HTML"/>
+            <a name="NODEFUN-HTML" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
@@ -602,7 +602,7 @@ Alternatively, the type can be a DTD specification that will be supplied to cxml
               <pre class="funcdesc">Get the HTML contents of the elements or set the HTML contents of every matched element.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-HTML-FILE"/>
+            <a name="NODEFUN-HTML-FILE" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
@@ -614,7 +614,7 @@ Alternatively, the type can be a DTD specification that will be supplied to cxml
               <pre class="funcdesc">Read an HTML file and insert its contents into each element.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-INDEX"/>
+            <a name="NODEFUN-INDEX" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
@@ -626,19 +626,19 @@ Alternatively, the type can be a DTD specification that will be supplied to cxml
               <pre class="funcdesc">Find the index of the node within its parent.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-INITIALIZE"/>
+            <a name="NODEFUN-INITIALIZE" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
                   <h3 class="funcname">NODEFUN-INITIALIZE</h3>
-                  <span class="funcargs">(WORKING-NODES DOCUMENT &amp;KEY (TYPE XML))</span>
+                  <span class="funcargs">(WORKING-NODES DOCUMENT)</span>
                 </code>
               </header>
               <pre class="funcdesc">Re-initializes lQuery with a new page.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-INSERT-AFTER"/>
+            <a name="NODEFUN-INSERT-AFTER" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
@@ -650,7 +650,7 @@ Alternatively, the type can be a DTD specification that will be supplied to cxml
               <pre class="funcdesc">Insert every element after the target.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-INSERT-BEFORE"/>
+            <a name="NODEFUN-INSERT-BEFORE" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
@@ -662,7 +662,7 @@ Alternatively, the type can be a DTD specification that will be supplied to cxml
               <pre class="funcdesc">Insert every element before the target.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-IS"/>
+            <a name="NODEFUN-IS" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
@@ -674,19 +674,19 @@ Alternatively, the type can be a DTD specification that will be supplied to cxml
               <pre class="funcdesc">Check the current elements against a selector or list of elements and return true if at least one of them matches.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-IS-EMPTY"/>
+            <a name="NODEFUN-IS-EMPTY" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
                   <h3 class="funcname">NODEFUN-IS-EMPTY</h3>
-                  <span class="funcargs">(WORKING-NODES)</span>
+                  <span class="funcargs">(NODE)</span>
                 </code>
               </header>
               <pre class="funcdesc">Check if the node contains no children and/or only empty (whitespace) text nodes. If it is empty, T is returned, otherwise NIL.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-LAST"/>
+            <a name="NODEFUN-LAST" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
@@ -698,7 +698,7 @@ Alternatively, the type can be a DTD specification that will be supplied to cxml
               <pre class="funcdesc">Reduce the set of matched elements to the final one in the set.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-LENGTH"/>
+            <a name="NODEFUN-LENGTH" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
@@ -710,7 +710,7 @@ Alternatively, the type can be a DTD specification that will be supplied to cxml
               <pre class="funcdesc">Returns the number of elements in the list.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-LT"/>
+            <a name="NODEFUN-LT" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
@@ -722,7 +722,7 @@ Alternatively, the type can be a DTD specification that will be supplied to cxml
               <pre class="funcdesc">Select all elements at an index less than the index within the matched set.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-MAP"/>
+            <a name="NODEFUN-MAP" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
@@ -734,43 +734,43 @@ Alternatively, the type can be a DTD specification that will be supplied to cxml
               <pre class="funcdesc">Pass each element through a function (which has to accept one argument, the node), returning the list of all results.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-NEXT"/>
+            <a name="NODEFUN-NEXT" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
                   <h3 class="funcname">NODEFUN-NEXT</h3>
-                  <span class="funcargs">(NODE &amp;OPTIONAL SELECTOR)</span>
+                  <span class="funcargs">(NODES &amp;OPTIONAL SELECTOR)</span>
                 </code>
               </header>
               <pre class="funcdesc">Get the immediately following sibling of each element (if there is one). If a selector is provided, the sibling is only included if it matches.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-NEXT-ALL"/>
+            <a name="NODEFUN-NEXT-ALL" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
                   <h3 class="funcname">NODEFUN-NEXT-ALL</h3>
-                  <span class="funcargs">(NODE &amp;OPTIONAL SELECTOR)</span>
+                  <span class="funcargs">(NODES &amp;OPTIONAL SELECTOR)</span>
                 </code>
               </header>
               <pre class="funcdesc">Get all following siblings of each element. If a selector is provided, the sibling is only included if it matches.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-NEXT-UNTIL"/>
+            <a name="NODEFUN-NEXT-UNTIL" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
                   <h3 class="funcname">NODEFUN-NEXT-UNTIL</h3>
-                  <span class="funcargs">(NODE SELECTOR-OR-NODES)</span>
+                  <span class="funcargs">(NODES SELECTOR-OR-NODES)</span>
                 </code>
               </header>
               <pre class="funcdesc">Get all following silings of each element up to (excluding) the element matched by the selector or node list.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-NODE"/>
+            <a name="NODEFUN-NODE" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
@@ -782,7 +782,7 @@ Alternatively, the type can be a DTD specification that will be supplied to cxml
               <pre class="funcdesc">Return the specified node (default first) directly, without encompassing it into a list.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-NOT"/>
+            <a name="NODEFUN-NOT" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
@@ -791,10 +791,10 @@ Alternatively, the type can be a DTD specification that will be supplied to cxml
                   <span class="funcargs">(WORKING-NODES SELECTOR-OR-NODES)</span>
                 </code>
               </header>
-              <pre class="funcdesc">Remove elements from the set of matched elements.</pre>
+              <pre class="funcdesc">Remove matching elements from the working elements.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-NOT-EMPTY"/>
+            <a name="NODEFUN-NOT-EMPTY" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
@@ -803,10 +803,10 @@ Alternatively, the type can be a DTD specification that will be supplied to cxml
                   <span class="funcargs">(NODE)</span>
                 </code>
               </header>
-              <pre class="funcdesc">Check if the node contains no children and/or only empty (whitespace) text nodes. If the node is effectively empty, NIL is returned. Otherwise a list of all non-empty children and text-nodes is returned.</pre>
+              <pre class="funcdesc">Check if the node contains no children and/or only empty (whitespace) text nodes. If the node is effectively empty NIL is returned, otherwise T</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-ODD"/>
+            <a name="NODEFUN-ODD" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
@@ -815,58 +815,58 @@ Alternatively, the type can be a DTD specification that will be supplied to cxml
                   <span class="funcargs">(WORKING-NODES)</span>
                 </code>
               </header>
-              <pre class="funcdesc">Select all odd elements from the current set.</pre>
+              <pre class="funcdesc">Select all odd elements from the current set, 1-indexed.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-PARENT"/>
+            <a name="NODEFUN-PARENT" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
                   <h3 class="funcname">NODEFUN-PARENT</h3>
-                  <span class="funcargs">(NODE &amp;OPTIONAL SELECTOR)</span>
+                  <span class="funcargs">(NODES &amp;OPTIONAL SELECTOR)</span>
                 </code>
               </header>
               <pre class="funcdesc">Get the parent of each element, optionally filtered by a selector.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-PARENTS"/>
+            <a name="NODEFUN-PARENTS" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
                   <h3 class="funcname">NODEFUN-PARENTS</h3>
-                  <span class="funcargs">(NODE &amp;OPTIONAL SELECTOR)</span>
+                  <span class="funcargs">(NODES &amp;OPTIONAL SELECTOR)</span>
                 </code>
               </header>
               <pre class="funcdesc">Get the ancestors of each element, optionally filtered by a selector. Closest parent first.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-PARENTS-UNTIL"/>
+            <a name="NODEFUN-PARENTS-UNTIL" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
                   <h3 class="funcname">NODEFUN-PARENTS-UNTIL</h3>
-                  <span class="funcargs">(NODE SELECTOR-OR-NODES)</span>
+                  <span class="funcargs">(NODES SELECTOR-OR-NODES)</span>
                 </code>
               </header>
               <pre class="funcdesc">Get the ancestors of each element, up to (excluding) the element matched by the selector or node list. Closest parent first</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-PREPEND"/>
+            <a name="NODEFUN-PREPEND" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
                   <h3 class="funcname">NODEFUN-PREPEND</h3>
-                  <span class="funcargs">(NODE HTML-OR-NODES)</span>
+                  <span class="funcargs">(NODES HTML-OR-NODES)</span>
                 </code>
               </header>
               <pre class="funcdesc">Insert content, specified by the parameter, to the beginning of each element.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-PREPEND-TO"/>
+            <a name="NODEFUN-PREPEND-TO" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
@@ -878,43 +878,43 @@ Alternatively, the type can be a DTD specification that will be supplied to cxml
               <pre class="funcdesc">Insert every element to the beginning of the target(s).</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-PREV"/>
+            <a name="NODEFUN-PREV" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
                   <h3 class="funcname">NODEFUN-PREV</h3>
-                  <span class="funcargs">(NODE &amp;OPTIONAL SELECTOR)</span>
+                  <span class="funcargs">(NODES &amp;OPTIONAL SELECTOR)</span>
                 </code>
               </header>
               <pre class="funcdesc">Get the immediately preceding sibling of each element (if there is one). If a selector is provided, the sibling is only included if it matches.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-PREV-ALL"/>
+            <a name="NODEFUN-PREV-ALL" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
                   <h3 class="funcname">NODEFUN-PREV-ALL</h3>
-                  <span class="funcargs">(NODE &amp;OPTIONAL SELECTOR)</span>
+                  <span class="funcargs">(NODES &amp;OPTIONAL SELECTOR)</span>
                 </code>
               </header>
               <pre class="funcdesc">Get all preceeding siblings of each element. If a selector is provided, the sibling is only included if it matches.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-PREV-UNTIL"/>
+            <a name="NODEFUN-PREV-UNTIL" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
                   <h3 class="funcname">NODEFUN-PREV-UNTIL</h3>
-                  <span class="funcargs">(NODE SELECTOR-OR-NODES)</span>
+                  <span class="funcargs">(NODES SELECTOR-OR-NODES)</span>
                 </code>
               </header>
               <pre class="funcdesc">Get all preceeding silings of each element down to (excluding) the element matched by the selector or node list.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-REMOVE"/>
+            <a name="NODEFUN-REMOVE" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
@@ -926,7 +926,7 @@ Alternatively, the type can be a DTD specification that will be supplied to cxml
               <pre class="funcdesc">Remove the set of matched elements from the DOM.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-REMOVE-ATTR"/>
+            <a name="NODEFUN-REMOVE-ATTR" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
@@ -938,7 +938,7 @@ Alternatively, the type can be a DTD specification that will be supplied to cxml
               <pre class="funcdesc">Remove attributes from each element.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-REMOVE-CLASS"/>
+            <a name="NODEFUN-REMOVE-CLASS" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
@@ -950,19 +950,19 @@ Alternatively, the type can be a DTD specification that will be supplied to cxml
               <pre class="funcdesc">Remove classes from each element.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-REMOVE-DATA"/>
+            <a name="NODEFUN-REMOVE-DATA" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
                   <h3 class="funcname">NODEFUN-REMOVE-DATA</h3>
-                  <span class="funcargs">(WORKING-NODES &amp;REST DATA)</span>
+                  <span class="funcargs">(NODE &amp;REST DATA)</span>
                 </code>
               </header>
               <pre class="funcdesc">Remove data attributes from each element. This is a convenience method and uses remove-attr in the back.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-REPLACE-ALL"/>
+            <a name="NODEFUN-REPLACE-ALL" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
@@ -971,10 +971,10 @@ Alternatively, the type can be a DTD specification that will be supplied to cxml
                   <span class="funcargs">(WORKING-NODES SELECTOR-OR-NODES)</span>
                 </code>
               </header>
-              <pre class="funcdesc">Replace each target element with the set of matched elements.</pre>
+              <pre class="funcdesc">Replace each in the set of matched elements with the current nodes.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-REPLACE-WITH"/>
+            <a name="NODEFUN-REPLACE-WITH" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
@@ -986,19 +986,19 @@ Alternatively, the type can be a DTD specification that will be supplied to cxml
               <pre class="funcdesc">Replace each element with the provided new content and return the set of elements that was removed.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-SERIALIZE"/>
+            <a name="NODEFUN-SERIALIZE" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
                   <h3 class="funcname">NODEFUN-SERIALIZE</h3>
-                  <span class="funcargs">(NODE &amp;KEY (OMIT-SELF NIL) (DOCTYPE html))</span>
+                  <span class="funcargs">(NODE &amp;OPTIONAL (STREAM NIL))</span>
                 </code>
               </header>
               <pre class="funcdesc">Serialize the node into a string.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-SHOW"/>
+            <a name="NODEFUN-SHOW" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
@@ -1010,19 +1010,19 @@ Alternatively, the type can be a DTD specification that will be supplied to cxml
               <pre class="funcdesc">Display the matched elements (short for (css :display 'block'))</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-SIBLINGS"/>
+            <a name="NODEFUN-SIBLINGS" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
                   <h3 class="funcname">NODEFUN-SIBLINGS</h3>
-                  <span class="funcargs">(NODE &amp;OPTIONAL SELECTOR)</span>
+                  <span class="funcargs">(NODES &amp;OPTIONAL SELECTOR)</span>
                 </code>
               </header>
               <pre class="funcdesc">Get the siblings of each element, optionally filtered by a selector.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-SIZE"/>
+            <a name="NODEFUN-SIZE" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
@@ -1034,7 +1034,7 @@ Alternatively, the type can be a DTD specification that will be supplied to cxml
               <pre class="funcdesc">Return the number of elements in the list.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-SLICE"/>
+            <a name="NODEFUN-SLICE" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
@@ -1046,19 +1046,19 @@ Alternatively, the type can be a DTD specification that will be supplied to cxml
               <pre class="funcdesc">Reduce the set of matched elements to a subset specified by a range of indices</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-TEXT"/>
+            <a name="NODEFUN-TEXT" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
                   <h3 class="funcname">NODEFUN-TEXT</h3>
-                  <span class="funcargs">(NODE &amp;OPTIONAL (TEXT NIL T-S-P) (DOCUMENT *LQUERY-MASTER-DOCUMENT*))</span>
+                  <span class="funcargs">(NODE &amp;OPTIONAL (TEXT NIL T-S-P))</span>
                 </code>
               </header>
-              <pre class="funcdesc">Get the combined text contents of each element, including their descendants. If text is set, all text nodes are removed and a new text node is appended to the end of the node. If text is NIL, all text nodes are removed from the node.</pre>
+              <pre class="funcdesc">Get the combined text contents of each element, including their descendants. If text is set, all text nodes are removed and a new text node is appended to the end of the node. If text is NIL, all direct text nodes are removed from the node.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-TOGGLE-CLASS"/>
+            <a name="NODEFUN-TOGGLE-CLASS" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
@@ -1070,7 +1070,7 @@ Alternatively, the type can be a DTD specification that will be supplied to cxml
               <pre class="funcdesc">Add or remove one or more classes from each element, depending on their presence within the element.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-UNWRAP"/>
+            <a name="NODEFUN-UNWRAP" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
@@ -1079,34 +1079,34 @@ Alternatively, the type can be a DTD specification that will be supplied to cxml
                   <span class="funcargs">(NODE)</span>
                 </code>
               </header>
-              <pre class="funcdesc">Remove the parents of the set of matched elements from the DOM, leaving the matched elements in their place. The parent is removed if it is empty after unwrapping.</pre>
+              <pre class="funcdesc">Remove the parents of the set of matched elements from the DOM, inserting the parents children in place of it.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-VAL"/>
+            <a name="NODEFUN-VAL" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
                   <h3 class="funcname">NODEFUN-VAL</h3>
-                  <span class="funcargs">(WORKING-NODES &amp;OPTIONAL VALUE)</span>
+                  <span class="funcargs">(NODE &amp;OPTIONAL (VALUE NIL V-P))</span>
                 </code>
               </header>
-              <pre class="funcdesc">Get the current values or set the value of every matched element. This uses (attr :value val) in the back.</pre>
+              <pre class="funcdesc">Get the current values or set the value of every matched element.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-WRAP"/>
+            <a name="NODEFUN-WRAP" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
                   <h3 class="funcname">NODEFUN-WRAP</h3>
-                  <span class="funcargs">(NODE HTML-OR-NODES)</span>
+                  <span class="funcargs">(NODES HTML-OR-NODES)</span>
                 </code>
               </header>
-              <pre class="funcdesc">Wrap an HTML structure around each element. Note that always the first subnode is chosen.</pre>
+              <pre class="funcdesc">Wrap an HTML structure around each element. Note that always the first node of the structure to wrap is chosen.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-WRAP-ALL"/>
+            <a name="NODEFUN-WRAP-ALL" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
@@ -1115,29 +1115,28 @@ Alternatively, the type can be a DTD specification that will be supplied to cxml
                   <span class="funcargs">(WORKING-NODES HTML-OR-NODES)</span>
                 </code>
               </header>
-              <pre class="funcdesc">Wrap an HTML structure around all elements inside their next (common) parent.</pre>
+              <pre class="funcdesc">Wrap an HTML structure around all elements and put it in place of the first element, removing all other elements from their position.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-WRAP-INNER"/>
+            <a name="NODEFUN-WRAP-INNER" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
                   <h3 class="funcname">NODEFUN-WRAP-INNER</h3>
-                  <span class="funcargs">(NODE HTML-OR-NODES)</span>
+                  <span class="funcargs">(NODES HTML-OR-NODES)</span>
                 </code>
               </header>
               <pre class="funcdesc">Wrap an HTML structure around the contents of each element.</pre>
             </article>
           </li><li id="template">
-            <a class="anchor" name="NODEFUN-WRITE-TO-FILE"/>
+            <a name="NODEFUN-WRITE-TO-FILE" class="anchor"/>
             <article>
               <header>
                 <span class="functype">EXTERNAL FUNCTION</span>
                 <code>
                   <h3 class="funcname">NODEFUN-WRITE-TO-FILE</h3>
-                  <span class="funcargs">(WORKING-NODES FILE &amp;KEY (DOCTYPE html) (IF-DOES-NOT-EXIST CREATE)
- (IF-EXISTS SUPERSEDE))</span>
+                  <span class="funcargs">(WORKING-NODES FILE &amp;KEY (IF-DOES-NOT-EXIST CREATE) (IF-EXISTS SUPERSEDE))</span>
                 </code>
               </header>
               <pre class="funcdesc">Write the serialized node to the file. Note that always only the first element is written.</pre>
