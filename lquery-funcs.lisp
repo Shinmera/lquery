@@ -290,6 +290,13 @@ If no matching element can be found the root is entered instead."
   "Remove all child nodes from the set of matched elements."
   (plump:clear node))
 
+(define-node-function empty-p (node)
+  "Check if the node contains no children and/or only empty (whitespace) text nodes. If it is empty, T is returned, otherwise NIL."
+  (loop for child across (plump:children node)
+        never (or (plump:element-p child)
+                  (and (plump:text-node-p child)
+                       (< 0 (length (trim (plump:text child))))))))
+
 (define-node-list-function eq (working-nodes index)
   "Reduce the set of matched elements to the one at the specified index"
   (setf (aref working-nodes 0) (aref working-nodes index)
@@ -398,12 +405,10 @@ If no matching element can be found the root is entered instead."
     (loop for node across working-nodes
           thereis (funcall find-fun node))))
 
-(define-node-function is-empty (node)
-  "Check if the node contains no children and/or only empty (whitespace) text nodes. If it is empty, T is returned, otherwise NIL."
-  (loop for child across (plump:children node)
-        never (or (plump:element-p child)
-                  (and (plump:text-node-p child)
-                       (< 0 (length (trim (plump:text child))))))))
+(defun lquery-funcs:is-empty (node)
+  "Check if the node contains no children and/or only empty (whitespace) text nodes. If it is empty, T is returned, otherwise NIL.
+Alias of EMPTY-P"
+  (lquery-funcs:empty-p node))
 
 (define-node-list-function last (working-nodes)
   "Reduce the set of matched elements to the final one in the set."

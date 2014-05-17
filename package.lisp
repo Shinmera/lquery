@@ -49,6 +49,7 @@
    :deepest
    :each
    :empty
+   :empty-p
    :eq
    :even
    :filter
