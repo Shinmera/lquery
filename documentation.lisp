@@ -13,7 +13,8 @@
 (in-package :org.tymoonnext.lquery.doc)
 
 (defmethod documentate-object :after (template object fields)
-  ($ template ".anchor" (attr "name" (symbol-name (nth 0 object)))))
+  ($ template ".anchor" (attr "name" (symbol-name (nth 0 object))))
+  ($ template "h3 a" (attr "href" (format NIL "#~a" (symbol-name (nth 0 object))))))
 
 (defun build-documentation ()
   ($ (initialize (merge-pathnames "about-template.html" (asdf:system-source-directory :lquery))))

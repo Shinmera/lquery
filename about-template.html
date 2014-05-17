@@ -7,26 +7,28 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>lQuery - About</title>
+    <title>lQuery - About - 3.0.0</title>
     <style type="text/css">
       code{font-family: Consolas, Inconsolata, monospace;}
+      code.line{margin-left: 20px;}
+      code a{text-decoration: none; color: blue;}
       h3{display: inline-block;margin:0;padding:0;}
-      .version-diff{color:red;}
       .docs{list-style: none;}
       .docs li{margin-bottom: 20px;}
       .docs pre{margin: 0 0 0 10px; white-space: pre-wrap;}
+      .version-diff{color:red;}
     </style>
   </head>
   <body>
     <header>
       <img src="lquery-logo.png" alt="lQuery"/>
-      <h1>v2.0.0</h1>
+      <h1>v3.0.0</h1>
     </header>
     <div id="content">
       <article>
         <header><h2>What is lQuery?</h2></header>
         <p>
-          lQuery is a DOM manipulation library written in Common Lisp, inspired by and based on the <a href="http://jquery.com/">jQuery</a> syntax and functions. It uses <a href="http://common-lisp.net/project/cxml/">Closure-XML</a> and <a href="https://github.com/AccelerationNet/css-selectors">CSS-Selectors</a> in the background to achieve its work. Its main idea is to replace HTML templating systems and allow generated HTML for websites while relying on pure HTML files. This achieves a much cleaner separation of static and dynamic page parts.
+          lQuery is a DOM manipulation library written in Common Lisp, inspired by and based on the <a href="http://jquery.com/">jQuery</a> syntax and functions. It uses <a href="http://shinmera.github.io/plump">Plump</a> and <a href="http://shinmera.github.io/CLSS/">CLSS</a> as DOM and selector engines. The main idea behind lQuery is to provide a simple interface for crawling and modifying HTML sites, as well as to allow for an alternative approach to templating.
         </p>
       </article>
       <article>
@@ -34,82 +36,119 @@
         <p>
           Load lQuery with ASDF or Quicklisp.
         </p>
-        <code>(ql:quickload :lquery)</code>
+        <code class="line">(ql:quickload :lquery)</code>
         <p>
           First, lQuery needs to be initialized with a document to work on:
         </p>
-        <code>($ (initialize #p"/path/to/input.html"))</code>
+        <code class="line">(<a href="#$">lquery:$</a> (<a href="#INITIALIZE">initialize</a> #p"/path/to/input.html"))</code>
         <p>
           After that, you can use the $ function to select and manipulate the DOM:
         </p>
-        <code>($ "article")</code><br />
-        <code>($ "article" (add-class "fancy") (attr :foo "bar"))</code>
+        <code class="line">(<a href="#$">lquery:$</a> "article")</code><br />
+        <pre><code class="line">(<a href="#$">lquery:$</a> "article"
+    (<a href="#ADD-CLASS">add-class</a> "fancy")
+    (<a href="#ATTR">attr</a> "foo" "bar"))</code></pre>
         <p>
           To render the HTML to a string use <code>serialize</code>. If you want to save it to a file directly, there's also <code>write-to-file</code>.
         </p>
-        <code>($ (serialize))</code><br />
-        <code>($ (write-to-file #p"/path/to/output.html"))</code>
+        <code class="line">(<a href="#$">lquery:$</a> (<a href="#SERIALIZE">serialize</a>))</code><br />
+        <code class="line">(<a href="#$">lquery:$</a> (<a href="#WRITE-TO-FILE">write-to-file</a> #p"/path/to/output.html"))</code>
         <p>
           So a quick file manipulation could look something like this:
         </p>
-        <code>($ (initialize #p"/path/to/input.html") "article" (append-to "content") (add-class "foo") (write-to-file #p"/path/to/output.html"))</code>
+        <pre><code class="line">(<a href="#$">lquery:$</a> (<a href="#INITIALIZE">initialize</a> #p"/path/to/input.html")
+    "article"
+    (<a href="#APPEND-TO">append-to</a> "content")
+    (<a href="#ADD-CLASS">add-class</a> "foo")
+    (<a href="#WRITE-TO-FILE">write-to-file</a> #p"/path/to/output.html"))</code></pre>
         <p>
-          Aside from using selectors as the first step, it's also possible to use any other variable or list and operate on it.
-          <span class="version-diff">Since 2.0</span>: Literal function calls need to be added with (inline).
+          Aside from using selectors as the first step, it's also possible to use any other variable or list and operate on it.<br />
+          <a href="#2.0.0"><span class="version-diff">2.0</span></a>: Literal function calls need to be added with <code>INLINE</code>.
           Note that the result of the inline function will be used as if literally put in place. For example, an inlined function that evaluates
           to a string will result in a CSS-select.
         </p>
-        <code>($ (inline (list node-a node-b)) "article" (serialize))</code>
+        <pre><code class="line">(<a href="#$">lquery:$</a> (inline (list node-a node-b))
+    "article"
+    (<a href="#SERIALIZE">serialize</a>))</code></pre>
         <p>
           Selectors can come at any point in the sequence of lQuery operations and will always act on the current set of elements.
-          If an operation evaluates to a list or a single node, the current set of elements is set to this result.
+          If an operation evaluates to a list, array, vector or a single node, the current set of elements is set to this result.
         </p>
-        <code>($ "a" (text "Link") ($ "p") (text "Paragraph"))</code>
+        <pre><code class="line">(<a href="#$">lquery:$</a> "a"
+    (<a href="#TEXT">text</a> "Link")
+    (inline (<a href="#$">lquery:$</a> "p"))
+    (<a href="#TEXT">text</a> "Paragraph"))</code></pre>
         <p>
           This is equivalent to the following:
         </p>
-        <code>($ "a" (text "Link"))</code><br />
-        <code>($ "p" (text "Paragraph"))</code>
-        <p>
-          While this sort of chaining is possible, it is discouraged and multiple statements should be used instead to ensure proper readability.
-        </p>
+        <pre><code class="line">(<a href="#$">lquery:$</a> "a"
+    (<a href="#TEXT">text</a> "Link"))</code></pre>
+        <pre><code class="line">(<a href="#$">lquery:$</a> "p"
+    (<a href="#TEXT">text</a> "Paragraph"))</code></pre>
         <p>
           Functions in the argument list will be translated to a function invocation with the current list of elements as their argument.
         </p>
-        <code>($ "a" #'(lambda (els) (first els)))</code>
+        <pre><code class="line">(<a href="#$">lquery:$</a> "a"
+    #'(lambda (els) (aref els 0)))</code></pre>
         <p>
-          lQuery<sup class="version-diff">Since 2.0</sup> also supports compile-time evaluation of forms, whose results are then put in place of their function calls:
+          lQuery<a href="#2.0.0"><sup class="version-diff">2.0</sup></a> also supports compile-time evaluation of forms, whose results are then put in place of their function calls:
         </p>
-        <code>($ (eval (format NIL "~a" *selector*)))</code>
+        <code class="line">(<a href="#$">lquery:$</a> (eval (format NIL "~a" *selector*)))</code>
         <p>
           Keep in mind that the lexical environment is not the same at compile-time as at run-time.
         </p>
+        <p>
+          lQuery uses vectors internally to modify and handle sets of nodes. These vectors are usually modified instead of copied to avoid unnecessary resource allocation. This however also means that lQuery functions are possibly side-effecting. If you pass an adjustable vector into lQuery through INLINE or similar, it will not be copied and therefore side-effects might occur. lQuery will automatically copy everything else that isn't an adjustable vector through <code><a href="#ENSURE-PROPER-VECTOR">ENSURE-PROPER-VECTOR</a></code>. If you do want to pass in an adjustable vector, but make sure it doesn't affect it, use <code><a href="#COPY-PROPER-VECTOR">COPY-PROPER-VECTOR</a></code>.
+        </p>
       </article>
       <article>
-        <header><h2>Extending lQuery <sup class="version-diff">For 2.0</sup></h2></header>
+        <header><h2>Test Suite</h2></header>
+        <p>
+          To ensure that functions are at least somewhat stable in their behaviour, lQuery includes a test suite. You can load this through Quicklisp/ASDF with
+        </p>
+        <code class="line">(ql:quickload :lquery-test)</code>
+        <p>
+          Running the suit is simply a matter of invoking <code>RUN</code>
+        </p>
+        <code class="line">(lquery-test:run)</code>
+        <p>
+          The tests are rather loose, but should cover all functions to at least behave mostly according to expectation.
+        </p>
+      </article>
+      <article>
+        <header><h2>Extending lQuery <a href="#3.0.0"><sup class="version-diff">3.0</sup></a></h2></header>
         <p>
           lQuery allows extension in a couple of ways. The most important of which are node operations themselves, which come in two flavours: node-funs and node-list-funs.
-          Any node operation resides in the package :lquery-funcs, which is automatically scanned by the $ macro. The two macros responsible for defining new node functions automatically
+          Any node operation resides in the package <code>LQUERY-FUNCS</code>, which is automatically scanned by the $ macro. The two macros responsible for defining new node functions automatically
           place the resulting operations in this package for you.
         </p>
-        <code>(define-node-function name (node-name &amp;rest arguments) &amp;optional docstring &amp;body body)</code><br />
-        <code>(define-node-list-function name (list-name &amp;rest arguments) &amp;optional docstring &amp;body body)</code>
+        <code class="line">(<a href="#DEFINE-NODE-FUNCTION">define-node-function</a> name (node-name &amp;rest arguments) &amp;body body)</code><br />
+        <code class="line">(<a href="#DEFINE-NODE-LIST-FUNCTION">define-node-list-function</a> name (vector-name &amp;rest arguments) &amp;body body)</code>
         <p>
-          Any function generated by these macros can be called either with a single node or a list of nodes. In the case of a regular node operation, if it receives a list of nodes, the
-          function is called once for each node and the results are collected into a list, which is then returned. If it receives a single node, only a single result is returned. In the
-          case of a node list function, the return value can be either a list or a single value, depending on what the goal of the operation is.
+          Any function generated by these macros can be called either with a single node or a vector of nodes. In the case of a regular node operation, if it receives a vector of nodes, the
+          function is called once for each node and the results are collected into a vector, which is then returned. If it receives a single node, only a single result is returned. In the
+          case of a node list function, the return value can be either a vector or a single value, depending on what the goal of the operation is. It is expected that node list functions will
+          modify the given vector directly in order to avoid unnecessary copying.
         </p>
         <p>
-          The $ macro itself can be extended as well by providing additional argument- or symbol-handlers. The following two macros make this possible:
+          The $ macro itself can be extended as well by providing additional argument- or value-handlers. The following two macros make this possible:
         </p>
-        <code>(define-argument-handler type (argsname nodesname) &amp;body body)</code>
+        <code class="line">(<a href="#DEFINE-ARGUMENT-HANDLER">define-argument-handler</a> type (argument-name operator-name) &amp;body body)</code>
         <p>
           Argument handlers transform the arguments at compile-time. For example, this would allow an extension to turn literal arrays into lists so they can be processed as well.
         </p>
-        <code>(define-symbol-handler type (symbolname nodesname) &amp;body body)</code>
+        <code class="line">(<a href="#DEFINE-VALUE-HANDLER">define-value-handler</a> type (variable-name operator-name) &amp;body body)</code>
         <p>
-          Symbol handlers on the other hand determine the action at run-time. This is mostly useful for defining special actions on certain variable values.
+          Value handlers on the other hand determine the action at run-time. This is mostly useful for defining special actions on certain variable values.
         </p>
+      </article>
+      <article>
+        <header><h2>What's New</h2></header>
+        <a name="3.0.0"></a><h3>3.0.0</h3>
+        <p>Complete rewrite of everything. This version is <strong class="version-diff">compatibility breaking</strong>. While the node functions themselves perform just the same as before (with one or two exceptions), lQuery now uses vectors instead of lists internally. If you ever relied on lQuery return values, this version will most likely break your code. Effort has been made to keep upgrading as simple as possible though; passing lists into an lQuery chain automatically transforms it for example.</p>
+        <p>Thanks to the change to Plump, lQuery is now also able to parse almost any kind of X/HT/ML document, which was not well possible previously. And thanks to switching to CLSS, lQuery is now much faster at selecting nodes from the DOM.</p>
+        <a name="2.0.0"></a><h3>2.0.0</h3>
+        <p>Added extension system and INLINE, EVAL handling. Revamped base macros to be more stable and simple.</p>
       </article>
       <article>
         <header><h2>Other Guff</h2></header>
@@ -122,12 +161,12 @@
         <header><h2>lQuery Package Function Index</h2></header>
         <ul id="docs" class="docs">
           <li id="template">
-            <a name="" class="anchor"></a>
             <article>
+              <a name="Foo" class="anchor"></a>
               <header>
                 <span class="functype">test</span>
                 <code>
-                  <h3 class="funcname">Foo</h3>
+                  <h3><a href="#Foo" class="funcname">Foo</a></h3>
                   <span class="funcargs">()</span>
                 </code>
               </header>
