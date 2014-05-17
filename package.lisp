@@ -18,7 +18,7 @@
 
    :define-node-function
    :define-node-list-function
-   :define-symbol-handler
+   :define-value-handler
    :define-argument-handler))
 
 (defpackage lquery-funcs

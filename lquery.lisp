@@ -149,35 +149,35 @@ define-symbol-handler, respectively.")
 (defgeneric determine-symbol (symbol nodes)
   (:documentation "Determines what to do with a given symbol at run-time (variable type)."))
 
-(defmacro define-symbol-handler (type (symbolname nodesname) &body body)
+(defmacro define-value-handler (type (symbolname nodesname) &body body)
   "Defines a new symbol handler that decides what to do with a certain type of symbol at run-time (variable type)."
   `(defmethod determine-symbol ((,symbolname ,type) ,nodesname)
      ,@body))
 
-(define-symbol-handler T (variable nodes)
+(define-value-handler T (variable nodes)
   (declare (ignore nodes))
   variable)
 
-(define-symbol-handler list (list nodes)
+(define-value-handler list (list nodes)
   (declare (ignore nodes))
   (copy-proper-vector list))
 
-(define-symbol-handler array (array nodes)
+(define-value-handler array (array nodes)
   (declare (ignore nodes))
   (copy-proper-vector array))
 
-(define-symbol-handler vector (vector nodes)
+(define-value-handler vector (vector nodes)
   (declare (ignore nodes))
   (if (adjustable-array-p vector)
       vector
       (copy-proper-vector vector)))
 
-(define-symbol-handler string (selector nodes)
+(define-value-handler string (selector nodes)
   (clss:select selector nodes))
 
-(define-symbol-handler plump:node (node nodes)
+(define-value-handler plump:node (node nodes)
   (declare (ignore nodes))
   (make-proper-vector :size 1 :initial-element node :fill-pointer T))
 
-(define-symbol-handler function (function nodes)
+(define-value-handler function (function nodes)
   (funcall function nodes))
