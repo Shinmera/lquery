@@ -134,24 +134,24 @@ define-symbol-handler, respectively.")
       (cond 
         ((eq function 'FUNCTION) `(,(cadr list) ,nodes))
         ((eq function 'EVAL) `($ (inline ,nodes) ,(eval (second list))))
-        ((eq function 'INLINE) `(determine-symbol ,(second list) ,nodes))
+        ((eq function 'INLINE) `(determine-value ,(second list) ,nodes))
         (T (multiple-value-bind (nodefun status) (find-symbol (format NIL "NODEFUN-~a" function) :lquery-funcs)
              (if (and nodefun (eq status :EXTERNAL))
                  (append `(,nodefun ,nodes) (cdr list))
                  (append `(,function ,nodes) (cdr list)))))))))
 
 (define-argument-handler symbol (symbol nodes)
-  `(determine-symbol ,symbol ,nodes))
+  `(determine-value ,symbol ,nodes))
 
 (define-argument-handler string (string nodes)
   `(clss:select ,string ,nodes))
 
-(defgeneric determine-symbol (symbol nodes)
+(defgeneric determine-value (symbol nodes)
   (:documentation "Determines what to do with a given symbol at run-time (variable type)."))
 
 (defmacro define-value-handler (type (symbolname nodesname) &body body)
   "Defines a new symbol handler that decides what to do with a certain type of symbol at run-time (variable type)."
-  `(defmethod determine-symbol ((,symbolname ,type) ,nodesname)
+  `(defmethod determine-value ((,symbolname ,type) ,nodesname)
      ,@body))
 
 (define-value-handler T (variable nodes)
