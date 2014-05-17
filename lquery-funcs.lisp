@@ -176,7 +176,7 @@
     (1 (plump:attribute node (assure-attribute (first pairs))))
     (otherwise 
      (loop for (key val) on pairs by #'cddr
-           do (setf (plump:attribute node key) val))
+           do (setf (plump:attribute node (assure-attribute key)) val))
      node)))
 
 (define-node-list-function before (nodes html-or-nodes)
