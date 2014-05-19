@@ -62,7 +62,7 @@ BODY          ::= form*"
     (if (stringp docstring)
         (setf body (cdr body))
         (setf docstring (format NIL "lQuery node macro ~a" name)))
-    `(defun ,(intern (symbol-name name) :lquery-macros) (,operator-name ,@arguments)
+    `(defun ,(intern (symbol-name name) :lquery-macros) (,previous-form ,@arguments)
        ,docstring
        ,@body)))
 
