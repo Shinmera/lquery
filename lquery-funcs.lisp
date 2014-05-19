@@ -335,7 +335,7 @@ Alias of EMPTY-P"
 
 (define-node-list-function map (working-nodes function)
   "Pass each element through a function (which has to accept one argument, the node), returning the list of all results."
-  (replace-vector-if working-nodes #'(lambda (a) (declare (ignore a)) T) :key function))
+  (replace-vector working-nodes function))
 
 (define-node-list-function next (nodes &optional selector)
   "Get the immediately following sibling of each element (if there is one). If a selector is provided, the sibling is only included if it matches."
