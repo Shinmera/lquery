@@ -6,7 +6,7 @@
 
 (in-package :lquery)
 
-(defmacro define-node-function (name (node-name &rest arguments) &body body)
+(defmacro define-lquery-function (name (node-name &rest arguments) &body body)
   "Defines a new node function. This is the main mechanism by which node manipulations are defined.
 All node functions are automatically created in the lquery-funcs package.
 
@@ -31,7 +31,7 @@ BODY      ::= form*"
                      finally (return ,node-name))
                (,funsymb ,node-name)))))))
 
-(defmacro define-node-list-function (name (vector-name &rest arguments) &body body)
+(defmacro define-lquery-list-function (name (vector-name &rest arguments) &body body)
   "Defines a new function that operates on the current node array instead of individual elements.
 All node list functions are automatically created in the lquery-funcs package.
 
@@ -49,7 +49,7 @@ BODY        ::= form*"
        (let ((,vector-name (ensure-proper-vector ,vector-name)))
          ,@body))))
 
-(defmacro define-node-macro (name (operator-name &rest arguments) &body body)
+(defmacro define-lquery-macro (name (operator-name &rest arguments) &body body)
   ""
   (assert (symbolp name))
   (let ((docstring (car body)))

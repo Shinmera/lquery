@@ -20,10 +20,10 @@
    #:inline
    #:eval
 
-   #:define-node-function
-   #:define-node-list-function
+   #:define-lquery-function
+   #:define-lquery-list-function
+   #:define-lquery-macro
    #:define-value-handler
-   #:define-list-handler
    #:define-argument-handler))
 
 (defpackage lquery-funcs
