@@ -8,9 +8,9 @@
 
 (defmacro define-lquery-function (name (node-name &rest arguments) &body body)
   "Defines a new node function. This is the main mechanism by which node manipulations are defined.
-All node functions are automatically created in the lquery-funcs package.
+All lquery functions are automatically created in the lquery-funcs package.
 
-NAME      --- A symbol naming the node function. Automatically interned in the LQUERY-FUNCS package.
+NAME      --- A symbol naming the lquery function. Automatically interned in the LQUERY-FUNCS package.
 NODE-NAME --- Symbol bound to the current node.
 ARGUMENTS --- A lambda-list specifying the arguments for the function.
 BODY      ::= form*"
@@ -33,9 +33,9 @@ BODY      ::= form*"
 
 (defmacro define-lquery-list-function (name (vector-name &rest arguments) &body body)
   "Defines a new function that operates on the current node array instead of individual elements.
-All node list functions are automatically created in the lquery-funcs package.
+All lquery functions are automatically created in the lquery-funcs package.
 
-NAME        --- A symbol naming the node function. Automatically interned in the LQUERY-FUNCS package.
+NAME        --- A symbol naming the lquery function. Automatically interned in the LQUERY-FUNCS package.
 VECTOR-NAME --- Symbol bound to the node vector.
 ARGUMENTS   --- A lambda-list specifying the arguments for the function.
 BODY        ::= form*"
@@ -49,8 +49,14 @@ BODY        ::= form*"
        (let ((,vector-name (ensure-proper-vector ,vector-name)))
          ,@body))))
 
-(defmacro define-lquery-macro (name (operator-name &rest arguments) &body body)
-  ""
+(defmacro define-lquery-macro (name (previous-form &rest arguments) &body body)
+  "Define a new lquery local macro.
+All lquery macros are automatically created in the lquery-macros package.
+
+NAME          --- A symbol naming the lquery macro. Automatically interned in the LQUERY-MACROS package.
+PREVIOUS-FORM --- Symbol bound to the so far assembled form, the previous value so to speak.
+ARGUMENTS     --- A lambda-list specifying the arguments for the macro (note that this must be a standard lambda-list).
+BODY          ::= form*"
   (assert (symbolp name))
   (let ((docstring (car body)))
     (if (stringp docstring)
@@ -66,22 +72,17 @@ BODY        ::= form*"
 Each argument is executed in sequence. The arguments are evaluated according to the defined argument-handlers. ~
 By default, the following cases are handled: 
   * STRING    Translates to a CLSS:QUERY on the current elements.
-  * LIST      What lists translate to is determined by their first element:
-    * EVAL      The second value of the list is evaluated at compile-time and the result ~
-                is inlined as if it had been there as a standard argument to $.
-    * INLINE    The second value of the list is put in place and its run-time evaluation result ~
-                will be handled as if by symbol. See the symbol-handlers for more information.
-    * NODEFUN   If the symbol name is a node function, it is translated into a nodefun-call ~
-                with the list of nodes as first argument and the other elements in the call-list ~
-                as extra arguments.
-    * T         Otherwise this list will be transformed into a regular function call with the ~
-                current list of nodes as first argument and the other elements in the call-list ~
-                as extra arguments.
   * FUNCTION  Translates to a function call with the list of nodes as argument.
-  * SYMBOL    Delegates to the symbol handlers.
+  * SYMBOL    Delegates to the value handlers.
+  * LIST      Lists are transformed according to their first element, which must be a symbol. ~
+              If the symbol's name corresponds to a function found in the LQUERY-MACROS package, ~
+              The form is assembled according to that function. Otherwise if it corresponds to an ~
+              LQUERY-FUNCS function, it is expanded into a call to that function. If the symbol ~
+              cannot be found in either package, it is put back in place, but the call itself is ~
+              assembled like so: (FUNCTION PREVIOUS-RESULT ARGUMENT*)
 
-Symbols/Variables are handled at runtime (where they have a value) according to the defined ~
-symbol-handlers. By default, the following cases are handled at run time:
+Values are handled at runtime according to the defined variable-handlers. ~
+By default, the following cases are handled at run time:
   * STRING    Performs a CLSS:QUERY on the current elements.
   * DOM:NODE  Replaces the current set of nodes with just this node.  
   * FUNCTION  Calls the given function with the current set of nodes as argument.
@@ -113,13 +114,15 @@ BODY          ::= form*"
 
 (define-argument-handler list (list nodes)
   (when list
-    (let ((nodemacro (find-symbol (symbol-name (car list)) :lquery-macros)))
-      (if nodemacro
-          (apply (symbol-function nodemacro) nodes (cdr list))
-          (let ((nodefunc (find-symbol (symbol-name (car list)) :lquery-funcs)))
-            (if nodefunc
-                `(,nodefunc ,nodes ,@(cdr list))
-                `(,(car list) ,nodes ,@(cdr list))))))))
+    (etypecase (car list)
+      (symbol
+       (let ((nodemacro (find-symbol (symbol-name (car list)) :lquery-macros)))
+         (if nodemacro
+             (apply (symbol-function nodemacro) nodes (cdr list))
+             (let ((nodefunc (find-symbol (symbol-name (car list)) :lquery-funcs)))
+               (if nodefunc
+                   `(,nodefunc ,nodes ,@(cdr list))
+                   `(,(car list) ,nodes ,@(cdr list))))))))))
 
 (define-argument-handler symbol (symbol nodes)
   `(determine-value ,symbol ,nodes))

@@ -22,5 +22,7 @@
     (let ((nodes (lquery-doc::documentate template :lquery :exclude '(:internal :method))))
       ($ "#docs" (empty) (append nodes)))
     (let ((nodes (lquery-doc::documentate template :lquery-funcs :exclude '(:internal :method))))
-      ($ "#func-docs" (empty) (append nodes))))
+      ($ "#func-docs" (empty) (append nodes)))
+    (let ((nodes (lquery-doc::documentate template :lquery-macros :exclude '(:internal :method))))
+      ($ "#macro-docs" (empty) (append nodes))))
   ($ (write-to-file (merge-pathnames "about.html" (asdf:system-source-directory :lquery)))))

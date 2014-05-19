@@ -7,7 +7,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8"/>
-    <title>lQuery - About - 3.0.0</title>
+    <title>lQuery - About - 3.1.0</title>
     <style type="text/css">
       code{font-family: Consolas, Inconsolata, monospace;}
       code.line{margin-left: 20px;}
@@ -22,7 +22,7 @@
   <body>
     <header>
       <img src="lquery-logo.png" alt="lQuery"/>
-      <h1>v3.0.0</h1>
+      <h1>v3.1.0</h1>
     </header>
     <div id="content">
       <article>
@@ -67,7 +67,7 @@
           Note that the result of the inline function will be used as if literally put in place. For example, an inlined function that evaluates
           to a string will result in a CSS-select.
         </p>
-        <pre><code class="line">(<a href="#$">lquery:$</a> (inline (list node-a node-b))
+        <pre><code class="line">(<a href="#$">lquery:$</a> (<a href="#INLINE">inline</a> (list node-a node-b))
     &quot;article&quot;
     (<a href="#SERIALIZE">serialize</a>))</code></pre>
         <p>
@@ -76,7 +76,7 @@
         </p>
         <pre><code class="line">(<a href="#$">lquery:$</a> &quot;a&quot;
     (<a href="#TEXT">text</a> &quot;Link&quot;)
-    (inline (<a href="#$">lquery:$</a> &quot;p&quot;))
+    (<a href="#INLINE">inline</a> (<a href="#$">lquery:$</a> &quot;p&quot;))
     (<a href="#TEXT">text</a> &quot;Paragraph&quot;))</code></pre>
         <p>
           This is equivalent to the following:
@@ -93,10 +93,16 @@
         <p>
           lQuery<a href="#2.0.0"><sup class="version-diff">2.0</sup></a> also supports compile-time evaluation of forms, whose results are then put in place of their function calls:
         </p>
-        <code class="line">(<a href="#$">lquery:$</a> (eval (format NIL &quot;~a&quot; *selector*)))</code>
+        <code class="line">(<a href="#$">lquery:$</a> (<a href="#EVAL">eval</a> (format NIL &quot;~a&quot; *selector*)))</code>
         <p>
           Keep in mind that the lexical environment is not the same at compile-time as at run-time.
         </p>
+        <p>
+          Often times you'll also want to retrieve multiple, different values from your current set of nodes. To make this more convenient, you can use the <code>COMBINE</code> form:
+        </p>
+        <pre><code class="line">(<a href="#$">lquery:$</a> &quot;a&quot;
+    (<a href="#COMBINE">combine</a> (<a href="#ATTR">attr</a> :href) (<a href="#TEXT">text</a>))
+    (<a href="#MAP-APPLY">map-apply</a> #'(lambda (url text) (format T &quot;[~a](~a)&quot; text url))))</code></pre>
         <p>
           lQuery uses vectors internally to modify and handle sets of nodes. These vectors are usually modified instead of copied to avoid unnecessary resource allocation. This however also means that lQuery functions are possibly side-effecting. If you pass an adjustable vector into lQuery through INLINE or similar, it will not be copied and therefore side-effects might occur. lQuery will automatically copy everything else that isn't an adjustable vector through <code><a href="#ENSURE-PROPER-VECTOR">ENSURE-PROPER-VECTOR</a></code>. If you do want to pass in an adjustable vector, but make sure it doesn't affect it, use <code><a href="#COPY-PROPER-VECTOR">COPY-PROPER-VECTOR</a></code>.
         </p>
@@ -116,20 +122,24 @@
         </p>
       </article>
       <article>
-        <header><h2>Extending lQuery <a href="#3.0.0"><sup class="version-diff">3.0</sup></a></h2></header>
+        <header><h2>Extending lQuery <a href="#3.1.0"><sup class="version-diff">3.1</sup></a></h2></header>
         <p>
-          lQuery allows extension in a couple of ways. The most important of which are node operations themselves, which come in two flavours: node-funs and node-list-funs.
-          Any node operation resides in the package <code>LQUERY-FUNCS</code>, which is automatically scanned by the $ macro. The two macros responsible for defining new node functions automatically
+          lQuery allows extension in a couple of ways. The most important of which are node functions themselves, which come in two flavours: lquery-funs and lquery-list-funs.
+          Any lquery function resides in the package <code>LQUERY-FUNCS</code>, which is automatically scanned by the $ macro. The two macros responsible for defining new lquery functions automatically
           place the resulting operations in this package for you.
         </p>
-        <code class="line">(<a href="#DEFINE-NODE-FUNCTION">define-node-function</a> name (node-name &amp;rest arguments) &amp;body body)</code><br/>
-        <code class="line">(<a href="#DEFINE-NODE-LIST-FUNCTION">define-node-list-function</a> name (vector-name &amp;rest arguments) &amp;body body)</code>
+        <code class="line">(<a href="#DEFINE-LQUERY-FUNCTION">define-lquery-function</a> name (node-name &amp;rest arguments) &amp;body body)</code><br/>
+        <code class="line">(<a href="#DEFINE-LQUERY-LIST-FUNCTION">define-lquery-list-function</a> name (vector-name &amp;rest arguments) &amp;body body)</code>
         <p>
           Any function generated by these macros can be called either with a single node or a vector of nodes. In the case of a regular node operation, if it receives a vector of nodes, the
           function is called once for each node and the results are collected into a vector, which is then returned. If it receives a single node, only a single result is returned. In the
           case of a node list function, the return value can be either a vector or a single value, depending on what the goal of the operation is. It is expected that node list functions will
           modify the given vector directly in order to avoid unnecessary copying.
         </p>
+        <p>
+          Some constructs would be very cumbersome to write as functions, or would simply be more suited in the form of a macro. To allow for this, lQuery<a href="#3.1.0"><sup class="version-diff">3.1</sup></a> includes a mechanism of <code>$</code> local macros. The previously mentioned forms like <code>INLINE</code> are handled through this system. Just like lquery functions, lquery macros reside in their own package <code>LQUERY-MACROS</code>. The responsible macro for defining new lquery macros will automatically place it in there for you.
+        </p>
+        <code class="line">(<a href="#DEFINE-LQUERY-MACRO">define-lquery-macro</a> name (previous-form &amp;rest arguments) &amp;body body)</code>
         <p>
           The $ macro itself can be extended as well by providing additional argument- or value-handlers. The following two macros make this possible:
         </p>
@@ -144,6 +154,9 @@
       </article>
       <article>
         <header><h2>What's New</h2></header>
+        <a name="3.1.0"/><h3>3.1.0</h3>
+        <p>Renamed <code>DEFINE-NODE-*</code> macros into more sensible <code>DEFINE-LQUERY-*</code>.</p>
+        <p>Added macro system, new standard <code>COMBINE</code> macro.</p>
         <a name="3.0.0"/><h3>3.0.0</h3>
         <p>Complete rewrite of everything. This version is <strong class="version-diff">compatibility breaking</strong>. While the node functions themselves perform just the same as before (with one or two exceptions), lQuery now uses vectors instead of lists internally. If you ever relied on lQuery return values, this version will most likely break your code. Effort has been made to keep upgrading as simple as possible though; passing lists into an lQuery chain automatically transforms it for example.</p>
         <p>Thanks to the change to Plump, lQuery is now also able to parse almost any kind of X/HT/ML document, which was not well possible previously. And thanks to switching to CLSS, lQuery is now much faster at selecting nodes from the DOM.</p>
@@ -173,24 +186,18 @@
 
 Each argument is executed in sequence. The arguments are evaluated according to the defined argument-handlers. By default, the following cases are handled: 
   * STRING    Translates to a CLSS:QUERY on the current elements.
-  * LIST      What lists translate to is determined by their first element:
-    * EVAL      The second value of the list is evaluated at compile-time and the result is inlined as if it had been there as a standard argument to $.
-    * INLINE    The second value of the list is put in place and its run-time evaluation result will be handled as if by symbol. See the symbol-handlers for more information.
-    * NODEFUN   If the symbol name is a node function, it is translated into a nodefun-call with the list of nodes as first argument and the other elements in the call-list as extra arguments.
-    * T         Otherwise this list will be transformed into a regular function call with the current list of nodes as first argument and the other elements in the call-list as extra arguments.
   * FUNCTION  Translates to a function call with the list of nodes as argument.
-  * SYMBOL    Delegates to the symbol handlers.
+  * SYMBOL    Delegates to the value handlers.
+  * LIST      Lists are transformed according to their first element, which must be a symbol. If the symbol's name corresponds to a function found in the LQUERY-MACROS package, The form is assembled according to that function. Otherwise if it corresponds to an LQUERY-FUNCS function, it is expanded into a call to that function. If the symbol cannot be found in either package, it is put back in place, but the call itself is assembled like so: (FUNCTION PREVIOUS-RESULT ARGUMENT*)
 
-Symbols/Variables are handled at runtime (where they have a value) according to the defined symbol-handlers. By default, the following cases are handled at run time:
+Values are handled at runtime according to the defined variable-handlers. By default, the following cases are handled at run time:
   * STRING    Performs a CLSS:QUERY on the current elements.
   * DOM:NODE  Replaces the current set of nodes with just this node.  
   * FUNCTION  Calls the given function with the current set of nodes as argument.
   * LIST      Lists are transformed into a proper vector.
   * ARRAY     Arrays are transformed into a proper vector.
   * VECTOR    Vectors that are not adjustable are transformed into a proper vector.
-  * T         Any other value simply replaces the current list of nodes.
-
-Additional argument and symbol handlers can be defined with define-argument-handler and define-symbol-handler, respectively.</pre>
+  * T         Any other value simply replaces the current list of nodes.</pre>
             </article>
           </li><li id="template">
             <article>
@@ -235,16 +242,16 @@ BODY          ::= form*</pre>
             </article>
           </li><li id="template">
             <article>
-              <a name="DEFINE-NODE-FUNCTION" class="anchor"/>
+              <a name="DEFINE-LQUERY-FUNCTION" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL MACRO</span>
                 <code>
-                  <h3><a href="#DEFINE-NODE-FUNCTION" class="funcname">DEFINE-NODE-FUNCTION</a></h3>
+                  <h3><a href="#DEFINE-LQUERY-FUNCTION" class="funcname">DEFINE-LQUERY-FUNCTION</a></h3>
                   <span class="funcargs">(NAME (NODE-NAME &amp;REST ARGUMENTS) &amp;BODY BODY)</span>
                 </code>
               </header>
               <pre class="funcdesc">Defines a new node function. This is the main mechanism by which node manipulations are defined.
-All node functions are automatically created in the lquery-funcs package.
+All lquery functions are automatically created in the lquery-funcs package.
 
 NAME      --- A symbol naming the node function. Automatically interned in the LQUERY-FUNCS package.
 NODE-NAME --- Symbol bound to the current node.
@@ -253,21 +260,39 @@ BODY      ::= form*</pre>
             </article>
           </li><li id="template">
             <article>
-              <a name="DEFINE-NODE-LIST-FUNCTION" class="anchor"/>
+              <a name="DEFINE-LQUERY-LIST-FUNCTION" class="anchor"/>
               <header>
                 <span class="functype">EXTERNAL MACRO</span>
                 <code>
-                  <h3><a href="#DEFINE-NODE-LIST-FUNCTION" class="funcname">DEFINE-NODE-LIST-FUNCTION</a></h3>
+                  <h3><a href="#DEFINE-LQUERY-LIST-FUNCTION" class="funcname">DEFINE-LQUERY-LIST-FUNCTION</a></h3>
                   <span class="funcargs">(NAME (VECTOR-NAME &amp;REST ARGUMENTS) &amp;BODY BODY)</span>
                 </code>
               </header>
               <pre class="funcdesc">Defines a new function that operates on the current node array instead of individual elements.
-All node list functions are automatically created in the lquery-funcs package.
+All lquery functions are automatically created in the lquery-funcs package.
 
 NAME        --- A symbol naming the node function. Automatically interned in the LQUERY-FUNCS package.
 VECTOR-NAME --- Symbol bound to the node vector.
 ARGUMENTS   --- A lambda-list specifying the arguments for the function.
 BODY        ::= form*</pre>
+            </article>
+          </li><li id="template">
+            <article>
+              <a name="DEFINE-LQUERY-MACRO" class="anchor"/>
+              <header>
+                <span class="functype">EXTERNAL MACRO</span>
+                <code>
+                  <h3><a href="#DEFINE-LQUERY-MACRO" class="funcname">DEFINE-LQUERY-MACRO</a></h3>
+                  <span class="funcargs">(NAME (PREVIOUS-FORM &amp;REST ARGUMENTS) &amp;BODY BODY)</span>
+                </code>
+              </header>
+              <pre class="funcdesc">Define a new lquery local macro.
+All lquery macros are automatically created in the lquery-macros package.
+
+NAME          --- A symbol naming the lquery macro. Automatically interned in the LQUERY-MACROS package.
+PREVIOUS-FORM --- Symbol bound to the so far assembled form, the previous value so to speak.
+ARGUMENTS     --- A lambda-list specifying the arguments for the macro (note that this must be a standard lambda-list).
+BODY          ::= form*</pre>
             </article>
           </li><li id="template">
             <article>
@@ -345,6 +370,78 @@ BODY          ::= form*</pre>
                 </code>
               </header>
               <pre class="funcdesc">Build the given string into DOM objects related to the master document.</pre>
+            </article>
+          </li></ul>
+      </article>
+      <article>
+        <header><h2>lQuery-Macros Package Function Index</h2></header>
+        <ul id="macro-docs" class="docs"><li id="template">
+            <article>
+              <a name="COMBINE" class="anchor"/>
+              <header>
+                <span class="functype">EXTERNAL FUNCTION</span>
+                <code>
+                  <h3><a href="#COMBINE" class="funcname">COMBINE</a></h3>
+                  <span class="funcargs">(NODES &amp;REST CALLS)</span>
+                </code>
+              </header>
+              <pre class="funcdesc">COMBINES multiple lquery function calls into one by gathering them into a list for each element.
+
+ ($ (combine (text) (attr :a))) would be  equivalent to 
+ ($ (map #'(lambda (node) (list (lquery-funcs:text node) (lquery-funcs:attr node :a)))))
+This construct is especially useful in combination with MAP-APPLY.</pre>
+            </article>
+          </li><li id="template">
+            <article>
+              <a name="EVAL" class="anchor"/>
+              <header>
+                <span class="functype">EXTERNAL FUNCTION</span>
+                <code>
+                  <h3><a href="#EVAL" class="funcname">EVAL</a></h3>
+                  <span class="funcargs">(NODES FORM)</span>
+                </code>
+              </header>
+              <pre class="funcdesc">Evaluates the form at compile-time and puts its resulting value in place.</pre>
+            </article>
+          </li><li id="template">
+            <article>
+              <a name="FUNCTION" class="anchor"/>
+              <header>
+                <span class="functype">EXTERNAL FUNCTION</span>
+                <code>
+                  <h3><a href="#FUNCTION" class="funcname">FUNCTION</a></h3>
+                  <span class="funcargs">(NODES NAME)</span>
+                </code>
+              </header>
+              <pre class="funcdesc">Macro to allow #'foo to be used in lquery chains.</pre>
+            </article>
+          </li><li id="template">
+            <article>
+              <a name="INITIALIZE" class="anchor"/>
+              <header>
+                <span class="functype">EXTERNAL FUNCTION</span>
+                <code>
+                  <h3><a href="#INITIALIZE" class="funcname">INITIALIZE</a></h3>
+                  <span class="funcargs">(NODES &amp;REST INIT-CALLS)</span>
+                </code>
+              </header>
+              <pre class="funcdesc">See lquery function INITIALIZE.
+
+This is merely a performance macro to avoid the unnecessary default allocation of a vector.</pre>
+            </article>
+          </li><li id="template">
+            <article>
+              <a name="INLINE" class="anchor"/>
+              <header>
+                <span class="functype">EXTERNAL FUNCTION</span>
+                <code>
+                  <h3><a href="#INLINE" class="funcname">INLINE</a></h3>
+                  <span class="funcargs">(NODES FORM)</span>
+                </code>
+              </header>
+              <pre class="funcdesc">Treats the form as if the evaluated value was put literally in place.
+
+See DETERMINE-VALUE.</pre>
             </article>
           </li></ul>
       </article>
