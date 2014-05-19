@@ -253,7 +253,7 @@ BODY          ::= form*</pre>
               <pre class="funcdesc">Defines a new node function. This is the main mechanism by which node manipulations are defined.
 All lquery functions are automatically created in the lquery-funcs package.
 
-NAME      --- A symbol naming the node function. Automatically interned in the LQUERY-FUNCS package.
+NAME      --- A symbol naming the lquery function. Automatically interned in the LQUERY-FUNCS package.
 NODE-NAME --- Symbol bound to the current node.
 ARGUMENTS --- A lambda-list specifying the arguments for the function.
 BODY      ::= form*</pre>
@@ -271,7 +271,7 @@ BODY      ::= form*</pre>
               <pre class="funcdesc">Defines a new function that operates on the current node array instead of individual elements.
 All lquery functions are automatically created in the lquery-funcs package.
 
-NAME        --- A symbol naming the node function. Automatically interned in the LQUERY-FUNCS package.
+NAME        --- A symbol naming the lquery function. Automatically interned in the LQUERY-FUNCS package.
 VECTOR-NAME --- Symbol bound to the node vector.
 ARGUMENTS   --- A lambda-list specifying the arguments for the function.
 BODY        ::= form*</pre>
@@ -940,6 +940,19 @@ Alias of EMPTY-P</pre>
                 </code>
               </header>
               <pre class="funcdesc">Pass each element through a function (which has to accept one argument, the node), returning the list of all results.</pre>
+            </article>
+          </li><li id="template">
+            <article>
+              <a name="MAP-APPLY" class="anchor"/>
+              <header>
+                <span class="functype">EXTERNAL FUNCTION</span>
+                <code>
+                  <h3><a href="#MAP-APPLY" class="funcname">MAP-APPLY</a></h3>
+                  <span class="funcargs">(WORKING-NODES FUNCTION)</span>
+                </code>
+              </header>
+              <pre class="funcdesc">Pass each element through a function by apply, returning the vector of all results.
+This is commonly useful in combination with COMBINE.</pre>
             </article>
           </li><li id="template">
             <article>

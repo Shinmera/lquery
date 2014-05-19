@@ -70,6 +70,7 @@
    #:length
    #:lt
    #:map
+   #:map-apply
    #:next
    #:next-all
    #:next-until
