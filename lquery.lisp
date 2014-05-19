@@ -14,6 +14,7 @@ NAME      --- A symbol naming the node function. Automatically interned in the L
 NODE-NAME --- Symbol bound to the current node.
 ARGUMENTS --- A lambda-list specifying the arguments for the function.
 BODY      ::= form*"
+  (assert (symbolp name))
   (let ((docstring (car body)))
     (if (stringp docstring)
         (setf body (cdr body))
@@ -38,6 +39,7 @@ NAME        --- A symbol naming the node function. Automatically interned in the
 VECTOR-NAME --- Symbol bound to the node vector.
 ARGUMENTS   --- A lambda-list specifying the arguments for the function.
 BODY        ::= form*"
+  (assert (symbolp name))
   (let ((docstring (car body)))
     (if (stringp docstring)
         (setf body (cdr body))
@@ -46,6 +48,17 @@ BODY        ::= form*"
        ,docstring
        (let ((,vector-name (ensure-proper-vector ,vector-name)))
          ,@body))))
+
+(defmacro define-node-macro (name (operator-name &rest arguments) &body body)
+  ""
+  (assert (symbolp name))
+  (let ((docstring (car body)))
+    (if (stringp docstring)
+        (setf body (cdr body))
+        (setf docstring (format NIL "lQuery node macro ~a" name)))
+    `(defun ,(intern (symbol-name name) :lquery-macros) (,operator-name ,@arguments)
+       ,docstring
+       ,@body)))
 
 (defmacro $ (&body actions)
 #.(format NIL "Performs lQuery operations on the current document.
@@ -100,46 +113,19 @@ BODY          ::= form*"
 
 (define-argument-handler list (list nodes)
   (when list
-    (determine-list (find-symbol (string (car list)) :lquery) list nodes)))
+    (let ((nodemacro (find-symbol (symbol-name (car list)) :lquery-macros)))
+      (if nodemacro
+          (apply (symbol-function nodemacro) nodes (cdr list))
+          (let ((nodefunc (find-symbol (symbol-name (car list)) :lquery-funcs)))
+            (if nodefunc
+                `(,nodefunc ,nodes ,@(cdr list))
+                `(,(car list) ,nodes ,@(cdr list))))))))
 
 (define-argument-handler symbol (symbol nodes)
   `(determine-value ,symbol ,nodes))
 
 (define-argument-handler string (string nodes)
   `(clss:select ,string ,nodes))
-
-(defgeneric determine-list (car list nodes)
-  (:documentation "Determines what to do with a list."))
-
-(defmethod determine-list (car list nodes)
-  (multiple-value-bind (nodefun status) (find-symbol (symbol-name (car list)) :lquery-funcs)
-    (if (and nodefun (eq status :EXTERNAL))
-        `(,nodefun ,nodes ,@(cdr list))
-        `(,(car list) ,nodes ,@(cdr list)))))
-
-(defmacro define-list-handler (car-symbol (list-name operator-name) &body body)
-  (assert (symbolp car-symbol))
-  (setf car-symbol (or (find-symbol (string car-symbol) :lquery)
-                       (intern (string car-symbol) :lquery)))
-  `(defmethod determine-list ((,(gensym) (EQL ',car-symbol)) ,list-name ,operator-name)
-     ,@body))
-
-(define-list-handler function (list nodes)
-  `(,(second list) ,nodes))
-
-(define-list-handler eval (list nodes)
-  `($ (inline ,nodes) ,(eval (second list))))
-
-(define-list-handler inline (list nodes)
-  `(determine-value ,(second list) ,nodes))
-
-(define-list-handler combine (list nodes)
-  (let ((node (gensym "NODE")))
-    `(lquery-funcs:map ,nodes #'(lambda (,node) (list ,@(loop for call in (cdr list)
-                                                              collect (determine-argument call node)))))))
-
-(define-list-handler initialize (list nodes)
-  `(lquery-funcs:initialize NIL ,@(cdr list)))
 
 (defgeneric determine-value (symbol nodes)
   (:documentation "Determines what to do with a given symbol at run-time (variable type)."))

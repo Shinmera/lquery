@@ -104,3 +104,12 @@
    #:wrap-inner
    #:write-to-file
    #:serialize))
+
+(defpackage lquery-macros
+  (:nicknames #:org.tymoonnext.radiance.lib.lquery.macros)
+  (:export
+   #:inline
+   #:eval
+   #:combine
+   #:initialize
+   #:function))

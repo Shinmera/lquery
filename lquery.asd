@@ -18,7 +18,8 @@
   :components ((:file "package")
                (:file "toolkit")
                (:file "lquery")
-               (:file "lquery-funcs"))
+               (:file "lquery-funcs")
+               (:file "lquery-macros"))
   :depends-on (:plump
                :clss
                :alexandria
