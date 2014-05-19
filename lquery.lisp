@@ -28,8 +28,7 @@ BODY      ::= form*"
                      do (setf (aref ,node-name ,i)
                               (,funsymb (aref ,node-name ,i)))
                      finally (return ,node-name))
-               (,funsymb ,node-name)))
-         ,node-name))))
+               (,funsymb ,node-name)))))))
 
 (defmacro define-node-list-function (name (vector-name &rest arguments) &body body)
   "Defines a new function that operates on the current node array instead of individual elements.
@@ -136,8 +135,11 @@ BODY          ::= form*"
 
 (define-list-handler combine (list nodes)
   (let ((node (gensym "NODE")))
-    `(replace-vector ,nodes #'(lambda (,node) (list ,@(loop for call in (cdr list)
-                                                            collect (determine-argument call node)))))))
+    `(lquery-funcs:map ,nodes #'(lambda (,node) (list ,@(loop for call in (cdr list)
+                                                              collect (determine-argument call node)))))))
+
+(define-list-handler initialize (list nodes)
+  `(lquery-funcs:initialize NIL ,@(cdr list)))
 
 (defgeneric determine-value (symbol nodes)
   (:documentation "Determines what to do with a given symbol at run-time (variable type)."))
