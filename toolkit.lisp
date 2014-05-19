@@ -141,6 +141,12 @@
                 unless (= (length val) 0)
                   do (format s "~a:~a;" (assure-attribute key) val)))))
 
+(defun replace-vector (vector function)
+  (loop for i from 0 below (length vector)
+        do (setf (aref vector i)
+                 (funcall function (aref vector i))))
+  vector)
+
 (defun replace-vector-if (vector condition &key (key #'identity))
   (loop with i = 0
         for item across vector
