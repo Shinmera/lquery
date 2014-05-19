@@ -101,7 +101,7 @@ BODY          ::= form*"
 
 (define-argument-handler list (list nodes)
   (when list
-    (determine-list (car list) (cdr list) nodes)))
+    (determine-list (find-symbol (string (car list)) :lquery) list nodes)))
 
 (define-argument-handler symbol (symbol nodes)
   `(determine-value ,symbol ,nodes))
@@ -109,27 +109,35 @@ BODY          ::= form*"
 (define-argument-handler string (string nodes)
   `(clss:select ,string ,nodes))
 
-(defgeneric determine-list (car cdr nodes)
+(defgeneric determine-list (car list nodes)
   (:documentation "Determines what to do with a list."))
 
-(defmethod determine-list (car cdr nodes)
-  (multiple-value-bind (nodefun status) (find-symbol (symbol-name car) :lquery-funcs)
+(defmethod determine-list (car list nodes)
+  (multiple-value-bind (nodefun status) (find-symbol (symbol-name (car list)) :lquery-funcs)
     (if (and nodefun (eq status :EXTERNAL))
-        `(,nodefun ,nodes ,@cdr)
-        `(,car ,nodes ,@cdr))))
+        `(,nodefun ,nodes ,@(cdr list))
+        `(,(car list) ,nodes ,@(cdr list)))))
 
-(defmacro define-list-handler (car-symbol (cdr-name operator-name) &body body)
-  `(defmethod determine-list ((,(gensym) (EQL ',car-symbol)) ,cdr-name ,operator-name)
+(defmacro define-list-handler (car-symbol (list-name operator-name) &body body)
+  (assert (symbolp car-symbol))
+  (setf car-symbol (or (find-symbol (string car-symbol) :lquery)
+                       (intern (string car-symbol) :lquery)))
+  `(defmethod determine-list ((,(gensym) (EQL ',car-symbol)) ,list-name ,operator-name)
      ,@body))
 
-(define-list-handler function (rest nodes)
-  `(,(car rest) ,nodes))
+(define-list-handler function (list nodes)
+  `(,(second list) ,nodes))
 
-(define-list-handler eval (rest nodes)
-  `($ (inline ,nodes) ,(eval (car rest))))
+(define-list-handler eval (list nodes)
+  `($ (inline ,nodes) ,(eval (second list))))
 
-(define-list-handler inline (rest nodes)
-  `(determine-value ,(car rest) ,nodes))
+(define-list-handler inline (list nodes)
+  `(determine-value ,(second list) ,nodes))
+
+(define-list-handler combine (list nodes)
+  (let ((node (gensym "NODE")))
+    `(replace-vector ,nodes #'(lambda (,node) (list ,@(loop for call in (cdr list)
+                                                            collect (determine-argument call node)))))))
 
 (defgeneric determine-value (symbol nodes)
   (:documentation "Determines what to do with a given symbol at run-time (variable type)."))
