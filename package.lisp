@@ -23,6 +23,7 @@
    #:define-node-function
    #:define-node-list-function
    #:define-value-handler
+   #:define-list-handler
    #:define-argument-handler))
 
 (defpackage lquery-funcs

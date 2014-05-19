@@ -101,21 +101,35 @@ BODY          ::= form*"
 
 (define-argument-handler list (list nodes)
   (when list
-    (let ((function (car list)))
-      (cond 
-        ((eq function 'FUNCTION) `(,(cadr list) ,nodes))
-        ((eq function 'EVAL) `($ (inline ,nodes) ,(eval (second list))))
-        ((eq function 'INLINE) `(determine-value ,(second list) ,nodes))
-        (T (multiple-value-bind (nodefun status) (find-symbol (symbol-name function) :lquery-funcs)
-             (if (and nodefun (eq status :EXTERNAL))
-                 (append `(,nodefun ,nodes) (cdr list))
-                 (append `(,function ,nodes) (cdr list)))))))))
+    (determine-list (car list) (cdr list) nodes)))
 
 (define-argument-handler symbol (symbol nodes)
   `(determine-value ,symbol ,nodes))
 
 (define-argument-handler string (string nodes)
   `(clss:select ,string ,nodes))
+
+(defgeneric determine-list (car cdr nodes)
+  (:documentation "Determines what to do with a list."))
+
+(defmethod determine-list (car cdr nodes)
+  (multiple-value-bind (nodefun status) (find-symbol (symbol-name car) :lquery-funcs)
+    (if (and nodefun (eq status :EXTERNAL))
+        `(,nodefun ,nodes ,@cdr)
+        `(,car ,nodes ,@cdr))))
+
+(defmacro define-list-handler (car-symbol (cdr-name operator-name) &body body)
+  `(defmethod determine-list ((,(gensym) (EQL ',car-symbol)) ,cdr-name ,operator-name)
+     ,@body))
+
+(define-list-handler function (rest nodes)
+  `(,(car rest) ,nodes))
+
+(define-list-handler eval (rest nodes)
+  `($ (inline ,nodes) ,(eval (car rest))))
+
+(define-list-handler inline (rest nodes)
+  `(determine-value ,(car rest) ,nodes))
 
 (defgeneric determine-value (symbol nodes)
   (:documentation "Determines what to do with a given symbol at run-time (variable type)."))
