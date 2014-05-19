@@ -337,6 +337,11 @@ Alias of EMPTY-P"
   "Pass each element through a function (which has to accept one argument, the node), returning the list of all results."
   (replace-vector working-nodes function))
 
+(define-lquery-list-function map-apply (working-nodes function)
+  "Pass each element through a function by apply, returning the vector of all results.
+This is commonly useful in combination with COMBINE."
+  (replace-vector working-nodes #'(lambda (element) (apply function element))))
+
 (define-lquery-list-function next (nodes &optional selector)
   "Get the immediately following sibling of each element (if there is one). If a selector is provided, the sibling is only included if it matches."
   (when (stringp selector)
