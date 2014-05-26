@@ -28,6 +28,7 @@
 
 (defpackage lquery-funcs
   (:nicknames #:org.tymoonnext.radiance.lib.lquery.funcs)
+  (:use)
   (:export
    #:add
    #:add-class
@@ -108,6 +109,7 @@
 
 (defpackage lquery-macros
   (:nicknames #:org.tymoonnext.radiance.lib.lquery.macros)
+  (:use)
   (:export
    #:inline
    #:eval
