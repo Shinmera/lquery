@@ -270,11 +270,11 @@ If no matching element can be found the root is entered instead."
   (lquery-funcs:css working-nodes "display" "none"))
 
 (define-lquery-function html (node &optional new-content)
-  "Get the HTML contents of the elements or set the HTML contents of every matched element."
+  "Get the HTML contents of the elements or set the HTML contents of every matched element. If the new content is not a string, it is turned into one as per PRINC-TO-STRING."
   (if new-content
       (progn
         (plump:clear node)
-        (plump:parse new-content :root node)
+        (plump:parse (princ-to-string new-content) :root node)
         node)
       (with-output-to-string (stream)
         (plump:serialize (plump:children node) stream))))
@@ -563,12 +563,12 @@ This is commonly useful in combination with COMBINE."
   working-nodes)
 
 (define-lquery-function text (node &optional (text NIL t-s-p))
-  "Get the combined text contents of each element, including their descendants. If text is set, all text nodes are removed and a new text node is appended to the end of the node. If text is NIL, all direct text nodes are removed from the node."
+  "Get the combined text contents of each element, including their descendants. If text is set, all text nodes are removed and a new text node is appended to the end of the node. If text is NIL, all direct text nodes are removed from the node. If text is not a string, it is transformed into one by PRINC-TO-STRING."
   (if t-s-p
       (if text 
           (progn
             (replace-vector-if (plump:children node) #'(lambda (el) (not (plump:text-node-p el))))
-            (plump:make-text-node node text)
+            (plump:make-text-node node (princ-to-string text))
             node)
           (progn
             (replace-vector-if (plump:children node) #'(lambda (el) (not (plump:text-node-p el))))
