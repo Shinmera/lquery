@@ -71,13 +71,15 @@
   working-nodes)
 
 (define-lquery-function attr (node &rest pairs)
-  "Retrieve or set attributes on a node"
+  "Retrieve or set attributes on a node.
+The value on a node is turned into a string using PRINC-TO-STRING."
   (case (length pairs)
     (0 (error "Attribute arguments must be one or more attributes or one or more key-value pairs."))
     (1 (plump:attribute node (assure-attribute (first pairs))))
     (otherwise 
      (loop for (key val) on pairs by #'cddr
-           do (setf (plump:attribute node (assure-attribute key)) val))
+           do (setf (plump:attribute node (assure-attribute key))
+                    (princ-to-string val)))
      node)))
 
 (define-lquery-list-function before (nodes html-or-nodes)
