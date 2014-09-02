@@ -16,7 +16,7 @@ First, lQuery needs to be initialized with a document to work on:
 (lquery:$ (initialize #p"/path/to/input.html"))</code>
 ```
 
-After that, you can use the $ function to select and manipulate the DOM:
+After that, you can use the `$` macro to select and manipulate the DOM:
 
 ```
 (lquery:$ "article")
@@ -24,7 +24,7 @@ After that, you can use the $ function to select and manipulate the DOM:
   (add-class "fancy")
   (attr "foo" "bar"))
 ```
-To render the HTML to a string use `serialize`. If you want to save it to a file directly, there's also `write-to-file`.
+To render the HTML to a string use `SERIALIZE`. If you want to save it to a file directly, there's also `WRITE-TO-FILE`.
 
 ```
 (lquery:$ (serialize))
@@ -37,12 +37,12 @@ So a quick file manipulation could look something like this:
 (lquery:$ (initialize #p"/path/to/input.html")
   "article"
   (append-to "content")
-  (add-class "foo")
-  (write-to-file #p"/path/to/output.html"))
+  (add-class "foo"))
+(lquery:$ (write-to-file #p"/path/to/output.html"))
 ```
     
 Aside from using selectors as the first step, it's also possible to use any other variable or list and operate on it. <br />
-Since 2.0: Literal function calls need to be added with `inline`.
+Since 2.0: Literal function calls need to be added with `INLINE`.
 Note that the result of the inline function will be used as if literally put in place. For example, an inlined function that evaluates
 to a string will result in a CSS-select.
 
@@ -61,6 +61,7 @@ If an operation evaluates to a list, array, vector or a single node, the current
   (inline (lquery:$ "p"))
   (text "Paragraph"))
 ```
+
 This is equivalent to the following:
 
 ```
@@ -69,6 +70,7 @@ This is equivalent to the following:
 (lquery:$ "p"
   (text "Paragraph"))
 ```
+
 Functions in the argument list will be translated to a function invocation with the current list of elements as their argument.
 
 ```
@@ -83,14 +85,15 @@ lQuery<sup>2.0</sup> also supports compile-time evaluation of forms, whose resul
 
 Keep in mind that the lexical environment is not the same at compile-time as at run-time.
 
-Often times you'll also want to retrieve multiple, different values from your current set of nodes. To make this more convenient, you can use the <code>COMBINE</code> form:
+Often times you'll also want to retrieve multiple, different values from your current set of nodes. To make this more convenient, you can use the `COMBINE` form:
 
 ```
 (lquery:$ "a"
   (combine (attr :href) (text))
   (map-apply #'(lambda (url text) (format T "[~a](~a)" text url))))
 ```
-lQuery uses vectors internally to modify and handle sets of nodes. These vectors are usually modified instead of copied to avoid unnecessary resource allocation. This however also means that lQuery functions are possibly side-effecting. If you pass an adjustable vector into lQuery through INLINE or similar, it will not be copied and therefore side-effects might occur. lQuery will automatically copy everything else that isn't an adjustable vector through `ENSURE-PROPER-VECTOR`. If you do want to pass in an adjustable vector, but make sure it doesn't affect it, use `COPY-PROPER-VECTOR`.
+
+lQuery uses vectors internally to modify and handle sets of nodes. These vectors are usually modified instead of copied to avoid unnecessary resource allocation. This however also means that lQuery functions are possibly side-effecting. If you pass an adjustable vector into lQuery through `INLINE` or similar, it will not be copied and therefore side-effects might occur. lQuery will automatically copy everything else that isn't an adjustable vector through `ENSURE-PROPER-VECTOR`. If you do want to pass in an adjustable vector, but make sure it doesn't affect it, use `COPY-PROPER-VECTOR`.
 
 Test Suite
 ----------
@@ -139,16 +142,16 @@ What's New
 ----------
 ### <a name="3.1.0"></a>3.1.0
 
-Renamed <code>DEFINE-NODE-\*</code> macros into more sensible <code>DEFINE-LQUERY-*</code>.
-Added macro system, new standard <code>COMBINE</code> macro.
+Renamed `DEFINE-NODE-\*` macros into more sensible `DEFINE-LQUERY-*`.
+Added macro system, new standard `COMBINE` macro.
 
 ### <a name="3.0.0"></a>3.0.0
-Complete rewrite of everything. This version is <strong>compatibility breaking</strong>. While the node functions themselves perform just the same as before (with one or two exceptions), lQuery now uses vectors instead of lists internally. If you ever relied on lQuery return values, this version will most likely break your code. Effort has been made to keep upgrading as simple as possible though; passing lists into an lQuery chain automatically transforms it for example.
+Complete rewrite of everything. This version is **compatibility breaking**. While the node functions themselves perform just the same as before (with one or two exceptions), lQuery now uses vectors instead of lists internally. If you ever relied on lQuery return values, this version will most likely break your code. Effort has been made to keep upgrading as simple as possible though; passing lists into an lQuery chain automatically transforms it for example.
 
 Thanks to the change to Plump, lQuery is now also able to parse almost any kind of X/HT/ML document, which was not well possible previously. And thanks to switching to CLSS, lQuery is now much faster at selecting nodes from the DOM.
 
 ### <a name="2.0.0"></a>2.0.0
-Added extension system and INLINE, EVAL handling. Revamped base macros to be more stable and simple.
+Added extension system and `INLINE`, `EVAL` handling. Revamped base macros to be more stable and simple.
 
 Further Reading
 ---------------

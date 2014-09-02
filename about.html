@@ -39,14 +39,14 @@
 
 <pre><code>(<a href="#LQUERY:$">lquery:$</a> (<a href="#LQUERY:INITIALIZE">initialize</a> #p&quot;/path/to/input.html&quot;))</code></pre>
 
-<p>After that, you can use the $ function to select and manipulate the DOM:</p>
+<p>After that, you can use the <code>$</code> macro to select and manipulate the DOM:</p>
 
 <pre><code>(<a href="#LQUERY:$">lquery:$</a> &quot;article&quot;)
 (<a href="#LQUERY:$">lquery:$</a> &quot;article&quot;
   (<a href="#LQUERY-FUNCS:ADD-CLASS">add-class</a> &quot;fancy&quot;)
   (<a href="#LQUERY-FUNCS:ATTR">attr</a> &quot;foo&quot; &quot;bar&quot;))</code></pre>
 
-<p>To render the HTML to a string use <code><a href="#LQUERY-FUNCS:SERIALIZE">serialize</a></code>. If you want to save it to a file directly, there's also <code><a href="#LQUERY-FUNCS:WRITE-TO-FILE">write-to-file</a></code>.</p>
+<p>To render the HTML to a string use <code><a href="#LQUERY-FUNCS:SERIALIZE">SERIALIZE</a></code>. If you want to save it to a file directly, there's also <code><a href="#LQUERY-FUNCS:WRITE-TO-FILE">WRITE-TO-FILE</a></code>.</p>
 
 <pre><code>(<a href="#LQUERY:$">lquery:$</a> (<a href="#LQUERY-FUNCS:SERIALIZE">serialize</a>))
 (<a href="#LQUERY:$">lquery:$</a> (<a href="#LQUERY-FUNCS:WRITE-TO-FILE">write-to-file</a> #p&quot;/path/to/output.html&quot;))</code></pre>
@@ -56,11 +56,11 @@
 <pre><code>(<a href="#LQUERY:$">lquery:$</a> (<a href="#LQUERY:INITIALIZE">initialize</a> #p&quot;/path/to/input.html&quot;)
   &quot;article&quot;
   (<a href="#LQUERY-FUNCS:APPEND-TO">append-to</a> &quot;content&quot;)
-  (<a href="#LQUERY-FUNCS:ADD-CLASS">add-class</a> &quot;foo&quot;)
-  (<a href="#LQUERY-FUNCS:WRITE-TO-FILE">write-to-file</a> #p&quot;/path/to/output.html&quot;))</code></pre>
+  (<a href="#LQUERY-FUNCS:ADD-CLASS">add-class</a> &quot;foo&quot;))
+(<a href="#LQUERY:$">lquery:$</a> (<a href="#LQUERY-FUNCS:WRITE-TO-FILE">write-to-file</a> #p&quot;/path/to/output.html&quot;))</code></pre>
 
 <p>Aside from using selectors as the first step, it's also possible to use any other variable or list and operate on it. <br/>
-Since 2.0: Literal function calls need to be added with <code><a href="#LQUERY:INLINE">inline</a></code>.
+Since 2.0: Literal function calls need to be added with <code><a href="#LQUERY:INLINE">INLINE</a></code>.
 Note that the result of the inline function will be used as if literally put in place. For example, an inlined function that evaluates
 to a string will result in a CSS-select.</p>
 
@@ -100,7 +100,7 @@ If an operation evaluates to a list, array, vector or a single node, the current
   (<a href="#LQUERY-MACROS:COMBINE">combine</a> (<a href="#LQUERY-FUNCS:ATTR">attr</a> :href) (<a href="#LQUERY-FUNCS:TEXT">text</a>))
   (<a href="#LQUERY-FUNCS:MAP-APPLY">map-apply</a> #'(<a href="http://l1sp.org/cl/lambda">lambda</a> (url text) (<a href="http://l1sp.org/cl/format">format</a> T &quot;[~a](~a)&quot; text url))))</code></pre>
 
-<p>lQuery uses vectors internally to modify and handle sets of nodes. These vectors are usually modified instead of copied to avoid unnecessary resource allocation. This however also means that lQuery functions are possibly side-effecting. If you pass an adjustable vector into lQuery through INLINE or similar, it will not be copied and therefore side-effects might occur. lQuery will automatically copy everything else that isn't an adjustable vector through <code><a href="#LQUERY:ENSURE-PROPER-VECTOR">ENSURE-PROPER-VECTOR</a></code>. If you do want to pass in an adjustable vector, but make sure it doesn't affect it, use <code><a href="#LQUERY:COPY-PROPER-VECTOR">COPY-PROPER-VECTOR</a></code>.</p>
+<p>lQuery uses vectors internally to modify and handle sets of nodes. These vectors are usually modified instead of copied to avoid unnecessary resource allocation. This however also means that lQuery functions are possibly side-effecting. If you pass an adjustable vector into lQuery through <code><a href="#LQUERY:INLINE">INLINE</a></code> or similar, it will not be copied and therefore side-effects might occur. lQuery will automatically copy everything else that isn't an adjustable vector through <code><a href="#LQUERY:ENSURE-PROPER-VECTOR">ENSURE-PROPER-VECTOR</a></code>. If you do want to pass in an adjustable vector, but make sure it doesn't affect it, use <code><a href="#LQUERY:COPY-PROPER-VECTOR">COPY-PROPER-VECTOR</a></code>.</p>
 
 <h2>Test Suite</h2>
 
@@ -139,7 +139,7 @@ Any lquery function resides in the package <code>LQUERY-FUNCS</code>, which is a
 
 <h3><a name="3.1.0"/>3.1.0</h3>
 
-<p>Renamed <code>DEFINE-NODE-*</code> macros into more sensible <code>DEFINE-LQUERY-*</code>.
+<p>Renamed <code>DEFINE-NODE-\*</code> macros into more sensible <code>DEFINE-LQUERY-*</code>.
 Added macro system, new standard <code><a href="#LQUERY-MACROS:COMBINE">COMBINE</a></code> macro.</p>
 
 <h3><a name="3.0.0"/>3.0.0</h3>
@@ -150,7 +150,7 @@ Added macro system, new standard <code><a href="#LQUERY-MACROS:COMBINE">COMBINE<
 
 <h3><a name="2.0.0"/>2.0.0</h3>
 
-<p>Added extension system and INLINE, EVAL handling. Revamped base macros to be more stable and simple.</p>
+<p>Added extension system and <code><a href="#LQUERY:INLINE">INLINE</a></code>, <code><a href="#LQUERY:EVAL">EVAL</a></code> handling. Revamped base macros to be more stable and simple.</p>
 
 <h2>Further Reading</h2>
 
