@@ -12,8 +12,10 @@
   :name "lQuery"
   :version "3.1.1"
   :author "Nicolas Hafner <shinmera@tymoon.eu>"
+  :maintainer "Nicolas Hafner <shinmera@tymoon.eu>"
   :license "Artistic"
   :description "A library to allow jQuery-like HTML/DOM manipulation."
+  :homepage "https://github.com/Shinmera/lquery"
   :serial T
   :components ((:file "package")
                (:file "toolkit")
