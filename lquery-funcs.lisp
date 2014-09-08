@@ -276,7 +276,11 @@ If no matching element can be found the root is entered instead."
   (if new-content
       (progn
         (plump:clear node)
-        (plump:parse (princ-to-string new-content) :root node)
+        (typecase new-content
+          (plump:root (loop for child across (plump:children new-content)
+                            do (plump:append-child node child)))
+          (plump:node (plump:append-child node new-content))
+          (T (plump:parse (princ-to-string new-content) :root node)))
         node)
       (with-output-to-string (stream)
         (plump:serialize (plump:children node) stream))))
