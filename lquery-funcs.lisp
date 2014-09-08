@@ -161,7 +161,7 @@ If no matching element can be found the root is entered instead."
     (otherwise
      (loop for (key val) on pairs by #'cddr
            do (setf (plump:attribute node (concatenate 'string "data-" (assure-attribute (first pairs))))
-                    val))
+                    (princ-to-string val)))
      node)))
 
 (define-lquery-function deepest (node)
@@ -617,7 +617,8 @@ This is commonly useful in combination with COMBINE."
   (if v-p
       (progn
         (if value
-            (setf (plump:attribute node "value") value)
+            (setf (plump:attribute node "value")
+                  (princ-to-string value))
             (plump:remove-attribute node "value"))
         node)
       (plump:attribute node "value")))

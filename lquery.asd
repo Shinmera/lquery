@@ -10,7 +10,7 @@
 
 (defsystem lquery
   :name "lQuery"
-  :version "3.1.1"
+  :version "3.1.2"
   :author "Nicolas Hafner <shinmera@tymoon.eu>"
   :maintainer "Nicolas Hafner <shinmera@tymoon.eu>"
   :license "Artistic"
