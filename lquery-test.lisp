@@ -22,6 +22,9 @@
 (defun run ()
   (5am:run! 'lquery))
 
+(defmethod asdf:perform ((op asdf:test-op) (sys (eql (asdf:find-system :lquery-test))))
+  (run))
+
 (defun vlast (vector)
   (if (= 0 (length vector))
       NIL
