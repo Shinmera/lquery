@@ -577,7 +577,10 @@ This is commonly useful in combination with COMBINE."
       (if text 
           (progn
             (replace-vector-if (plump:children node) #'(lambda (el) (not (plump:text-node-p el))))
-            (plump:make-text-node node (princ-to-string text))
+            (plump:make-text-node node (typecase text
+                                         (plump:node (with-output-to-string (stream)
+                                                       (plump:serialize text stream)))
+                                         (T (princ-to-string text))))
             node)
           (progn
             (replace-vector-if (plump:children node) #'(lambda (el) (not (plump:text-node-p el))))
