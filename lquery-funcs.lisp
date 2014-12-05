@@ -4,11 +4,11 @@
   Author: Nicolas Hafner <shinmera@tymoon.eu>
 |#
 
-(in-package :lquery)
+(in-package #:org.shirakumo.lquery)
 
 (define-lquery-list-function add (working-nodes selector-or-nodes)
   "Add elements to the set of matched elements."
-  (plump::vector-append working-nodes (nodes-or-select selector-or-nodes)))
+  (vector-append working-nodes (nodes-or-select selector-or-nodes)))
 
 (define-lquery-function add-class (node &rest classes)
   "Adds the specified class(es) to the set of matched elements."
@@ -22,7 +22,7 @@
   (let ((inserts (nodes-or-build html-or-nodes)))
     (loop for node across nodes
           for position = (plump:child-position node)
-          do (plump::array-shift (plump:family node) :n (length inserts) :from (1+ position))
+          do (array-shift (plump:family node) :n (length inserts) :from (1+ position))
              (loop for i from (1+ position)
                    for insert across inserts
                    do (let ((insert (plump:clone-node insert)))
@@ -90,7 +90,7 @@ If a value is NIL, the associated attribute is removed."
   (let ((inserts (nodes-or-build html-or-nodes)))
     (loop for node across nodes
           for position = (plump:child-position node)
-          do (plump::array-shift (plump:family node) :n (length inserts) :from position)
+          do (array-shift (plump:family node) :n (length inserts) :from position)
              (loop for i from position
                    for insert across inserts
                    do (let ((insert (plump:clone-node insert)))
@@ -529,7 +529,7 @@ This is commonly useful in combination with COMBINE."
       (loop for target across targets
             for position = (plump:child-position target)
             for family = (plump:family target)
-            do (plump::array-shift family :n (1- (length working-nodes)) :from position)
+            do (array-shift family :n (1- (length working-nodes)) :from position)
                (loop for i from 0 below (length working-nodes)
                      do (setf (aref family (+ i position))
                               (aref working-nodes i)))
@@ -567,7 +567,7 @@ This is commonly useful in combination with COMBINE."
 (define-lquery-list-function slice (working-nodes start &optional end)
   "Reduce the set of matched elements to a subset specified by a range of indices"
   (unless end (setf end (length working-nodes)))
-  (plump::array-shift working-nodes :from start :to end :n (- start) :adjust NIL)
+  (array-shift working-nodes :from start :to end :n (- start) :adjust NIL)
   (setf (fill-pointer working-nodes) (- end start))
   working-nodes)
 
@@ -609,7 +609,7 @@ This is commonly useful in combination with COMBINE."
   (let* ((parent (plump:parent node))
          (pparent (plump:parent parent))
          (parentpos (plump:child-position parent)))
-    (plump::array-shift (plump:children pparent) :n (1- (length (plump:children parent))) :from parentpos)
+    (array-shift (plump:children pparent) :n (1- (length (plump:children parent))) :from parentpos)
     (loop for child across (plump:children parent)
           for i from parentpos
           do (setf (aref (plump:children pparent) i) child
