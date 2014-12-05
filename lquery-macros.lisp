@@ -4,7 +4,7 @@
  Author: Nicolas Hafner <shinmera@tymoon.eu>
 |#
 
-(in-package :lquery)
+(in-package #:org.shirakumo.lquery)
 
 (define-lquery-macro function (nodes name)
   "Macro to allow #'foo to be used in lquery chains."

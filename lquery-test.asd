@@ -4,11 +4,8 @@
   Author: Nicolas Hafner <shinmera@tymoon.eu>
 |#
 
-(defpackage org.tymoonnext.radiance.lib.lquery.test.asd
-  (:use :cl :asdf))
-(in-package :org.tymoonnext.radiance.lib.lquery.test.asd)
-
-(defsystem lquery-test
+(in-package #:cl-user)
+(asdf:defsystem lquery-test
   :name "lQuery-Test"
   :version "1.0.0"
   :author "Nicolas Hafner <shinmera@tymoon.eu>"

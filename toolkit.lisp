@@ -4,7 +4,7 @@
  Author: Nicolas Hafner <shinmera@tymoon.eu>
 |#
 
-(in-package :lquery)
+(in-package #:org.shirakumo.lquery)
 
 (defvar *lquery-master-document* NIL
   "The master document used at the beginning of a chain.")

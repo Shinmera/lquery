@@ -4,9 +4,9 @@
   Author: Nicolas Hafner <shinmera@tymoon.eu>
 |#
 
-(defpackage lquery
-  (:nicknames #:org.tymoonnext.radiance.lib.lquery #:radiance-lib-lquery)
-  (:use #:cl #:alexandria #:split-sequence)
+(defpackage #:lquery
+  (:nicknames #:org.shirakumo.lquery)
+  (:use #:cl #:array-utils #:alexandria #:split-sequence)
   (:export
    #:*lquery-master-document*
    #:make-proper-vector
@@ -26,8 +26,8 @@
    #:define-value-handler
    #:define-argument-handler))
 
-(defpackage lquery-funcs
-  (:nicknames #:org.tymoonnext.radiance.lib.lquery.funcs)
+(defpackage #:lquery-funcs
+  (:nicknames #:org.shirakumo.lquery.funcs)
   (:use)
   (:export
    #:add
@@ -107,8 +107,8 @@
    #:write-to-file
    #:serialize))
 
-(defpackage lquery-macros
-  (:nicknames #:org.tymoonnext.radiance.lib.lquery.macros)
+(defpackage #:lquery-macros
+  (:nicknames #:org.shirakumo.lquery.macros)
   (:use)
   (:export
    #:inline

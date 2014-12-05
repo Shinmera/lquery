@@ -4,14 +4,14 @@
   Author: Nicolas Hafner <shinmera@tymoon.eu>
 |#
 
+(in-package #:cl-user)
+(defpackage #:lquery-test
+  (:use #:cl #:lquery #:5am)
+  (:shadow #:run)
+  (:nicknames #:org.shirakumo.lquery.test)
+  (:export #:lquery #:run))
 
-(defpackage lquery-test
-  (:use :cl :lquery :5am)
-  (:shadow :run)
-  (:nicknames #:org.tymoonnext.radiance.lib.lquery.test)
-  (:export :lquery :run))
-
-(in-package :org.tymoonnext.radiance.lib.lquery.test)
+(in-package #:org.shirakumo.lquery.test)
 
 (defvar *test-file* (merge-pathnames "test.html" (asdf:system-source-directory :lquery)))
 

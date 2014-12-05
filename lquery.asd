@@ -4,11 +4,8 @@
   Author: Nicolas Hafner <shinmera@tymoon.eu>
 |#
 
-(defpackage org.tymoonnext.radiance.lib.lquery.asd
-  (:use :cl :asdf))
-(in-package :org.tymoonnext.radiance.lib.lquery.asd)
-
-(defsystem lquery
+(in-package #:cl-user)
+(asdf:defsystem lquery
   :name "lQuery"
   :version "3.1.2"
   :author "Nicolas Hafner <shinmera@tymoon.eu>"
@@ -22,7 +19,8 @@
                (:file "lquery")
                (:file "lquery-funcs")
                (:file "lquery-macros"))
-  :depends-on (:plump
+  :depends-on (:array-utils
+               :plump
                :clss
                :alexandria
                :split-sequence)
