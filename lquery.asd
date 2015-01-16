@@ -22,4 +22,4 @@
   :depends-on (:array-utils
                :plump
                :clss)
-  :in-order-to ((test-op (test-op :lquery-test))))
+  :in-order-to ((asdf:test-op (asdf:test-op :lquery-test))))
