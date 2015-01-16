@@ -6,7 +6,7 @@
 
 (defpackage #:lquery
   (:nicknames #:org.shirakumo.lquery)
-  (:use #:cl #:array-utils #:alexandria)
+  (:use #:cl #:array-utils)
   (:export
    #:*lquery-master-document*
    #:make-proper-vector

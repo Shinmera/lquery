@@ -21,6 +21,5 @@
                (:file "lquery-macros"))
   :depends-on (:array-utils
                :plump
-               :clss
-               :alexandria)
+               :clss)
   :in-order-to ((test-op (test-op :lquery-test))))
