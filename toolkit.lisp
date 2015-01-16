@@ -125,13 +125,42 @@
   (:method ((checknode plump:node))
     #'(lambda (node) (eql node checknode))))
 
+(defun classes (node)
+  (clss::split #\Space (plump:attribute node "class")))
+
+(defun parse-css (css)
+  (macrolet ((pop-string (stream)
+               `(prog1 (get-output-stream-string ,stream)
+                  (close ,stream)
+                  (setf ,stream (make-string-output-stream)))))
+    (loop with table = (make-hash-table :test 'equalp)
+          with output = (make-string-output-stream)
+          with attribute = NIL
+          with section = :name
+          for char across css
+          do (case section
+               (:name (case char
+                        (#\: (setf section :value
+                                   attribute (pop-string output)))
+                        (#\Space)
+                        (T (write-char char output))))
+               (:value (case char
+                         (#\; (setf section :name
+                                    (gethash attribute table) (pop-string output)))
+                         (T (write-char char output)
+                          (case char
+                            (#\( (setf section #\)))
+                            (#\" (setf section #\"))))))
+               (T (write-char char output)
+                (when (char= char section)
+                  (setf section :value))))
+          finally (progn
+                    (unless (eql section :name)
+                      (setf (gethash attribute table) (pop-string output)))
+                    (return table)))))
+
 (defun get-css-styles (node)
-  (loop with table = (make-hash-table :test 'equalp)
-        for statement in (split-sequence:split-sequence #\; (plump:attribute node "style"))
-        unless (= (length statement) 0)
-          do (let ((keyval (split-sequence:split-sequence #\: statement)))
-               (setf (gethash (assure-attribute (first keyval)) table) (second keyval)))
-        finally (return table)))
+  (parse-css (or (plump:attribute node "style") "")))
 
 (defun set-css-styles (node css-styles)
   (setf (plump:attribute node "style")

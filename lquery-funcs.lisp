@@ -265,9 +265,7 @@ If no matching element can be found the root is entered instead."
   "Determine whether any of the matched elements are assigned to the given class."
   (let ((class (assure-attribute class)))
     (loop for node across working-nodes
-          if (find class
-                   (split-sequence:split-sequence #\space (plump:attribute node "class")) 
-                   :test #'string-equal)
+          if (find class (classes node) :test #'string-equal)
             return T)))
 
 (define-lquery-list-function hide (working-nodes )
@@ -512,8 +510,7 @@ This is commonly useful in combination with COMBINE."
   "Remove classes from each element."
   (setf (plump:attribute node "class")
         (format NIL "~{~a~^ ~}"
-                (remove-if #'(lambda (a) (find a classes :test #'string=))
-                           (split-sequence #\Space (plump:attribute node "class") :remove-empty-subseqs T))))
+                (remove-if #'(lambda (a) (find a classes :test #'string=)) (classes node))))
   node)
 
 (define-lquery-function remove-data (node &rest data)
@@ -589,7 +586,7 @@ This is commonly useful in combination with COMBINE."
 
 (define-lquery-function toggle-class (node &rest classes)
   "Add or remove one or more classes from each element, depending on their presence within the element."
-  (let ((list (split-sequence #\Space (plump:attribute node "class") :remove-empty-subseqs T)))
+  (let ((list (classes node)))
     (loop for class in classes
           if (member class list :test #'string=)
             collect class into to-remove

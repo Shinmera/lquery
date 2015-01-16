@@ -22,6 +22,5 @@
   :depends-on (:array-utils
                :plump
                :clss
-               :alexandria
-               :split-sequence)
+               :alexandria)
   :in-order-to ((test-op (test-op :lquery-test))))
