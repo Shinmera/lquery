@@ -498,7 +498,8 @@ This is commonly useful in combination with COMBINE."
 (define-lquery-function remove (node &optional selector)
   "Remove the set of matched elements from the DOM."
   (when (or (not selector) (clss:node-matches-p selector node))
-    (plump:remove-child node)))
+    (plump:remove-child node))
+  node)
 
 (define-lquery-function remove-attr (node &rest attributes)
   "Remove attributes from each element."
