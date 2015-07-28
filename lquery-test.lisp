@@ -556,6 +556,16 @@
   (is (eq (vsecond ($ "#list li"))
           (vfirst ($ "li, p, div" (slice 1 4))))))
 
+(test fun-splice
+  (init-test-environment)
+  (is (= (length (plump-dom:children ($ "ul" (node))))
+         7))
+  ($ "li" (splice))
+  (is (= (length (plump-dom:children ($ "ul" (node))))
+         7))
+  (is (= (length ($ "ul" (children)))
+         0)))
+
 (test fun-text
   (init-test-environment)
   (is (eq (vfirst ($ "#source>p"))
