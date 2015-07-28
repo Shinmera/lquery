@@ -569,6 +569,11 @@ This is commonly useful in combination with COMBINE."
   (setf (fill-pointer working-nodes) (- end start))
   working-nodes)
 
+(define-lquery-function splice (node)
+  "Splice the element's contents in place of itself."
+  (plump-dom:splice node)
+  node)
+
 (define-lquery-function text (node &optional (text NIL t-s-p))
   "Get the combined text contents of each element, including their descendants. If text is set, all text nodes are removed and a new text node is appended to the end of the node. If text is NIL, all direct text nodes are removed from the node. If text is not a string, it is transformed into one by PRINC-TO-STRING."
   (if t-s-p

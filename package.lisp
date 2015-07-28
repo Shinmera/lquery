@@ -97,6 +97,7 @@
    #:siblings
    #:size
    #:slice
+   #:splice
    #:text
    #:toggle-class
    #:unwrap
