@@ -17,6 +17,7 @@
    #:load-page
    
    #:$
+   #:$1
    #:inline
    #:eval
 

@@ -92,6 +92,10 @@ By default, the following cases are handled at run time:
   * T         Any other value simply replaces the current list of nodes.")
   (%$ (reverse actions)))
 
+(defmacro $1 (&body actions)
+  "This is the same as $, except it automatically uses NODE at the end and thus only returns the first result, if any."
+  `($ ,@actions (node)))
+
 (defun %$ (actions)
   (if (null actions)
       `(make-proper-vector :size 1 :initial-element *lquery-master-document* :fill-pointer T)
