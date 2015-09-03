@@ -20,6 +20,7 @@
                (:file "lquery-funcs")
                (:file "lquery-macros"))
   :depends-on (:array-utils
+               :form-fiddle
                :plump
                :clss)
   :in-order-to ((asdf:test-op (asdf:test-op :lquery-test))))

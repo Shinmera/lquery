@@ -6,6 +6,10 @@
 
 (in-package #:org.shirakumo.lquery)
 
+(defmacro deflqfun (name args &rest forms)
+  (assert (symbolp name))
+  `(defun ,(intern (symbol-name name) :lquery-funcs) ,args ,@forms))
+
 (defmacro define-lquery-function (name (node-name &rest arguments) &body body)
   "Defines a new node function. This is the main mechanism by which node manipulations are defined.
 All lquery functions are automatically created in the lquery-funcs package.
@@ -14,16 +18,14 @@ NAME      --- A symbol naming the lquery function. Automatically interned in the
 NODE-NAME --- Symbol bound to the current node.
 ARGUMENTS --- A lambda-list specifying the arguments for the function.
 BODY      ::= form*"
-  (assert (symbolp name))
-  (let ((docstring (car body)))
-    (if (stringp docstring)
-        (setf body (cdr body))
-        (setf docstring (format NIL "lQuery node function ~a" name)))
+  (form-fiddle:with-destructured-lambda-form (:docstring doc :declarations decls :forms forms)
+                                             `(lambda () ,@body)
     (let ((funsymb (gensym "FUN"))
           (i (gensym "I")))
-      `(defun ,(intern (symbol-name name) :lquery-funcs) (,node-name ,@arguments)
-         ,docstring
-         (flet ((,funsymb (,node-name) ,@body))
+      `(deflqfun ,name (,node-name ,@arguments)
+         ,@(when doc (list doc))
+         ,@decls
+         (flet ((,funsymb (,node-name) ,@forms))
            (if (arrayp ,node-name)
                (loop for ,i from 0 below (length ,node-name)
                      do (setf (aref ,node-name ,i)
@@ -39,15 +41,13 @@ NAME        --- A symbol naming the lquery function. Automatically interned in t
 VECTOR-NAME --- Symbol bound to the node vector.
 ARGUMENTS   --- A lambda-list specifying the arguments for the function.
 BODY        ::= form*"
-  (assert (symbolp name))
-  (let ((docstring (car body)))
-    (if (stringp docstring)
-        (setf body (cdr body))
-        (setf docstring (format NIL "lQuery node list function ~a" name)))
-    `(defun ,(intern (symbol-name name) :lquery-funcs) (,vector-name ,@arguments)
-       ,docstring
+  (form-fiddle:with-destructured-lambda-form (:docstring doc :declarations decls :forms forms)
+                                             `(lambda () ,@body)
+    `(deflqfun ,name (,vector-name ,@arguments)
+       ,@(when doc (list doc))
+       ,@decls
        (let ((,vector-name (ensure-proper-vector ,vector-name)))
-         ,@body))))
+         ,@forms))))
 
 (defmacro define-lquery-macro (name (previous-form &rest arguments) &body body)
   "Define a new lquery local macro.
