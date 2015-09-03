@@ -49,6 +49,20 @@ BODY        ::= form*"
        (let ((,vector-name (ensure-proper-vector ,vector-name)))
          ,@forms))))
 
+(defmacro define-lquery-subroutine (name (&rest arguments) &body body)
+  "Defines a shorthand function. The body is a set of lQuery instructions as you'd use in $.
+
+NAME      --- A symbol naming the subroutine. Automatically interned in the LQUERY-FUNCS package.
+ARGUMENTS --- A lambda-list specifying the arguments for the function.
+BODY      ::= lquery-form*"
+  (let ((prev (gensym "PREV")))
+    (labels ((%$ (forms)
+               (if (null forms)
+                   prev
+                   (determine-argument (car forms) (%$ (cdr forms))))))
+      `(deflqfun ,name (,prev ,@arguments)
+         ,(%$ (reverse body))))))
+
 (defmacro define-lquery-macro (name (previous-form &rest arguments) &body body)
   "Define a new lquery local macro.
 All lquery macros are automatically created in the lquery-macros package.

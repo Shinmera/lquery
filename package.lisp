@@ -23,6 +23,7 @@
 
    #:define-lquery-function
    #:define-lquery-list-function
+   #:define-lquery-subroutine
    #:define-lquery-macro
    #:define-value-handler
    #:define-argument-handler))
