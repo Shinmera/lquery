@@ -387,8 +387,9 @@ This is commonly useful in combination with COMBINE."
         finally (return result)))
 
 (define-lquery-list-function node (working-nodes &optional (n 0))
-  "Return the specified node (default first) directly, without encompassing it into a list."
-  (elt working-nodes n))
+  "Return the specified node (default first) directly, without encompassing it into a vector if it exists. Otherwise return NIL."
+  (when (< n (length working-nodes))
+    (elt working-nodes n)))
 
 (define-lquery-list-function not (working-nodes selector-or-nodes)
   "Remove matching elements from the working elements."
