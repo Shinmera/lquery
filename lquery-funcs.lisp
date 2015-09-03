@@ -579,14 +579,14 @@ This is commonly useful in combination with COMBINE."
   (if t-s-p
       (if text 
           (progn
-            (replace-vector-if (plump:children node) #'(lambda (el) (not (plump:text-node-p el))))
+            (replace-vector-if (plump:children node) (complement #'plump:textual-node-p))
             (plump:make-text-node node (typecase text
                                          (plump:node (with-output-to-string (stream)
                                                        (plump:serialize text stream)))
                                          (T (princ-to-string text))))
             node)
           (progn
-            (replace-vector-if (plump:children node) #'(lambda (el) (not (plump:text-node-p el))))
+            (replace-vector-if (plump:children node) (complement #'plump:textual-node-p))
             node))
       (plump:text node)))
 
