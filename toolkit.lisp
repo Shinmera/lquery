@@ -16,22 +16,24 @@
     (initial-contents (make-array size :initial-contents initial-contents :adjustable T :fill-pointer fill-pointer))
     (T                (make-array size :adjustable T :fill-pointer fill-pointer))))
 
-(defgeneric copy-proper-vector (sequence &key transform)
-  (:documentation "Copies the sequence into a new proper vector.")
-  (:method ((vector sequence) &key (transform #'identity))
-    (loop with result = (make-proper-vector :size (length vector) :fill-pointer T)
-          for i from 0 below (length vector)
-          do (setf (aref result i)
-                   (funcall transform (aref vector i)))
-          finally (return result)))
-  (:method ((list list) &key (transform #'identity))
-    (loop with length = (length list)
-          with result = (make-proper-vector :size length :fill-pointer T)
-          for i from 0 below length
-          for item in list
-          do (setf (aref result i)
-                   (funcall transform item))
-          finally (return result))))
+(defun copy-proper-vector (sequence &key (transform #'identity))
+  "Copies the sequence into a new proper vector."
+  (declare (optimize (speed 3)))
+  (etypecase sequence
+    (vector
+     (loop with result = (make-proper-vector :size (length sequence) :fill-pointer T)
+           for i from 0 below (length sequence)
+           do (setf (aref result i)
+                    (funcall transform (aref sequence i)))
+           finally (return result)))
+    (list
+     (loop with length = (length sequence)
+           with result = (make-proper-vector :size length :fill-pointer T)
+           for i from 0 below length
+           for item in sequence
+           do (setf (aref result i)
+                    (funcall transform item))
+           finally (return result)))))
 
 (defun ensure-proper-vector (var)
   "Ensure that the variable is a proper vector."
@@ -80,50 +82,46 @@
 (defun build-elements (html)
   (plump:children (plump:parse html)))
 
-(defgeneric nodes-or-select (object &optional root)
-  (:documentation "Return the object as a node list or use it to form a select query.")
-  (:method ((string string) &optional (root *lquery-master-document*))
-    (clss:select string root))
-  (:method ((vector vector) &optional (root *lquery-master-document*))
-    (declare (ignore root))
-    vector)
-  (:method ((list list) &optional (root *lquery-master-document*))
-    (declare (ignore root))
-    (copy-proper-vector list))
-  (:method ((node plump:node) &optional (root *lquery-master-document*))
-    (declare (ignore root))
-    (make-proper-vector :size 1 :initial-element node)))
+(defun nodes-or-select (object &optional (root *lquery-master-document*))
+  "Return the object as a node list or use it to form a select query."
+  (declare (optimize (speed 3)))
+  (etypecase object
+    (string (clss:select object root))
+    (vector object)
+    (list (copy-proper-vector object))
+    (plump:node (make-proper-vector :size 1 :initial-element object))))
 
-(defgeneric nodes-or-build (object)
-  (:documentation "Clone the object as a node list or use it to build a new HTML node.")
-  (:method ((html string))
-    (build-elements html))
-  (:method ((vector vector))
-    (copy-proper-vector vector))
-  (:method ((list list))
-    (copy-proper-vector list))
-  (:method ((node plump:node))
-    (make-proper-vector :size 1 :initial-element (plump:clone-node node))))
+(defun nodes-or-build (object)
+  "Clone the object as a node list or use it to build a new HTML node."
+  (declare (optimize (speed 3)))
+  (etypecase object
+    (string (build-elements object))
+    (sequence (copy-proper-vector object))
+    (plump:node (make-proper-vector :size 1 :initial-element (plump:clone-node object)))))
 
-(defgeneric funcs-or-select (object)
-  (:documentation "Return the object as a function or use it to construct a node-matches? function.")
-  (:method ((selector string))
-    (let ((selector (clss:parse-selector selector)))
-      #'(lambda (node)
-          (clss:node-matches-p selector node))))
-  (:method ((function function))
-    function))
+(defun funcs-or-select (object)
+  "Return the object as a function or use it to construct a node-matches? function."
+  (declare (optimize (speed 3)))
+  (etypecase object
+    (string
+     (let ((selector (clss:parse-selector object)))
+       #'(lambda (node)
+           (clss:node-matches-p selector node))))
+    (function
+     object)))
 
-(defgeneric nodes-or-selector-func (object)
-  (:documentation "Build a function matching the selector or checking the equality/inclusion of the object.")
-  (:method ((selector string))
-    (let ((selector (clss:parse-selector selector)))
-      #'(lambda (node)
-          (clss:node-matches-p selector node))))
-  (:method ((nodes list))
-    #'(lambda (node) (find node nodes)))
-  (:method ((checknode plump:node))
-    #'(lambda (node) (eql node checknode))))
+(defun nodes-or-selector-func (object)
+  "Build a function matching the selector or checking the equality/inclusion of the object."
+  (declare (optimize (speed 3)))
+  (etypecase object
+    (string
+     (let ((selector (clss:parse-selector object)))
+       #'(lambda (node)
+           (clss:node-matches-p selector node))))
+    (list
+     #'(lambda (node) (find node object)))
+    (plump:node
+     #'(lambda (node) (eql node object)))))
 
 (defun classes (node)
   (clss::split #\Space (plump:attribute node "class")))
