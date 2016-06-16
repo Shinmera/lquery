@@ -9,6 +9,11 @@
 (defvar *lquery-master-document* NIL
   "The master document used at the beginning of a chain.")
 
+(defmacro with-master-document ((&optional (doc '*lquery-master-document*)) &body body)
+  "Surrounds the body in a binding for the *lquery-master-document* to ensure it does not get clobbered."
+  `(let ((*lquery-master-document* ,doc))
+     ,@body))
+
 (defun make-proper-vector (&key (size 0) initial-element initial-contents (fill-pointer T))
   "Creates a new proper vector."
   (cond

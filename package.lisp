@@ -9,6 +9,7 @@
   (:use #:cl #:array-utils)
   (:export
    #:*lquery-master-document*
+   #:with-master-document
    #:make-proper-vector
    #:copy-proper-vector
    #:ensure-proper-vector
