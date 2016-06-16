@@ -7,7 +7,7 @@
 (in-package #:cl-user)
 (asdf:defsystem lquery
   :name "lQuery"
-  :version "3.1.2"
+  :version "3.2.0"
   :author "Nicolas Hafner <shinmera@tymoon.eu>"
   :maintainer "Nicolas Hafner <shinmera@tymoon.eu>"
   :license "Artistic"
