@@ -95,6 +95,7 @@
    #:remove-data
    #:replace-all
    #:replace-with
+   #:root
    #:show
    #:siblings
    #:size
