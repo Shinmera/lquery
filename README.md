@@ -6,92 +6,76 @@ How To
 ------
 Load lQuery with ASDF or Quicklisp.
 
-```
-(ql:quickload :lquery)</code>
-```
+    (ql:quickload :lquery)
 
 First, lQuery needs to be initialized with a document to work on:
 
-```
-(lquery:$ (initialize #p"/path/to/input.html"))</code>
-```
+    (defvar *doc* (lquery:$ (initialize (asdf:system-relative-pathname :lquery "test.html"))))
 
 After that, you can use the `$` macro to select and manipulate the DOM:
 
-```
-(lquery:$ "article")
-(lquery:$ "article"
-  (add-class "fancy")
-  (attr "foo" "bar"))
-```
+    (lquery:$ *doc* "article")
+    (lquery:$ *doc* 
+      "article"
+      (add-class "fancy")
+      (attr "foo" "bar"))
+      
 To render the HTML to a string use `SERIALIZE`. If you want to save it to a file directly, there's also `WRITE-TO-FILE`.
 
-```
-(lquery:$ (serialize))
-(lquery:$ (write-to-file #p"/path/to/output.html"))
-```
+    (lquery:$ *doc* (serialize))
+    (lquery:$ *doc* (write-to-file #p"~/plump-test.html"))
 
 So a quick file manipulation could look something like this:
 
-```
-(lquery:$ (initialize #p"/path/to/input.html")
-  "article"
-  (append-to "content")
-  (add-class "foo"))
-(lquery:$ (write-to-file #p"/path/to/output.html"))
-```
+    (lquery:$ (initialize (asdf:system-relative-pathname :lquery "test.html"))
+      "article"
+      (append-to "#target")
+      (add-class "foo")
+      (root)
+      (write-to-file #p"~/plump-test.html"))
     
 Aside from using selectors as the first step, it's also possible to use any other variable or list and operate on it. <br />
 Since 2.0: Literal function calls need to be added with `INLINE`.
 Note that the result of the inline function will be used as if literally put in place. For example, an inlined function that evaluates
 to a string will result in a CSS-select.
 
-```
-(lquery:$ (inline (list node-a node-b))
-  "article"
-  (serialize))
-```
+    (lquery:$ (inline (list node-a node-b))
+      "article"
+      (serialize))
     
 Selectors can come at any point in the sequence of lQuery operations and will always act on the current set of elements.
 If an operation evaluates to a list, array, vector or a single node, the current set of elements is set to this result.
 
-```
-(lquery:$ "a"
-  (text "Link")
-  (inline (lquery:$ "p"))
-  (text "Paragraph"))
-```
+    (lquery:$ *doc*
+      "a"
+      (text "Link")
+      (inline (lquery:$ *doc* "p"))
+      (text "Paragraph"))
 
 This is equivalent to the following:
 
-```
-(lquery:$ "a"
-  (text "Link"))
-(lquery:$ "p"
-  (text "Paragraph"))
-```
+    (lquery:$ *doc*
+      "a" (text "Link"))
+    (lquery:$ *doc*
+      "p" (text "Paragraph"))
 
 Functions in the argument list will be translated to a function invocation with the current list of elements as their argument.
 
-```
-(lquery:$ "a"
-  #'(lambda (els) (aref els 0)))
-```
+    (lquery:$ *doc*
+      "a" #'(lambda (els) (aref els 0)))
+
 lQuery<sup>2.0</sup> also supports compile-time evaluation of forms, whose results are then put in place of their function calls:
 
-```
-(lquery:$ (eval (format NIL "~a" *selector*)))</code>
-```
+    (lquery:$ *doc* (eval (format NIL "~a" *selector*)))
 
 Keep in mind that the lexical environment is not the same at compile-time as at run-time.
 
 Often times you'll also want to retrieve multiple, different values from your current set of nodes. To make this more convenient, you can use the `COMBINE` form:
 
-```
-(lquery:$ "a"
-  (combine (attr :href) (text))
-  (map-apply #'(lambda (url text) (format T "[~a](~a)" text url))))
-```
+    (lquery:$ *doc*
+      "a"
+      (combine (attr :href) (text))
+      (map-apply #'(lambda (url text) (format T "[~a](~a)" text url))))
 
 lQuery uses vectors internally to modify and handle sets of nodes. These vectors are usually modified instead of copied to avoid unnecessary resource allocation. This however also means that lQuery functions are possibly side-effecting. If you pass an adjustable vector into lQuery through `INLINE` or similar, it will not be copied and therefore side-effects might occur. lQuery will automatically copy everything else that isn't an adjustable vector through `ENSURE-PROPER-VECTOR`. If you do want to pass in an adjustable vector, but make sure it doesn't affect it, use `COPY-PROPER-VECTOR`.
 
@@ -99,10 +83,8 @@ Test Suite
 ----------
 To ensure that functions are at least somewhat stable in their behaviour, lQuery includes a test suite. You can load this through Quicklisp/ASDF with
 
-```
-(ql:quickload :lquery-test)
-(lquery-test:run)
-```
+    (ql:quickload :lquery-test)
+    (lquery-test:run)
 
 The tests are rather loose, but should cover all functions to at least behave mostly according to expectation.
 
@@ -111,30 +93,22 @@ Extending lQuery<sup>3.1</sup>
 lQuery allows extension in a couple of ways. The most important of which are node functions themselves, which come in two flavours: lquery-funs and lquery-list-funs.
 Any lquery function resides in the package `LQUERY-FUNCS`, which is automatically scanned by the $ macro. The two macros responsible for defining new lquery functions automatically place the resulting operations in this package for you.
 
-```
-(define-lquery-function name (node-name &rest arguments) &body body)
-(define-lquery-list-function name (vector-name &rest arguments) &body body)</code>
-```
+    (define-lquery-function name (node-name &rest arguments) &body body)
+    (define-lquery-list-function name (vector-name &rest arguments) &body body)
 
 Any function generated by these macros can be called either with a single node or a vector of nodes. In the case of a regular node operation, if it receives a vector of nodes, the function is called once for each node and the results are collected into a vector, which is then returned. If it receives a single node, only a single result is returned. In the case of a node list function, the return value can be either a vector or a single value, depending on what the goal of the operation is. It is expected that node list functions will modify the given vector directly in order to avoid unnecessary copying.
 
 Some constructs would be very cumbersome to write as functions, or would simply be more suited in the form of a macro. To allow for this, lQuery<sup>3.1</sup> includes a mechanism of `$` local macros. The previously mentioned forms like `INLINE` are handled through this system. Just like lquery functions, lquery macros reside in their own package `LQUERY-MACROS`. The responsible macro for defining new lquery macros will automatically place it in there for you.
 
-```
-(define-lquery-macro name (previous-form &rest arguments) &body body)</code>
-```
+    (define-lquery-macro name (previous-form &rest arguments) &body body)
 
 The $ macro itself can be extended as well by providing additional argument- or value-handlers. The following two macros make this possible:
 
-```
-(define-argument-handler type (argument-name operator-name) &body body)</code>
-```
+    (define-argument-handler type (argument-name operator-name) &body body)
 
 Argument handlers transform the arguments at compile-time. For example, this would allow an extension to turn literal arrays into lists so they can be processed as well.
 
-```
-(define-value-handler type (variable-name operator-name) &body body)</code>
-```
+    (define-value-handler type (variable-name operator-name) &body body)
 
 Value handlers on the other hand determine the action at run-time. This is mostly useful for defining special actions on certain variable values.
 
