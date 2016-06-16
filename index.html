@@ -4,14 +4,15 @@
     <meta charset="utf-8"/>
     <title>LQUERY</title>
     <style type="text/css">
-      code a{text-decoration:none;}
-      h1{display:inline-block;font-size: 28pt;margin-bottom:0;}
-      code{font-family: Consolas, Inconsolata, monospace;}
-      h4{display: inline-block;margin:0;padding:0;}
+      html{font-family: serif;}
+      code a{text-decoration: none;}
+      h1{display: inline-block; margin-bottom: 0;}
+      code{font-family: monospace;}
+      h4{display: inline-block; margin: 0; padding: 0;}
       #symbol-index ul{list-style: none;}
       .package li{margin-bottom: 20px;}
       .package pre{margin: 0 0 0 10px; white-space: pre-wrap;}
-      .package .nicknames{font-size: 12pt; font-weight: normal;}
+      .package .nicknames{font-weight: normal;}
       table{margin: 20px;}
       td{padding-bottom: 10px;}
     </style>
@@ -19,12 +20,12 @@
   <body>
     <header>
       <h1><img src="lquery-logo.png" alt="lquery"/></h1>
-      <span>3.1.1</span>
-      <p>A library to allow jQuery-like HTML/DOM manipulation.</p>
+      <span class="version">3.2.0</span>
+      <p class="description">A library to allow jQuery-like HTML/DOM manipulation.</p>
     </header>
     <div id="content">
       <article>
-        <c:documentate>
+        
           <span><h2>About lQuery</h2>
 
 <p>lQuery is a DOM manipulation library written in Common Lisp, inspired by and based on the <a href="http://jquery.com/">jQuery</a> syntax and functions. It uses <a href="http://shinmera.github.io/plump">Plump</a> and <a href="http://shinmera.github.io/CLSS/">CLSS</a> as DOM and selector engines. The main idea behind lQuery is to provide a simple interface for crawling and modifying HTML sites, as well as to allow for an alternative approach to templating.</p>
@@ -33,31 +34,38 @@
 
 <p>Load lQuery with ASDF or Quicklisp.</p>
 
-<pre><code>(ql:quickload :lquery)</code></pre>
+<pre><code>(ql:quickload :lquery)
+</code></pre>
 
 <p>First, lQuery needs to be initialized with a document to work on:</p>
 
-<pre><code>(<a href="#LQUERY:$">lquery:$</a> (<a href="#LQUERY:INITIALIZE">initialize</a> #p&quot;/path/to/input.html&quot;))</code></pre>
+<pre><code>(<a href="http://l1sp.org/cl/defvar">defvar</a> *doc* (<a href="#LQUERY:$">lquery:$</a> (<a href="#LQUERY:INITIALIZE">initialize</a> (asdf:system-relative-pathname :lquery &quot;test.html&quot;))))
+</code></pre>
 
 <p>After that, you can use the <code>$</code> macro to select and manipulate the DOM:</p>
 
-<pre><code>(<a href="#LQUERY:$">lquery:$</a> &quot;article&quot;)
-(<a href="#LQUERY:$">lquery:$</a> &quot;article&quot;
+<pre><code>(<a href="#LQUERY:$">lquery:$</a> *doc* &quot;article&quot;)
+(<a href="#LQUERY:$">lquery:$</a> *doc* 
+  &quot;article&quot;
   (<a href="#LQUERY-FUNCS:ADD-CLASS">add-class</a> &quot;fancy&quot;)
-  (<a href="#LQUERY-FUNCS:ATTR">attr</a> &quot;foo&quot; &quot;bar&quot;))</code></pre>
+  (<a href="#LQUERY-FUNCS:ATTR">attr</a> &quot;foo&quot; &quot;bar&quot;))
+</code></pre>
 
 <p>To render the HTML to a string use <code><a href="#LQUERY-FUNCS:SERIALIZE">SERIALIZE</a></code>. If you want to save it to a file directly, there's also <code><a href="#LQUERY-FUNCS:WRITE-TO-FILE">WRITE-TO-FILE</a></code>.</p>
 
-<pre><code>(<a href="#LQUERY:$">lquery:$</a> (<a href="#LQUERY-FUNCS:SERIALIZE">serialize</a>))
-(<a href="#LQUERY:$">lquery:$</a> (<a href="#LQUERY-FUNCS:WRITE-TO-FILE">write-to-file</a> #p&quot;/path/to/output.html&quot;))</code></pre>
+<pre><code>(<a href="#LQUERY:$">lquery:$</a> *doc* (<a href="#LQUERY-FUNCS:SERIALIZE">serialize</a>))
+(<a href="#LQUERY:$">lquery:$</a> *doc* (<a href="#LQUERY-FUNCS:WRITE-TO-FILE">write-to-file</a> #p&quot;~/plump-test.html&quot;))
+</code></pre>
 
 <p>So a quick file manipulation could look something like this:</p>
 
-<pre><code>(<a href="#LQUERY:$">lquery:$</a> (<a href="#LQUERY:INITIALIZE">initialize</a> #p&quot;/path/to/input.html&quot;)
+<pre><code>(<a href="#LQUERY:$">lquery:$</a> (<a href="#LQUERY:INITIALIZE">initialize</a> (asdf:system-relative-pathname :lquery &quot;test.html&quot;))
   &quot;article&quot;
-  (<a href="#LQUERY-FUNCS:APPEND-TO">append-to</a> &quot;content&quot;)
-  (<a href="#LQUERY-FUNCS:ADD-CLASS">add-class</a> &quot;foo&quot;))
-(<a href="#LQUERY:$">lquery:$</a> (<a href="#LQUERY-FUNCS:WRITE-TO-FILE">write-to-file</a> #p&quot;/path/to/output.html&quot;))</code></pre>
+  (<a href="#LQUERY-FUNCS:APPEND-TO">append-to</a> &quot;#target&quot;)
+  (<a href="#LQUERY-FUNCS:ADD-CLASS">add-class</a> &quot;foo&quot;)
+  (<a href="#LQUERY-FUNCS:ROOT">root</a>)
+  (<a href="#LQUERY-FUNCS:WRITE-TO-FILE">write-to-file</a> #p&quot;~/plump-test.html&quot;))
+</code></pre>
 
 <p>Aside from using selectors as the first step, it's also possible to use any other variable or list and operate on it. <br/>
 Since 2.0: Literal function calls need to be added with <code><a href="#LQUERY:INLINE">INLINE</a></code>.
@@ -66,39 +74,47 @@ to a string will result in a CSS-select.</p>
 
 <pre><code>(<a href="#LQUERY:$">lquery:$</a> (<a href="#LQUERY:INLINE">inline</a> (<a href="http://l1sp.org/cl/list">list</a> node-a node-b))
   &quot;article&quot;
-  (<a href="#LQUERY-FUNCS:SERIALIZE">serialize</a>))</code></pre>
+  (<a href="#LQUERY-FUNCS:SERIALIZE">serialize</a>))
+</code></pre>
 
 <p>Selectors can come at any point in the sequence of lQuery operations and will always act on the current set of elements.
 If an operation evaluates to a list, array, vector or a single node, the current set of elements is set to this result.</p>
 
-<pre><code>(<a href="#LQUERY:$">lquery:$</a> &quot;a&quot;
+<pre><code>(<a href="#LQUERY:$">lquery:$</a> *doc*
+  &quot;a&quot;
   (<a href="#LQUERY-FUNCS:TEXT">text</a> &quot;Link&quot;)
-  (<a href="#LQUERY:INLINE">inline</a> (<a href="#LQUERY:$">lquery:$</a> &quot;p&quot;))
-  (<a href="#LQUERY-FUNCS:TEXT">text</a> &quot;Paragraph&quot;))</code></pre>
+  (<a href="#LQUERY:INLINE">inline</a> (<a href="#LQUERY:$">lquery:$</a> *doc* &quot;p&quot;))
+  (<a href="#LQUERY-FUNCS:TEXT">text</a> &quot;Paragraph&quot;))
+</code></pre>
 
 <p>This is equivalent to the following:</p>
 
-<pre><code>(<a href="#LQUERY:$">lquery:$</a> &quot;a&quot;
-  (<a href="#LQUERY-FUNCS:TEXT">text</a> &quot;Link&quot;))
-(<a href="#LQUERY:$">lquery:$</a> &quot;p&quot;
-  (<a href="#LQUERY-FUNCS:TEXT">text</a> &quot;Paragraph&quot;))</code></pre>
+<pre><code>(<a href="#LQUERY:$">lquery:$</a> *doc*
+  &quot;a&quot; (<a href="#LQUERY-FUNCS:TEXT">text</a> &quot;Link&quot;))
+(<a href="#LQUERY:$">lquery:$</a> *doc*
+  &quot;p&quot; (<a href="#LQUERY-FUNCS:TEXT">text</a> &quot;Paragraph&quot;))
+</code></pre>
 
 <p>Functions in the argument list will be translated to a function invocation with the current list of elements as their argument.</p>
 
-<pre><code>(<a href="#LQUERY:$">lquery:$</a> &quot;a&quot;
-  #'(<a href="http://l1sp.org/cl/lambda">lambda</a> (els) (<a href="http://l1sp.org/cl/aref">aref</a> els 0)))</code></pre>
+<pre><code>(<a href="#LQUERY:$">lquery:$</a> *doc*
+  &quot;a&quot; #'(<a href="http://l1sp.org/cl/lambda">lambda</a> (els) (<a href="http://l1sp.org/cl/aref">aref</a> els 0)))
+</code></pre>
 
 <p>lQuery<sup>2.0</sup> also supports compile-time evaluation of forms, whose results are then put in place of their function calls:</p>
 
-<pre><code>(<a href="#LQUERY:$">lquery:$</a> (<a href="#LQUERY:EVAL">eval</a> (<a href="http://l1sp.org/cl/format">format</a> NIL &quot;~a&quot; *selector*)))</code></pre>
+<pre><code>(<a href="#LQUERY:$">lquery:$</a> *doc* (<a href="#LQUERY:EVAL">eval</a> (<a href="http://l1sp.org/cl/format">format</a> NIL &quot;~a&quot; *selector*)))
+</code></pre>
 
 <p>Keep in mind that the lexical environment is not the same at compile-time as at run-time.</p>
 
 <p>Often times you'll also want to retrieve multiple, different values from your current set of nodes. To make this more convenient, you can use the <code><a href="#LQUERY-MACROS:COMBINE">COMBINE</a></code> form:</p>
 
-<pre><code>(<a href="#LQUERY:$">lquery:$</a> &quot;a&quot;
+<pre><code>(<a href="#LQUERY:$">lquery:$</a> *doc*
+  &quot;a&quot;
   (<a href="#LQUERY-MACROS:COMBINE">combine</a> (<a href="#LQUERY-FUNCS:ATTR">attr</a> :href) (<a href="#LQUERY-FUNCS:TEXT">text</a>))
-  (<a href="#LQUERY-FUNCS:MAP-APPLY">map-apply</a> #'(<a href="http://l1sp.org/cl/lambda">lambda</a> (url text) (<a href="http://l1sp.org/cl/format">format</a> T &quot;[~a](~a)&quot; text url))))</code></pre>
+  (<a href="#LQUERY-FUNCS:MAP-APPLY">map-apply</a> #'(<a href="http://l1sp.org/cl/lambda">lambda</a> (url text) (<a href="http://l1sp.org/cl/format">format</a> T &quot;[~a](~a)&quot; text url))))
+</code></pre>
 
 <p>lQuery uses vectors internally to modify and handle sets of nodes. These vectors are usually modified instead of copied to avoid unnecessary resource allocation. This however also means that lQuery functions are possibly side-effecting. If you pass an adjustable vector into lQuery through <code><a href="#LQUERY:INLINE">INLINE</a></code> or similar, it will not be copied and therefore side-effects might occur. lQuery will automatically copy everything else that isn't an adjustable vector through <code><a href="#LQUERY:ENSURE-PROPER-VECTOR">ENSURE-PROPER-VECTOR</a></code>. If you do want to pass in an adjustable vector, but make sure it doesn't affect it, use <code><a href="#LQUERY:COPY-PROPER-VECTOR">COPY-PROPER-VECTOR</a></code>.</p>
 
@@ -107,7 +123,8 @@ If an operation evaluates to a list, array, vector or a single node, the current
 <p>To ensure that functions are at least somewhat stable in their behaviour, lQuery includes a test suite. You can load this through Quicklisp/ASDF with</p>
 
 <pre><code>(ql:quickload :lquery-test)
-(<a href="#LQUERY-TEST:RUN">lquery-test:run</a>)</code></pre>
+(lquery-test:run)
+</code></pre>
 
 <p>The tests are rather loose, but should cover all functions to at least behave mostly according to expectation.</p>
 
@@ -117,21 +134,25 @@ If an operation evaluates to a list, array, vector or a single node, the current
 Any lquery function resides in the package <code>LQUERY-FUNCS</code>, which is automatically scanned by the $ macro. The two macros responsible for defining new lquery functions automatically place the resulting operations in this package for you.</p>
 
 <pre><code>(<a href="#LQUERY:DEFINE-LQUERY-FUNCTION">define-lquery-function</a> name (node-name &amp;rest arguments) &amp;body body)
-(<a href="#LQUERY:DEFINE-LQUERY-LIST-FUNCTION">define-lquery-list-function</a> name (vector-name &amp;rest arguments) &amp;body body)</code></pre>
+(<a href="#LQUERY:DEFINE-LQUERY-LIST-FUNCTION">define-lquery-list-function</a> name (vector-name &amp;rest arguments) &amp;body body)
+</code></pre>
 
 <p>Any function generated by these macros can be called either with a single node or a vector of nodes. In the case of a regular node operation, if it receives a vector of nodes, the function is called once for each node and the results are collected into a vector, which is then returned. If it receives a single node, only a single result is returned. In the case of a node list function, the return value can be either a vector or a single value, depending on what the goal of the operation is. It is expected that node list functions will modify the given vector directly in order to avoid unnecessary copying.</p>
 
 <p>Some constructs would be very cumbersome to write as functions, or would simply be more suited in the form of a macro. To allow for this, lQuery<sup>3.1</sup> includes a mechanism of <code>$</code> local macros. The previously mentioned forms like <code><a href="#LQUERY:INLINE">INLINE</a></code> are handled through this system. Just like lquery functions, lquery macros reside in their own package <code>LQUERY-MACROS</code>. The responsible macro for defining new lquery macros will automatically place it in there for you.</p>
 
-<pre><code>(<a href="#LQUERY:DEFINE-LQUERY-MACRO">define-lquery-macro</a> name (previous-form &amp;rest arguments) &amp;body body)</code></pre>
+<pre><code>(<a href="#LQUERY:DEFINE-LQUERY-MACRO">define-lquery-macro</a> name (previous-form &amp;rest arguments) &amp;body body)
+</code></pre>
 
 <p>The $ macro itself can be extended as well by providing additional argument- or value-handlers. The following two macros make this possible:</p>
 
-<pre><code>(<a href="#LQUERY:DEFINE-ARGUMENT-HANDLER">define-argument-handler</a> type (argument-name operator-name) &amp;body body)</code></pre>
+<pre><code>(<a href="#LQUERY:DEFINE-ARGUMENT-HANDLER">define-argument-handler</a> type (argument-name operator-name) &amp;body body)
+</code></pre>
 
 <p>Argument handlers transform the arguments at compile-time. For example, this would allow an extension to turn literal arrays into lists so they can be processed as well.</p>
 
-<pre><code>(<a href="#LQUERY:DEFINE-VALUE-HANDLER">define-value-handler</a> type (variable-name operator-name) &amp;body body)</code></pre>
+<pre><code>(<a href="#LQUERY:DEFINE-VALUE-HANDLER">define-value-handler</a> type (variable-name operator-name) &amp;body body)
+</code></pre>
 
 <p>Value handlers on the other hand determine the action at run-time. This is mostly useful for defining special actions on certain variable values.</p>
 
@@ -161,109 +182,144 @@ Added macro system, new standard <code><a href="#LQUERY-MACROS:COMBINE">COMBINE<
 <li><a href="https://shinmera.github.io/clip">Clip</a>, a templating system based on lQuery.</li>
 </ul>
 </span>
-        </c:documentate>
+        
       </article>
       <article>
-        <h2>Copyright</h2>
-        <span>lquery</span> is licensed under the <span><a href="https://tldrlegal.com/search?q=Artistic">Artistic</a></span> license and ©<span>2014</span> <span>Nicolas Hafner &lt;shinmera@tymoon.eu&gt;</span>. This library can be obtained on <a href="https://github.com/Shinmera/lquery">https://github.com/Shinmera/lquery</a>.
+        
+          <h2>Copyright</h2>
+          <span>lquery</span> is licensed under the <span><a href="https://tldrlegal.com/search?q=Artistic">Artistic</a></span> license.
+          
+            © <span>Nicolas Hafner &lt;shinmera@tymoon.eu&gt;</span>
+            .
+          
+          This library can be obtained on <a href="https://github.com/Shinmera/lquery">https://github.com/Shinmera/lquery</a>.
+        
       </article>
-      <article id="symbol-index">
-        <h2>Package Index</h2>
-        <ul><li class="package">
-            <h3>
-              <a name="LQUERY" href="#LQUERY">LQUERY</a>
-              <span class="nicknames">(RADIANCE-LIB-LQUERY ORG.TYMOONNEXT.RADIANCE.LIB.LQUERY)</span>
-            </h3>
-            <ul><li>
-                <a name="LQUERY:ENSURE-PROPER-VECTOR"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY:ENSURE-PROPER-VECTOR">ENSURE-PROPER-VECTOR</a></h4>
-                      <span/>
-                      <span>(VAR)</span>
-                    </code>
-                  </header>
-                  <pre>Ensure that the variable is a proper vector.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY:INITIALIZE"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY:INITIALIZE">INITIALIZE</a></h4>
-                      <span/>
-                      <span>(DOCUMENT)</span>
-                    </code>
-                  </header>
-                  <pre>Sets the *lquery-master-document* variable to the provided document.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY:LOAD-PAGE"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY:LOAD-PAGE">LOAD-PAGE</a></h4>
-                      <span/>
-                      <span>(FILE-OR-STRING)</span>
-                    </code>
-                  </header>
-                  <pre>Load the given file or string into a HTML DOM.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY:MAKE-PROPER-VECTOR"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY:MAKE-PROPER-VECTOR">MAKE-PROPER-VECTOR</a></h4>
-                      <span/>
-                      <span>(&amp;KEY (SIZE 0) INITIAL-ELEMENT INITIAL-CONTENTS (FILL-POINTER T))</span>
-                    </code>
-                  </header>
-                  <pre>Creates a new proper vector.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY:PARSE-HTML"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY:PARSE-HTML">PARSE-HTML</a></h4>
-                      <span/>
-                      <span>(HTML)</span>
-                    </code>
-                  </header>
-                  <pre>Build the given string into DOM objects related to the master document.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY:COPY-PROPER-VECTOR"/>
-                <article>
-                  <header>
-                    <span>GENERIC</span>
-                    <code>
-                      <h4><a href="#LQUERY:COPY-PROPER-VECTOR">COPY-PROPER-VECTOR</a></h4>
-                      <span/>
-                      <span>(SEQUENCE &amp;KEY TRANSFORM (TRANSFORM #'IDENTITY))</span>
-                    </code>
-                  </header>
-                  <pre>Copies the sequence into a new proper vector.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY:$"/>
-                <article>
-                  <header>
-                    <span>MACRO</span>
-                    <code>
-                      <h4><a href="#LQUERY:$">$</a></h4>
-                      <span/>
-                      <span>(&amp;BODY ACTIONS)</span>
-                    </code>
-                  </header>
-                  <pre>Performs lQuery operations on the current document.
+      
+        <article id="symbol-index">
+          <h2>Package Index</h2>
+          <ul><li class="package">
+              <h3>
+                <a name="LQUERY" href="#LQUERY">LQUERY</a>
+                <span class="nicknames">(ORG.SHIRAKUMO.LQUERY)</span>
+              </h3>
+              <ul><li>
+                  <a name="LQUERY:*LQUERY-MASTER-DOCUMENT*"/>
+                  <article>
+                    <header class="special">
+                      <span class="type">special</span>
+                      <code>
+                        <h4><a href="#LQUERY:*LQUERY-MASTER-DOCUMENT*" class="name">*LQUERY-MASTER-DOCUMENT*</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">()</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">The master document used at the beginning of a chain.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY:COPY-PROPER-VECTOR"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY:COPY-PROPER-VECTOR" class="name">COPY-PROPER-VECTOR</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(SEQUENCE &amp;KEY (TRANSFORM (FUNCTION IDENTITY)))</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Copies the sequence into a new proper vector.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY:ENSURE-PROPER-VECTOR"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY:ENSURE-PROPER-VECTOR" class="name">ENSURE-PROPER-VECTOR</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(VAR)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Ensure that the variable is a proper vector.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY:EVAL"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY:EVAL" class="name">EVAL</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(ORIGINAL-EXP)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Evaluate the argument in a null lexical environment, returning the
+   result or results.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY:INITIALIZE"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY:INITIALIZE" class="name">INITIALIZE</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(DOCUMENT)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Sets the *lquery-master-document* variable to the provided document.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY:LOAD-PAGE"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY:LOAD-PAGE" class="name">LOAD-PAGE</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(FILE-OR-STRING)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Load the given file or string into a HTML DOM.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY:MAKE-PROPER-VECTOR"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY:MAKE-PROPER-VECTOR" class="name">MAKE-PROPER-VECTOR</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(&amp;KEY (SIZE 0) INITIAL-ELEMENT INITIAL-CONTENTS (FILL-POINTER T))</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Creates a new proper vector.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY:PARSE-HTML"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY:PARSE-HTML" class="name">PARSE-HTML</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(HTML)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Build the given string into DOM objects related to the master document.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY:$"/>
+                  <article>
+                    <header class="macro">
+                      <span class="type">macro</span>
+                      <code>
+                        <h4><a href="#LQUERY:$" class="name">$</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(&amp;REST ARGS)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Performs lQuery operations on the current document.
 
 Each argument is executed in sequence. The arguments are evaluated according to the defined argument-handlers. By default, the following cases are handled: 
   * STRING    Translates to a CLSS:QUERY on the current elements.
@@ -279,1212 +335,1238 @@ Values are handled at runtime according to the defined variable-handlers. By def
   * ARRAY     Arrays are transformed into a proper vector.
   * VECTOR    Vectors that are not adjustable are transformed into a proper vector.
   * T         Any other value simply replaces the current list of nodes.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY:DEFINE-ARGUMENT-HANDLER"/>
-                <article>
-                  <header>
-                    <span>MACRO</span>
-                    <code>
-                      <h4><a href="#LQUERY:DEFINE-ARGUMENT-HANDLER">DEFINE-ARGUMENT-HANDLER</a></h4>
-                      <span/>
-                      <span>(TYPE (ARGUMENT-NAME OPERATOR-NAME) &amp;BODY BODY)</span>
-                    </code>
-                  </header>
-                  <pre>Defines a new argument handler that decides what to do with a certain type of argument at compile-time.
+                  </article>
+                </li><li>
+                  <a name="LQUERY:$1"/>
+                  <article>
+                    <header class="macro">
+                      <span class="type">macro</span>
+                      <code>
+                        <h4><a href="#LQUERY:$1" class="name">$1</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(&amp;REST ARGS)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">This is the same as $, except it automatically uses NODE at the end and thus only returns the first result, if any.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY:DEFINE-ARGUMENT-HANDLER"/>
+                  <article>
+                    <header class="macro">
+                      <span class="type">macro</span>
+                      <code>
+                        <h4><a href="#LQUERY:DEFINE-ARGUMENT-HANDLER" class="name">DEFINE-ARGUMENT-HANDLER</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(&amp;REST ARGS)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Defines a new argument handler that decides what to do with a certain type of argument at compile-time.
 
 TYPE          --- A type or EQL specifier.
 ARGUMENT-NAME --- Symbol bound to the argument.
 OPERATOR-NAME --- Symbol bound to the object being operated on.
 BODY          ::= form*</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY:DEFINE-LQUERY-FUNCTION"/>
-                <article>
-                  <header>
-                    <span>MACRO</span>
-                    <code>
-                      <h4><a href="#LQUERY:DEFINE-LQUERY-FUNCTION">DEFINE-LQUERY-FUNCTION</a></h4>
-                      <span/>
-                      <span>(NAME (NODE-NAME &amp;REST ARGUMENTS) &amp;BODY BODY)</span>
-                    </code>
-                  </header>
-                  <pre>Defines a new node function. This is the main mechanism by which node manipulations are defined.
+                  </article>
+                </li><li>
+                  <a name="LQUERY:DEFINE-LQUERY-FUNCTION"/>
+                  <article>
+                    <header class="macro">
+                      <span class="type">macro</span>
+                      <code>
+                        <h4><a href="#LQUERY:DEFINE-LQUERY-FUNCTION" class="name">DEFINE-LQUERY-FUNCTION</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(&amp;REST ARGS)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Defines a new node function. This is the main mechanism by which node manipulations are defined.
 All lquery functions are automatically created in the lquery-funcs package.
 
 NAME      --- A symbol naming the lquery function. Automatically interned in the LQUERY-FUNCS package.
 NODE-NAME --- Symbol bound to the current node.
 ARGUMENTS --- A lambda-list specifying the arguments for the function.
 BODY      ::= form*</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY:DEFINE-LQUERY-LIST-FUNCTION"/>
-                <article>
-                  <header>
-                    <span>MACRO</span>
-                    <code>
-                      <h4><a href="#LQUERY:DEFINE-LQUERY-LIST-FUNCTION">DEFINE-LQUERY-LIST-FUNCTION</a></h4>
-                      <span/>
-                      <span>(NAME (VECTOR-NAME &amp;REST ARGUMENTS) &amp;BODY BODY)</span>
-                    </code>
-                  </header>
-                  <pre>Defines a new function that operates on the current node array instead of individual elements.
+                  </article>
+                </li><li>
+                  <a name="LQUERY:DEFINE-LQUERY-LIST-FUNCTION"/>
+                  <article>
+                    <header class="macro">
+                      <span class="type">macro</span>
+                      <code>
+                        <h4><a href="#LQUERY:DEFINE-LQUERY-LIST-FUNCTION" class="name">DEFINE-LQUERY-LIST-FUNCTION</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(&amp;REST ARGS)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Defines a new function that operates on the current node array instead of individual elements.
 All lquery functions are automatically created in the lquery-funcs package.
 
 NAME        --- A symbol naming the lquery function. Automatically interned in the LQUERY-FUNCS package.
 VECTOR-NAME --- Symbol bound to the node vector.
 ARGUMENTS   --- A lambda-list specifying the arguments for the function.
 BODY        ::= form*</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY:DEFINE-LQUERY-MACRO"/>
-                <article>
-                  <header>
-                    <span>MACRO</span>
-                    <code>
-                      <h4><a href="#LQUERY:DEFINE-LQUERY-MACRO">DEFINE-LQUERY-MACRO</a></h4>
-                      <span/>
-                      <span>(NAME (PREVIOUS-FORM &amp;REST ARGUMENTS) &amp;BODY BODY)</span>
-                    </code>
-                  </header>
-                  <pre>Define a new lquery local macro.
+                  </article>
+                </li><li>
+                  <a name="LQUERY:DEFINE-LQUERY-MACRO"/>
+                  <article>
+                    <header class="macro">
+                      <span class="type">macro</span>
+                      <code>
+                        <h4><a href="#LQUERY:DEFINE-LQUERY-MACRO" class="name">DEFINE-LQUERY-MACRO</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(&amp;REST ARGS)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Define a new lquery local macro.
 All lquery macros are automatically created in the lquery-macros package.
 
 NAME          --- A symbol naming the lquery macro. Automatically interned in the LQUERY-MACROS package.
 PREVIOUS-FORM --- Symbol bound to the so far assembled form, the previous value so to speak.
 ARGUMENTS     --- A lambda-list specifying the arguments for the macro (note that this must be a standard lambda-list).
 BODY          ::= form*</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY:DEFINE-VALUE-HANDLER"/>
-                <article>
-                  <header>
-                    <span>MACRO</span>
-                    <code>
-                      <h4><a href="#LQUERY:DEFINE-VALUE-HANDLER">DEFINE-VALUE-HANDLER</a></h4>
-                      <span/>
-                      <span>(TYPE (VARIABLE-NAME OPERATOR-NAME) &amp;BODY BODY)</span>
-                    </code>
-                  </header>
-                  <pre>Defines a new symbol handler that decides what to do with a certain type of symbol at run-time (variable type).
+                  </article>
+                </li><li>
+                  <a name="LQUERY:DEFINE-LQUERY-SUBROUTINE"/>
+                  <article>
+                    <header class="macro">
+                      <span class="type">macro</span>
+                      <code>
+                        <h4><a href="#LQUERY:DEFINE-LQUERY-SUBROUTINE" class="name">DEFINE-LQUERY-SUBROUTINE</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(&amp;REST ARGS)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Defines a shorthand function. The body is a set of lQuery instructions as you'd use in $.
+
+NAME      --- A symbol naming the subroutine. Automatically interned in the LQUERY-FUNCS package.
+ARGUMENTS --- A lambda-list specifying the arguments for the function.
+BODY      ::= lquery-form*</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY:DEFINE-VALUE-HANDLER"/>
+                  <article>
+                    <header class="macro">
+                      <span class="type">macro</span>
+                      <code>
+                        <h4><a href="#LQUERY:DEFINE-VALUE-HANDLER" class="name">DEFINE-VALUE-HANDLER</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(&amp;REST ARGS)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Defines a new symbol handler that decides what to do with a certain type of symbol at run-time (variable type).
 
 TYPE          --- A type or EQL specifier.
 VARIABLE-NAME --- Symbol bound to the argument.
 OPERATOR-NAME --- Symbol bound to the object being operated on.
 BODY          ::= form*</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY:*LQUERY-MASTER-DOCUMENT*"/>
-                <article>
-                  <header>
-                    <span>SPECIAL</span>
-                    <code>
-                      <h4><a href="#LQUERY:*LQUERY-MASTER-DOCUMENT*">*LQUERY-MASTER-DOCUMENT*</a></h4>
-                      <span/>
-                      <span/>
-                    </code>
-                  </header>
-                  <pre>The master document used at the beginning of a chain.</pre>
-                </article>
-              </li></ul>
-          </li><li class="package">
-            <h3>
-              <a name="LQUERY-TEST" href="#LQUERY-TEST">LQUERY-TEST</a>
-              <span class="nicknames">(ORG.TYMOONNEXT.RADIANCE.LIB.LQUERY.TEST)</span>
-            </h3>
-            <ul><li>
-                <a name="LQUERY-TEST:RUN"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-TEST:RUN">RUN</a></h4>
-                      <span/>
-                      <span/>
-                    </code>
-                  </header>
-                  <pre/>
-                </article>
-              </li></ul>
-          </li><li class="package">
-            <h3>
-              <a name="LQUERY-FUNCS" href="#LQUERY-FUNCS">LQUERY-FUNCS</a>
-              <span class="nicknames">(ORG.TYMOONNEXT.RADIANCE.LIB.LQUERY.FUNCS)</span>
-            </h3>
-            <ul><li>
-                <a name="LQUERY-FUNCS:ADD"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:ADD">ADD</a></h4>
-                      <span/>
-                      <span>(WORKING-NODES SELECTOR-OR-NODES)</span>
-                    </code>
-                  </header>
-                  <pre>Add elements to the set of matched elements.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:ADD-CLASS"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:ADD-CLASS">ADD-CLASS</a></h4>
-                      <span/>
-                      <span>(NODE &amp;REST CLASSES)</span>
-                    </code>
-                  </header>
-                  <pre>Adds the specified class(es) to the set of matched elements.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:AFTER"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:AFTER">AFTER</a></h4>
-                      <span/>
-                      <span>(NODES HTML-OR-NODES)</span>
-                    </code>
-                  </header>
-                  <pre>Insert content (in html-string or node-list form) after each element.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:ANCESTOR"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:ANCESTOR">ANCESTOR</a></h4>
-                      <span/>
-                      <span>(WORKING-NODES)</span>
-                    </code>
-                  </header>
-                  <pre>Find the common ancestor of all elements.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:APPEND"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:APPEND">APPEND</a></h4>
-                      <span/>
-                      <span>(NODES HTML-OR-NODES)</span>
-                    </code>
-                  </header>
-                  <pre>Insert content (in html-string or node-list form) to the end of each element.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:APPEND-TO"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:APPEND-TO">APPEND-TO</a></h4>
-                      <span/>
-                      <span>(WORKING-NODES SELECTOR-OR-NODES)</span>
-                    </code>
-                  </header>
-                  <pre>Insert every element to the end of the target(s).</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:ATTR"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:ATTR">ATTR</a></h4>
-                      <span/>
-                      <span>(NODE &amp;REST PAIRS)</span>
-                    </code>
-                  </header>
-                  <pre>Retrieve or set attributes on a node.
-The value on a node is turned into a string using PRINC-TO-STRING.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:BEFORE"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:BEFORE">BEFORE</a></h4>
-                      <span/>
-                      <span>(NODES HTML-OR-NODES)</span>
-                    </code>
-                  </header>
-                  <pre>Insert content (in html-string or node-list form) before each element.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:CHILD-INDEX"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:CHILD-INDEX">CHILD-INDEX</a></h4>
-                      <span/>
-                      <span>(NODE)</span>
-                    </code>
-                  </header>
-                  <pre>Returns the index of the element within its parent, also counting text nodes. See index() otherwise.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:CHILDREN"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:CHILDREN">CHILDREN</a></h4>
-                      <span/>
-                      <span>(NODES &amp;OPTIONAL SELECTOR)</span>
-                    </code>
-                  </header>
-                  <pre>Get the children of each element, optionally filtered by a selector.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:CLONE"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:CLONE">CLONE</a></h4>
-                      <span/>
-                      <span>(NODE)</span>
-                    </code>
-                  </header>
-                  <pre>Create a deep copy of the set of matched elements.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:CLOSEST"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:CLOSEST">CLOSEST</a></h4>
-                      <span/>
-                      <span>(NODE SELECTOR)</span>
-                    </code>
-                  </header>
-                  <pre>For each element in the set, get the first element that matches the selector by testing the element itself and traversing up through its ancestors in the DOM tree.
+                  </article>
+                </li></ul>
+            </li><li class="package">
+              <h3>
+                <a name="LQUERY-FUNCS" href="#LQUERY-FUNCS">LQUERY-FUNCS</a>
+                <span class="nicknames">(ORG.SHIRAKUMO.LQUERY.FUNCS)</span>
+              </h3>
+              <ul><li>
+                  <a name="LQUERY-FUNCS:ADD"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:ADD" class="name">ADD</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(WORKING-NODES SELECTOR-OR-NODES)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Add elements to the set of matched elements.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:ADD-CLASS"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:ADD-CLASS" class="name">ADD-CLASS</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(NODE &amp;REST CLASSES)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Adds the specified class(es) to the set of matched elements.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:AFTER"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:AFTER" class="name">AFTER</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(NODES HTML-OR-NODES)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Insert content (in html-string or node-list form) after each element.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:ANCESTOR"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:ANCESTOR" class="name">ANCESTOR</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(WORKING-NODES)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Find the common ancestor of all elements.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:APPEND"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:APPEND" class="name">APPEND</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(NODES HTML-OR-NODES)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Insert content (in html-string or node-list form) to the end of each element.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:APPEND-TO"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:APPEND-TO" class="name">APPEND-TO</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(WORKING-NODES SELECTOR-OR-NODES)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Insert every element to the end of the target(s).</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:ATTR"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:ATTR" class="name">ATTR</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(NODE &amp;REST PAIRS)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Retrieve or set attributes on a node.
+The value on a node is turned into a string using PRINC-TO-STRING.
+If a value is NIL, the associated attribute is removed.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:BEFORE"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:BEFORE" class="name">BEFORE</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(NODES HTML-OR-NODES)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Insert content (in html-string or node-list form) before each element.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:CHILD-INDEX"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:CHILD-INDEX" class="name">CHILD-INDEX</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(NODE)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Returns the index of the element within its parent, also counting text nodes. See index() otherwise.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:CHILDREN"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:CHILDREN" class="name">CHILDREN</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(NODES &amp;OPTIONAL SELECTOR)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Get the children of each element, optionally filtered by a selector.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:CLONE"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:CLONE" class="name">CLONE</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(NODE)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Create a deep copy of the set of matched elements.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:CLOSEST"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:CLOSEST" class="name">CLOSEST</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(NODE SELECTOR)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">For each element in the set, get the first element that matches the selector by testing the element itself and traversing up through its ancestors in the DOM tree.
 If no matching element can be found the root is entered instead.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:CONTAINS"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:CONTAINS">CONTAINS</a></h4>
-                      <span/>
-                      <span>(NODES STRING)</span>
-                    </code>
-                  </header>
-                  <pre>Select all elements that contain the specified text.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:CONTENTS"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:CONTENTS">CONTENTS</a></h4>
-                      <span/>
-                      <span>(NODES)</span>
-                    </code>
-                  </header>
-                  <pre>Get the children of each element, including text and comment nodes.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:CSS"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:CSS">CSS</a></h4>
-                      <span/>
-                      <span>(NODE &amp;REST PAIRS)</span>
-                    </code>
-                  </header>
-                  <pre>Retrieve or set css style attributes on a node.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:DATA"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:DATA">DATA</a></h4>
-                      <span/>
-                      <span>(NODE &amp;REST PAIRS)</span>
-                    </code>
-                  </header>
-                  <pre>Retrieve or set data attributes on a node. This is a convenience method and uses attr in the back.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:DEEPEST"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:DEEPEST">DEEPEST</a></h4>
-                      <span/>
-                      <span>(NODE)</span>
-                    </code>
-                  </header>
-                  <pre>Returns the innermost (left-bound) child element.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:EACH"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:EACH">EACH</a></h4>
-                      <span/>
-                      <span>(NODES FUN &amp;KEY REPLACE)</span>
-                    </code>
-                  </header>
-                  <pre>Execute the specified function on each element until NIL is returned or all elements have been processed. The original set of elements is returned if replace is NIL.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:EMPTY"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:EMPTY">EMPTY</a></h4>
-                      <span/>
-                      <span>(NODE)</span>
-                    </code>
-                  </header>
-                  <pre>Remove all child nodes from the set of matched elements.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:EMPTY-P"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:EMPTY-P">EMPTY-P</a></h4>
-                      <span/>
-                      <span>(NODE)</span>
-                    </code>
-                  </header>
-                  <pre>Check if the node contains no children and/or only empty (whitespace) text nodes. If it is empty, T is returned, otherwise NIL.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:EQ"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:EQ">EQ</a></h4>
-                      <span/>
-                      <span>(WORKING-NODES INDEX)</span>
-                    </code>
-                  </header>
-                  <pre>Reduce the set of matched elements to the one at the specified index</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:EVEN"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:EVEN">EVEN</a></h4>
-                      <span/>
-                      <span>(WORKING-NODES)</span>
-                    </code>
-                  </header>
-                  <pre>Selects even elements, 1-indexed</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:FILTER"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:FILTER">FILTER</a></h4>
-                      <span/>
-                      <span>(NODES SELECTOR-OR-FUNCTION)</span>
-                    </code>
-                  </header>
-                  <pre>Reduce the set of matched elements to those that match the selector or pass the function's test.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:FIND"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:FIND">FIND</a></h4>
-                      <span/>
-                      <span>(NODES SELECTOR-OR-FUNCTION &amp;KEY (TEST-SELF NIL))</span>
-                    </code>
-                  </header>
-                  <pre>Get the descendants of each element filtered by selector or function.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:FIRST"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:FIRST">FIRST</a></h4>
-                      <span/>
-                      <span>(WORKING-NODES)</span>
-                    </code>
-                  </header>
-                  <pre>Reduce the set of matched elements to the first in the set.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:GT"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:GT">GT</a></h4>
-                      <span/>
-                      <span>(WORKING-NODES INDEX)</span>
-                    </code>
-                  </header>
-                  <pre>Select all elements at a greater than index(0) within the matched set.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:HAS"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:HAS">HAS</a></h4>
-                      <span/>
-                      <span>(NODES SELECTOR-OR-NODES)</span>
-                    </code>
-                  </header>
-                  <pre>Reduce the set of matched elements to those that have a descendant that matches the selector or element.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:HAS-CLASS"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:HAS-CLASS">HAS-CLASS</a></h4>
-                      <span/>
-                      <span>(WORKING-NODES CLASS)</span>
-                    </code>
-                  </header>
-                  <pre>Determine whether any of the matched elements are assigned to the given class.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:HIDE"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:HIDE">HIDE</a></h4>
-                      <span/>
-                      <span>(WORKING-NODES)</span>
-                    </code>
-                  </header>
-                  <pre>Hide the matched elements (short for (css &quot;display&quot; &quot;none&quot;)).</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:HTML"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:HTML">HTML</a></h4>
-                      <span/>
-                      <span>(NODE &amp;OPTIONAL NEW-CONTENT)</span>
-                    </code>
-                  </header>
-                  <pre>Get the HTML contents of the elements or set the HTML contents of every matched element. If the new content is not a string, it is turned into one as per PRINC-TO-STRING.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:HTML-FILE"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:HTML-FILE">HTML-FILE</a></h4>
-                      <span/>
-                      <span>(WORKING-NODES PATHNAME)</span>
-                    </code>
-                  </header>
-                  <pre>Read an HTML file and insert its contents into each element.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:INDEX"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:INDEX">INDEX</a></h4>
-                      <span/>
-                      <span>(NODE)</span>
-                    </code>
-                  </header>
-                  <pre>Find the index of the node within its parent.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:INITIALIZE"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:INITIALIZE">INITIALIZE</a></h4>
-                      <span/>
-                      <span>(WORKING-NODES DOCUMENT)</span>
-                    </code>
-                  </header>
-                  <pre>Re-initializes lQuery with a new page.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:INSERT-AFTER"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:INSERT-AFTER">INSERT-AFTER</a></h4>
-                      <span/>
-                      <span>(WORKING-NODES SELECTOR-OR-NODES)</span>
-                    </code>
-                  </header>
-                  <pre>Insert every element after the target.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:INSERT-BEFORE"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:INSERT-BEFORE">INSERT-BEFORE</a></h4>
-                      <span/>
-                      <span>(WORKING-NODES SELECTOR-OR-NODES)</span>
-                    </code>
-                  </header>
-                  <pre>Insert every element before the target.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:IS"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:IS">IS</a></h4>
-                      <span/>
-                      <span>(WORKING-NODES SELECTOR-OR-NODES)</span>
-                    </code>
-                  </header>
-                  <pre>Check the current elements against a selector or list of elements and return true if at least one of them matches.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:IS-EMPTY"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:IS-EMPTY">IS-EMPTY</a></h4>
-                      <span/>
-                      <span>(NODE)</span>
-                    </code>
-                  </header>
-                  <pre>Check if the node contains no children and/or only empty (whitespace) text nodes. If it is empty, T is returned, otherwise NIL.
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:CONTAINS"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:CONTAINS" class="name">CONTAINS</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(NODES STRING)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Select all elements that contain the specified text.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:CONTENTS"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:CONTENTS" class="name">CONTENTS</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(NODES)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Get the children of each element, including text and comment nodes.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:CSS"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:CSS" class="name">CSS</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(NODE &amp;REST PAIRS)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Retrieve or set css style attributes on a node.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:DATA"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:DATA" class="name">DATA</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(NODE &amp;REST PAIRS)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Retrieve or set data attributes on a node. This is a convenience method and uses attr in the back.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:DEEPEST"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:DEEPEST" class="name">DEEPEST</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(NODE)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Returns the innermost (left-bound) child element.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:EACH"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:EACH" class="name">EACH</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(NODES FUN &amp;KEY REPLACE)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Execute the specified function on each element until NIL is returned or all elements have been processed. The original set of elements is returned if replace is NIL.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:EMPTY"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:EMPTY" class="name">EMPTY</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(NODE)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Remove all child nodes from the set of matched elements.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:EMPTY-P"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:EMPTY-P" class="name">EMPTY-P</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(NODE)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Check if the node contains no children and/or only empty (whitespace) text nodes. If it is empty, T is returned, otherwise NIL.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:EQ"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:EQ" class="name">EQ</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(WORKING-NODES INDEX)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Reduce the set of matched elements to the one at the specified index</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:EVEN"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:EVEN" class="name">EVEN</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(WORKING-NODES)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Selects even elements, 1-indexed</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:FILTER"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:FILTER" class="name">FILTER</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(NODES SELECTOR-OR-FUNCTION)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Reduce the set of matched elements to those that match the selector or pass the function's test.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:FIND"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:FIND" class="name">FIND</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(NODES SELECTOR-OR-FUNCTION &amp;KEY (TEST-SELF NIL))</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Get the descendants of each element filtered by selector or function.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:FIRST"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:FIRST" class="name">FIRST</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(WORKING-NODES)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Reduce the set of matched elements to the first in the set.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:GT"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:GT" class="name">GT</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(WORKING-NODES INDEX)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Select all elements at a greater than index(0) within the matched set.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:HAS"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:HAS" class="name">HAS</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(NODES SELECTOR-OR-NODES)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Reduce the set of matched elements to those that have a descendant that matches the selector or element.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:HAS-CLASS"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:HAS-CLASS" class="name">HAS-CLASS</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(WORKING-NODES CLASS)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Determine whether any of the matched elements are assigned to the given class.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:HIDE"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:HIDE" class="name">HIDE</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(WORKING-NODES)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Hide the matched elements (short for (css &quot;display&quot; &quot;none&quot;)).</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:HTML"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:HTML" class="name">HTML</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(NODE &amp;OPTIONAL NEW-CONTENT)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Get the HTML contents of the elements or set the HTML contents of every matched element. If the new content is not a string, it is turned into one as per PRINC-TO-STRING.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:HTML-FILE"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:HTML-FILE" class="name">HTML-FILE</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(WORKING-NODES PATHNAME)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Read an HTML file and insert its contents into each element.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:INDEX"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:INDEX" class="name">INDEX</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(NODE)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Find the index of the node within its parent.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:INITIALIZE"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:INITIALIZE" class="name">INITIALIZE</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(WORKING-NODES DOCUMENT)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Re-initializes lQuery with a new page.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:INSERT-AFTER"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:INSERT-AFTER" class="name">INSERT-AFTER</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(WORKING-NODES SELECTOR-OR-NODES)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Insert every element after the target.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:INSERT-BEFORE"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:INSERT-BEFORE" class="name">INSERT-BEFORE</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(WORKING-NODES SELECTOR-OR-NODES)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Insert every element before the target.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:IS"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:IS" class="name">IS</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(WORKING-NODES SELECTOR-OR-NODES)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Check the current elements against a selector or list of elements and return true if at least one of them matches.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:IS-EMPTY"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:IS-EMPTY" class="name">IS-EMPTY</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(NODE)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Check if the node contains no children and/or only empty (whitespace) text nodes. If it is empty, T is returned, otherwise NIL.
 Alias of EMPTY-P</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:LAST"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:LAST">LAST</a></h4>
-                      <span/>
-                      <span>(WORKING-NODES)</span>
-                    </code>
-                  </header>
-                  <pre>Reduce the set of matched elements to the final one in the set.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:LENGTH"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:LENGTH">LENGTH</a></h4>
-                      <span/>
-                      <span>(WORKING-NODES)</span>
-                    </code>
-                  </header>
-                  <pre>Returns the number of elements in the list.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:LT"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:LT">LT</a></h4>
-                      <span/>
-                      <span>(WORKING-NODES INDEX)</span>
-                    </code>
-                  </header>
-                  <pre>Select all elements at an index less than the index within the matched set.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:MAP"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:MAP">MAP</a></h4>
-                      <span/>
-                      <span>(WORKING-NODES FUNCTION)</span>
-                    </code>
-                  </header>
-                  <pre>Pass each element through a function (which has to accept one argument, the node), returning the list of all results.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:MAP-APPLY"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:MAP-APPLY">MAP-APPLY</a></h4>
-                      <span/>
-                      <span>(WORKING-NODES FUNCTION)</span>
-                    </code>
-                  </header>
-                  <pre>Pass each element through a function by apply, returning the vector of all results.
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:LAST"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:LAST" class="name">LAST</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(WORKING-NODES)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Reduce the set of matched elements to the final one in the set.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:LENGTH"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:LENGTH" class="name">LENGTH</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(WORKING-NODES)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Returns the number of elements in the list.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:LT"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:LT" class="name">LT</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(WORKING-NODES INDEX)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Select all elements at an index less than the index within the matched set.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:MAP"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:MAP" class="name">MAP</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(WORKING-NODES FUNCTION)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Pass each element through a function (which has to accept one argument, the node), returning the list of all results.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:MAP-APPLY"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:MAP-APPLY" class="name">MAP-APPLY</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(WORKING-NODES FUNCTION)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Pass each element through a function by apply, returning the vector of all results.
 This is commonly useful in combination with COMBINE.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:NEXT"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:NEXT">NEXT</a></h4>
-                      <span/>
-                      <span>(NODES &amp;OPTIONAL SELECTOR)</span>
-                    </code>
-                  </header>
-                  <pre>Get the immediately following sibling of each element (if there is one). If a selector is provided, the sibling is only included if it matches.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:NEXT-ALL"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:NEXT-ALL">NEXT-ALL</a></h4>
-                      <span/>
-                      <span>(NODES &amp;OPTIONAL SELECTOR)</span>
-                    </code>
-                  </header>
-                  <pre>Get all following siblings of each element. If a selector is provided, the sibling is only included if it matches.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:NEXT-UNTIL"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:NEXT-UNTIL">NEXT-UNTIL</a></h4>
-                      <span/>
-                      <span>(NODES SELECTOR-OR-NODES)</span>
-                    </code>
-                  </header>
-                  <pre>Get all following silings of each element up to (excluding) the element matched by the selector or node list.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:NODE"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:NODE">NODE</a></h4>
-                      <span/>
-                      <span>(WORKING-NODES &amp;OPTIONAL (N 0))</span>
-                    </code>
-                  </header>
-                  <pre>Return the specified node (default first) directly, without encompassing it into a list.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:NOT"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:NOT">NOT</a></h4>
-                      <span/>
-                      <span>(WORKING-NODES SELECTOR-OR-NODES)</span>
-                    </code>
-                  </header>
-                  <pre>Remove matching elements from the working elements.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:NOT-EMPTY"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:NOT-EMPTY">NOT-EMPTY</a></h4>
-                      <span/>
-                      <span>(NODE)</span>
-                    </code>
-                  </header>
-                  <pre>Check if the node contains no children and/or only empty (whitespace) text nodes. If the node is effectively empty NIL is returned, otherwise T</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:ODD"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:ODD">ODD</a></h4>
-                      <span/>
-                      <span>(WORKING-NODES)</span>
-                    </code>
-                  </header>
-                  <pre>Select all odd elements from the current set, 1-indexed.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:PARENT"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:PARENT">PARENT</a></h4>
-                      <span/>
-                      <span>(NODES &amp;OPTIONAL SELECTOR)</span>
-                    </code>
-                  </header>
-                  <pre>Get the parent of each element, optionally filtered by a selector.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:PARENTS"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:PARENTS">PARENTS</a></h4>
-                      <span/>
-                      <span>(NODES &amp;OPTIONAL SELECTOR)</span>
-                    </code>
-                  </header>
-                  <pre>Get the ancestors of each element, optionally filtered by a selector. Closest parent first.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:PARENTS-UNTIL"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:PARENTS-UNTIL">PARENTS-UNTIL</a></h4>
-                      <span/>
-                      <span>(NODES SELECTOR-OR-NODES)</span>
-                    </code>
-                  </header>
-                  <pre>Get the ancestors of each element, up to (excluding) the element matched by the selector or node list. Closest parent first</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:PREPEND"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:PREPEND">PREPEND</a></h4>
-                      <span/>
-                      <span>(NODES HTML-OR-NODES)</span>
-                    </code>
-                  </header>
-                  <pre>Insert content, specified by the parameter, to the beginning of each element.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:PREPEND-TO"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:PREPEND-TO">PREPEND-TO</a></h4>
-                      <span/>
-                      <span>(WORKING-NODES SELECTOR-OR-NODES)</span>
-                    </code>
-                  </header>
-                  <pre>Insert every element to the beginning of the target(s).</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:PREV"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:PREV">PREV</a></h4>
-                      <span/>
-                      <span>(NODES &amp;OPTIONAL SELECTOR)</span>
-                    </code>
-                  </header>
-                  <pre>Get the immediately preceding sibling of each element (if there is one). If a selector is provided, the sibling is only included if it matches.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:PREV-ALL"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:PREV-ALL">PREV-ALL</a></h4>
-                      <span/>
-                      <span>(NODES &amp;OPTIONAL SELECTOR)</span>
-                    </code>
-                  </header>
-                  <pre>Get all preceeding siblings of each element. If a selector is provided, the sibling is only included if it matches.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:PREV-UNTIL"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:PREV-UNTIL">PREV-UNTIL</a></h4>
-                      <span/>
-                      <span>(NODES SELECTOR-OR-NODES)</span>
-                    </code>
-                  </header>
-                  <pre>Get all preceeding silings of each element down to (excluding) the element matched by the selector or node list.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:REMOVE"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:REMOVE">REMOVE</a></h4>
-                      <span/>
-                      <span>(NODE &amp;OPTIONAL SELECTOR)</span>
-                    </code>
-                  </header>
-                  <pre>Remove the set of matched elements from the DOM.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:REMOVE-ATTR"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:REMOVE-ATTR">REMOVE-ATTR</a></h4>
-                      <span/>
-                      <span>(NODE &amp;REST ATTRIBUTES)</span>
-                    </code>
-                  </header>
-                  <pre>Remove attributes from each element.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:REMOVE-CLASS"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:REMOVE-CLASS">REMOVE-CLASS</a></h4>
-                      <span/>
-                      <span>(NODE &amp;REST CLASSES)</span>
-                    </code>
-                  </header>
-                  <pre>Remove classes from each element.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:REMOVE-DATA"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:REMOVE-DATA">REMOVE-DATA</a></h4>
-                      <span/>
-                      <span>(NODE &amp;REST DATA)</span>
-                    </code>
-                  </header>
-                  <pre>Remove data attributes from each element. This is a convenience method and uses remove-attr in the back.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:REPLACE-ALL"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:REPLACE-ALL">REPLACE-ALL</a></h4>
-                      <span/>
-                      <span>(WORKING-NODES SELECTOR-OR-NODES)</span>
-                    </code>
-                  </header>
-                  <pre>Replace each in the set of matched elements with the current nodes.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:REPLACE-WITH"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:REPLACE-WITH">REPLACE-WITH</a></h4>
-                      <span/>
-                      <span>(WORKING-NODES HTML-OR-NODES)</span>
-                    </code>
-                  </header>
-                  <pre>Replace each element with the provided new content and return the set of elements that was removed.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:SERIALIZE"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:SERIALIZE">SERIALIZE</a></h4>
-                      <span/>
-                      <span>(NODE &amp;OPTIONAL (STREAM NIL))</span>
-                    </code>
-                  </header>
-                  <pre>Serialize the node into a string.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:SHOW"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:SHOW">SHOW</a></h4>
-                      <span/>
-                      <span>(WORKING-NODES)</span>
-                    </code>
-                  </header>
-                  <pre>Display the matched elements (short for (css :display 'block'))</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:SIBLINGS"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:SIBLINGS">SIBLINGS</a></h4>
-                      <span/>
-                      <span>(NODES &amp;OPTIONAL SELECTOR)</span>
-                    </code>
-                  </header>
-                  <pre>Get the siblings of each element, optionally filtered by a selector.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:SIZE"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:SIZE">SIZE</a></h4>
-                      <span/>
-                      <span>(WORKING-NODES)</span>
-                    </code>
-                  </header>
-                  <pre>Return the number of elements in the list.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:SLICE"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:SLICE">SLICE</a></h4>
-                      <span/>
-                      <span>(WORKING-NODES START &amp;OPTIONAL END)</span>
-                    </code>
-                  </header>
-                  <pre>Reduce the set of matched elements to a subset specified by a range of indices</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:TEXT"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:TEXT">TEXT</a></h4>
-                      <span/>
-                      <span>(NODE &amp;OPTIONAL (TEXT NIL T-S-P))</span>
-                    </code>
-                  </header>
-                  <pre>Get the combined text contents of each element, including their descendants. If text is set, all text nodes are removed and a new text node is appended to the end of the node. If text is NIL, all direct text nodes are removed from the node. If text is not a string, it is transformed into one by PRINC-TO-STRING.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:TOGGLE-CLASS"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:TOGGLE-CLASS">TOGGLE-CLASS</a></h4>
-                      <span/>
-                      <span>(NODE &amp;REST CLASSES)</span>
-                    </code>
-                  </header>
-                  <pre>Add or remove one or more classes from each element, depending on their presence within the element.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:UNWRAP"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:UNWRAP">UNWRAP</a></h4>
-                      <span/>
-                      <span>(NODE)</span>
-                    </code>
-                  </header>
-                  <pre>Remove the parents of the set of matched elements from the DOM, inserting the parents children in place of it.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:VAL"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:VAL">VAL</a></h4>
-                      <span/>
-                      <span>(NODE &amp;OPTIONAL (VALUE NIL V-P))</span>
-                    </code>
-                  </header>
-                  <pre>Get the current values or set the value of every matched element.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:WRAP"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:WRAP">WRAP</a></h4>
-                      <span/>
-                      <span>(NODES HTML-OR-NODES)</span>
-                    </code>
-                  </header>
-                  <pre>Wrap an HTML structure around each element. Note that always the first node of the structure to wrap is chosen.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:WRAP-ALL"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:WRAP-ALL">WRAP-ALL</a></h4>
-                      <span/>
-                      <span>(WORKING-NODES HTML-OR-NODES)</span>
-                    </code>
-                  </header>
-                  <pre>Wrap an HTML structure around all elements and put it in place of the first element, removing all other elements from their position.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:WRAP-INNER"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:WRAP-INNER">WRAP-INNER</a></h4>
-                      <span/>
-                      <span>(NODES HTML-OR-NODES)</span>
-                    </code>
-                  </header>
-                  <pre>Wrap an HTML structure around the contents of each element.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-FUNCS:WRITE-TO-FILE"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-FUNCS:WRITE-TO-FILE">WRITE-TO-FILE</a></h4>
-                      <span/>
-                      <span>(WORKING-NODES FILE &amp;KEY (IF-DOES-NOT-EXIST CREATE) (IF-EXISTS SUPERSEDE))</span>
-                    </code>
-                  </header>
-                  <pre>Write the serialized node to the file. Note that always only the first element is written.</pre>
-                </article>
-              </li></ul>
-          </li><li class="package">
-            <h3>
-              <a name="LQUERY-MACROS" href="#LQUERY-MACROS">LQUERY-MACROS</a>
-              <span class="nicknames">(ORG.TYMOONNEXT.RADIANCE.LIB.LQUERY.MACROS)</span>
-            </h3>
-            <ul><li>
-                <a name="LQUERY-MACROS:COMBINE"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-MACROS:COMBINE">COMBINE</a></h4>
-                      <span/>
-                      <span>(NODES &amp;REST CALLS)</span>
-                    </code>
-                  </header>
-                  <pre>COMBINES multiple lquery function calls into one by gathering them into a list for each element.
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:NEXT"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:NEXT" class="name">NEXT</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(NODES &amp;OPTIONAL SELECTOR)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Get the immediately following sibling of each element (if there is one). If a selector is provided, the sibling is only included if it matches.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:NEXT-ALL"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:NEXT-ALL" class="name">NEXT-ALL</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(NODES &amp;OPTIONAL SELECTOR)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Get all following siblings of each element. If a selector is provided, the sibling is only included if it matches.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:NEXT-UNTIL"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:NEXT-UNTIL" class="name">NEXT-UNTIL</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(NODES SELECTOR-OR-NODES)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Get all following silings of each element up to (excluding) the element matched by the selector or node list.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:NODE"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:NODE" class="name">NODE</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(WORKING-NODES &amp;OPTIONAL (N 0))</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Return the specified node (default first) directly, without encompassing it into a vector if it exists. Otherwise return NIL.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:NOT"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:NOT" class="name">NOT</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(WORKING-NODES SELECTOR-OR-NODES)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Remove matching elements from the working elements.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:NOT-EMPTY"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:NOT-EMPTY" class="name">NOT-EMPTY</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(NODE)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Check if the node contains no children and/or only empty (whitespace) text nodes. If the node is effectively empty NIL is returned, otherwise T</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:ODD"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:ODD" class="name">ODD</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(WORKING-NODES)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Select all odd elements from the current set, 1-indexed.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:PARENT"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:PARENT" class="name">PARENT</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(NODES &amp;OPTIONAL SELECTOR)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Get the parent of each element, optionally filtered by a selector.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:PARENTS"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:PARENTS" class="name">PARENTS</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(NODES &amp;OPTIONAL SELECTOR)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Get the ancestors of each element, optionally filtered by a selector. Closest parent first.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:PARENTS-UNTIL"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:PARENTS-UNTIL" class="name">PARENTS-UNTIL</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(NODES SELECTOR-OR-NODES)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Get the ancestors of each element, up to (excluding) the element matched by the selector or node list. Closest parent first</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:PREPEND"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:PREPEND" class="name">PREPEND</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(NODES HTML-OR-NODES)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Insert content, specified by the parameter, to the beginning of each element.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:PREPEND-TO"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:PREPEND-TO" class="name">PREPEND-TO</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(WORKING-NODES SELECTOR-OR-NODES)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Insert every element to the beginning of the target(s).</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:PREV"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:PREV" class="name">PREV</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(NODES &amp;OPTIONAL SELECTOR)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Get the immediately preceding sibling of each element (if there is one). If a selector is provided, the sibling is only included if it matches.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:PREV-ALL"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:PREV-ALL" class="name">PREV-ALL</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(NODES &amp;OPTIONAL SELECTOR)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Get all preceeding siblings of each element. If a selector is provided, the sibling is only included if it matches.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:PREV-UNTIL"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:PREV-UNTIL" class="name">PREV-UNTIL</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(NODES SELECTOR-OR-NODES)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Get all preceeding silings of each element down to (excluding) the element matched by the selector or node list.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:REMOVE"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:REMOVE" class="name">REMOVE</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(NODE &amp;OPTIONAL SELECTOR)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Remove the set of matched elements from the DOM.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:REMOVE-ATTR"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:REMOVE-ATTR" class="name">REMOVE-ATTR</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(NODE &amp;REST ATTRIBUTES)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Remove attributes from each element.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:REMOVE-CLASS"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:REMOVE-CLASS" class="name">REMOVE-CLASS</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(NODE &amp;REST CLASSES)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Remove classes from each element.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:REMOVE-DATA"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:REMOVE-DATA" class="name">REMOVE-DATA</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(NODE &amp;REST DATA)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Remove data attributes from each element. This is a convenience method and uses remove-attr in the back.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:REPLACE-ALL"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:REPLACE-ALL" class="name">REPLACE-ALL</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(WORKING-NODES SELECTOR-OR-NODES)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Replace each in the set of matched elements with the current nodes.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:REPLACE-WITH"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:REPLACE-WITH" class="name">REPLACE-WITH</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(WORKING-NODES HTML-OR-NODES)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Replace each element with the provided new content and return the set of elements that was removed.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:ROOT"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:ROOT" class="name">ROOT</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(WORKING-NODES)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Returns to the root. Essentially traverses up the tree of the first element in the set until the root is reached.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:SERIALIZE"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:SERIALIZE" class="name">SERIALIZE</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(NODE &amp;OPTIONAL (STREAM NIL))</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Serialize the node into a string.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:SHOW"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:SHOW" class="name">SHOW</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(WORKING-NODES)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Display the matched elements (short for (css :display 'block'))</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:SIBLINGS"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:SIBLINGS" class="name">SIBLINGS</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(NODES &amp;OPTIONAL SELECTOR)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Get the siblings of each element, optionally filtered by a selector.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:SIZE"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:SIZE" class="name">SIZE</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(WORKING-NODES)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Return the number of elements in the list.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:SLICE"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:SLICE" class="name">SLICE</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(WORKING-NODES START &amp;OPTIONAL END)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Reduce the set of matched elements to a subset specified by a range of indices</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:SPLICE"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:SPLICE" class="name">SPLICE</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(NODE)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Splice the element's contents in place of itself.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:TEXT"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:TEXT" class="name">TEXT</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(NODE &amp;OPTIONAL (TEXT NIL T-S-P))</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Get the combined text contents of each element, including their descendants. If text is set, all text nodes are removed and a new text node is appended to the end of the node. If text is NIL, all direct text nodes are removed from the node. If text is not a string, it is transformed into one by PRINC-TO-STRING.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:TOGGLE-CLASS"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:TOGGLE-CLASS" class="name">TOGGLE-CLASS</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(NODE &amp;REST CLASSES)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Add or remove one or more classes from each element, depending on their presence within the element.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:UNWRAP"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:UNWRAP" class="name">UNWRAP</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(NODE)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Remove the parents of the set of matched elements from the DOM, inserting the parents children in place of it.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:VAL"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:VAL" class="name">VAL</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(NODE &amp;OPTIONAL (VALUE NIL V-P))</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Get the current values or set the value of every matched element.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:WRAP"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:WRAP" class="name">WRAP</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(NODES HTML-OR-NODES)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Wrap an HTML structure around each element. Note that always the first node of the structure to wrap is chosen.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:WRAP-ALL"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:WRAP-ALL" class="name">WRAP-ALL</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(WORKING-NODES HTML-OR-NODES)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Wrap an HTML structure around all elements and put it in place of the first element, removing all other elements from their position.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:WRAP-INNER"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:WRAP-INNER" class="name">WRAP-INNER</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(NODES HTML-OR-NODES)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Wrap an HTML structure around the contents of each element.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-FUNCS:WRITE-TO-FILE"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-FUNCS:WRITE-TO-FILE" class="name">WRITE-TO-FILE</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(WORKING-NODES FILE &amp;KEY (IF-DOES-NOT-EXIST :CREATE) (IF-EXISTS :SUPERSEDE))</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Write the serialized node to the file. Note that always only the first element is written.</pre>
+                  </article>
+                </li></ul>
+            </li><li class="package">
+              <h3>
+                <a name="LQUERY-MACROS" href="#LQUERY-MACROS">LQUERY-MACROS</a>
+                <span class="nicknames">(ORG.SHIRAKUMO.LQUERY.MACROS)</span>
+              </h3>
+              <ul><li>
+                  <a name="LQUERY-MACROS:COMBINE"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-MACROS:COMBINE" class="name">COMBINE</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(NODES &amp;REST CALLS)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">COMBINES multiple lquery function calls into one by gathering them into a list for each element.
 
  ($ (combine (text) (attr :a))) would be  equivalent to 
  ($ (map #'(lambda (node) (list (lquery-funcs:text node) (lquery-funcs:attr node :a)))))
 This construct is especially useful in combination with MAP-APPLY.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-MACROS:EVAL"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-MACROS:EVAL">EVAL</a></h4>
-                      <span/>
-                      <span>(NODES FORM)</span>
-                    </code>
-                  </header>
-                  <pre>Evaluates the form at compile-time and puts its resulting value in place.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-MACROS:FUNCTION"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-MACROS:FUNCTION">FUNCTION</a></h4>
-                      <span/>
-                      <span>(NODES NAME)</span>
-                    </code>
-                  </header>
-                  <pre>Macro to allow #'foo to be used in lquery chains.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-MACROS:INITIALIZE"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-MACROS:INITIALIZE">INITIALIZE</a></h4>
-                      <span/>
-                      <span>(NODES &amp;REST INIT-CALLS)</span>
-                    </code>
-                  </header>
-                  <pre>See lquery function INITIALIZE.
+                  </article>
+                </li><li>
+                  <a name="LQUERY-MACROS:EVAL"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-MACROS:EVAL" class="name">EVAL</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(NODES FORM)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Evaluates the form at compile-time and puts its resulting value in place.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-MACROS:FUNCTION"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-MACROS:FUNCTION" class="name">FUNCTION</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(NODES NAME)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Macro to allow #'foo to be used in lquery chains.</pre>
+                  </article>
+                </li><li>
+                  <a name="LQUERY-MACROS:INITIALIZE"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-MACROS:INITIALIZE" class="name">INITIALIZE</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(NODES &amp;REST INIT-CALLS)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">See lquery function INITIALIZE.
 
 This is merely a performance macro to avoid the unnecessary default allocation of a vector.</pre>
-                </article>
-              </li><li>
-                <a name="LQUERY-MACROS:INLINE"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#LQUERY-MACROS:INLINE">INLINE</a></h4>
-                      <span/>
-                      <span>(NODES FORM)</span>
-                    </code>
-                  </header>
-                  <pre>Treats the form as if the evaluated value was put literally in place.
+                  </article>
+                </li><li>
+                  <a name="LQUERY-MACROS:INLINE"/>
+                  <article>
+                    <header class="function">
+                      <span class="type">function</span>
+                      <code>
+                        <h4><a href="#LQUERY-MACROS:INLINE" class="name">INLINE</a></h4>
+                        <span class="qualifiers"></span>
+                        <span class="arguments">(NODES FORM)</span>
+                      </code>
+                    </header>
+                    <pre class="docstring">Treats the form as if the evaluated value was put literally in place.
 
 See DETERMINE-VALUE.</pre>
-                </article>
-              </li></ul>
-          </li></ul>
-      </article>
+                  </article>
+                </li></ul>
+            </li></ul>
+        </article>
+      
     </div>
   </body>
 </html>
