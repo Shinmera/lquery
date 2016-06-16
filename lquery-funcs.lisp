@@ -544,6 +544,16 @@ This is commonly useful in combination with COMBINE."
     (lquery-funcs:replace-all new-nodes working-nodes)
     working-nodes))
 
+(define-lquery-list-function root (working-nodes)
+  "Returns to the root. Essentially traverses up the tree of the first element in the set until the root is reached."
+  (if (= 0 (length working-nodes))
+      working-nodes
+      (loop for child = (aref working-nodes 0)
+            then (plump:parent child)
+            do (when (or (not (plump:child-node-p child))
+                         (not (plump:parent child)))
+                 (return (make-proper-vector :size 1 :initial-element child))))))
+
 (define-lquery-list-function show (working-nodes)
   "Display the matched elements (short for (css :display 'block'))"
   (lquery-funcs:css working-nodes "display" "block"))
