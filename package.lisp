@@ -70,6 +70,7 @@
    #:insert-after
    #:insert-before
    #:is
+   #:is-empty
    #:last
    #:length
    #:lt
