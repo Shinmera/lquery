@@ -6,38 +6,41 @@
           font-size: 14pt;
           padding: 5px;
       }
-
       body>header{
           display:flex;
           align-items: center;
           justify-content: center;
           flex-direction: column;
           max-width: 100%;
+          text-align: center;
       }
-
+      body>header img{
+          max-width: 50%;
+      }
       img{
           max-width: 100%;
           max-height: 100%;
       }
-
       code{
           font-family: Consolas, Inconsolata, monospace;
       }
-
       a{
           text-decoration: none;
           color: #0055AA;
       }
-
+      a img{
+          border: none;
+      }
       #documentation{
           text-align: justify;
       }
-
       #documentation pre{
           margin-left: 20px;
           overflow: auto;
       }
-
+      #documentation img{
+          margin: 5px;
+      }
       #symbol-index>ul{
           list-style: none;
           padding: 0;
@@ -68,101 +71,52 @@
           white-space: pre-wrap;
           font-size: 12pt;
       }
-
       @media (max-width: 800px){
           body{font-size: 12pt;}
       } </style> </head> <body> <header> <h1><img alt="lquery" src="lquery-logo.png"/></h1> <span class="version">3.2.0</span> <p class="description">A library to allow jQuery-like HTML/DOM manipulation.</p> </header> <main> <article id="documentation">  <div><h2>About lQuery</h2> <p>lQuery is a DOM manipulation library written in Common Lisp, inspired by and based on the <a href="http://jquery.com/">jQuery</a> syntax and functions. It uses <a href="http://shinmera.github.io/plump">Plump</a> and <a href="http://shinmera.github.io/CLSS/">CLSS</a> as DOM and selector engines. The main idea behind lQuery is to provide a simple interface for crawling and modifying HTML sites, as well as to allow for an alternative approach to templating.</p> <h2>How To</h2> <p>Load lQuery with ASDF or Quicklisp.</p> <pre><code>(ql:quickload :lquery)
-</code></pre> <p>First, lQuery needs to be initialized with a document to work on:</p> <pre><code>(<a href="http://l1sp.org/cl/defvar">defvar</a> *doc* (<a href="#LQUERY:$">lquery:$</a> (<a href="#LQUERY:INITIALIZE">initialize</a> (asdf:system-relative-pathname :lquery &quot;test.html&quot;))))
-</code></pre> <p>After that, you can use the <code>$</code> macro to select and manipulate the DOM:</p> <pre><code>(<a href="#LQUERY:$">lquery:$</a> *doc* &quot;article&quot;)
-(<a href="#LQUERY:$">lquery:$</a> *doc* 
+</code></pre> <p>First, lQuery needs to be initialized with a document to work on:</p> <pre><code>(<a href="http://l1sp.org/cl/defvar">defvar</a> *doc* (lquery:$ (initialize (asdf:system-relative-pathname :lquery &quot;test.html&quot;))))
+</code></pre> <p>After that, you can use the <code>$</code> macro to select and manipulate the DOM:</p> <pre><code>(lquery:$ *doc* &quot;article&quot;)
+(lquery:$ *doc* 
   &quot;article&quot;
   (add-class &quot;fancy&quot;)
   (attr &quot;foo&quot; &quot;bar&quot;))
-</code></pre> <p>To render the HTML to a string use <code>SERIALIZE</code>. If you want to save it to a file directly, there's also <code>WRITE-TO-FILE</code>.</p> <pre><code>(<a href="#LQUERY:$">lquery:$</a> *doc* (serialize))
-(<a href="#LQUERY:$">lquery:$</a> *doc* (write-to-file #p&quot;~/plump-test.html&quot;))
-</code></pre> <p>So a quick file manipulation could look something like this:</p> <pre><code>(<a href="#LQUERY:$">lquery:$</a> (<a href="#LQUERY:INITIALIZE">initialize</a> (asdf:system-relative-pathname :lquery &quot;test.html&quot;))
+</code></pre> <p>To render the HTML to a string use <code>SERIALIZE</code>. If you want to save it to a file directly, there's also <code>WRITE-TO-FILE</code>.</p> <pre><code>(lquery:$ *doc* (serialize))
+(lquery:$ *doc* (write-to-file #p&quot;~/plump-test.html&quot;))
+</code></pre> <p>So a quick file manipulation could look something like this:</p> <pre><code>(lquery:$ (initialize (asdf:system-relative-pathname :lquery &quot;test.html&quot;))
   &quot;article&quot;
   (append-to &quot;#target&quot;)
   (add-class &quot;foo&quot;)
   (root)
   (write-to-file #p&quot;~/plump-test.html&quot;))
-</code></pre> <p>Aside from using selectors as the first step, it's also possible to use any other variable or list and operate on it. <br/> Since 2.0: Literal function calls need to be added with <code><a href="#LQUERY:INLINE">INLINE</a></code>.
+</code></pre> <p>Aside from using selectors as the first step, it's also possible to use any other variable or list and operate on it. <br/> Since 2.0: Literal function calls need to be added with <code><a href="http://l1sp.org/cl/inline">INLINE</a></code>.
 Note that the result of the inline function will be used as if literally put in place. For example, an inlined function that evaluates
-to a string will result in a CSS-select.</p> <pre><code>(<a href="#LQUERY:$">lquery:$</a> (<a href="#LQUERY:INLINE">inline</a> (<a href="http://l1sp.org/cl/list">list</a> node-a node-b))
+to a string will result in a CSS-select.</p> <pre><code>(lquery:$ (<a href="http://l1sp.org/cl/inline">inline</a> (<a href="http://l1sp.org/cl/list">list</a> node-a node-b))
   &quot;article&quot;
   (serialize))
 </code></pre> <p>Selectors can come at any point in the sequence of lQuery operations and will always act on the current set of elements.
-If an operation evaluates to a list, array, vector or a single node, the current set of elements is set to this result.</p> <pre><code>(<a href="#LQUERY:$">lquery:$</a> *doc*
+If an operation evaluates to a list, array, vector or a single node, the current set of elements is set to this result.</p> <pre><code>(lquery:$ *doc*
   &quot;a&quot;
   (text &quot;Link&quot;)
-  (<a href="#LQUERY:INLINE">inline</a> (<a href="#LQUERY:$">lquery:$</a> *doc* &quot;p&quot;))
+  (<a href="http://l1sp.org/cl/inline">inline</a> (lquery:$ *doc* &quot;p&quot;))
   (text &quot;Paragraph&quot;))
-</code></pre> <p>This is equivalent to the following:</p> <pre><code>(<a href="#LQUERY:$">lquery:$</a> *doc*
+</code></pre> <p>This is equivalent to the following:</p> <pre><code>(lquery:$ *doc*
   &quot;a&quot; (text &quot;Link&quot;))
-(<a href="#LQUERY:$">lquery:$</a> *doc*
+(lquery:$ *doc*
   &quot;p&quot; (text &quot;Paragraph&quot;))
-</code></pre> <p>Functions in the argument list will be translated to a function invocation with the current list of elements as their argument.</p> <pre><code>(<a href="#LQUERY:$">lquery:$</a> *doc*
+</code></pre> <p>Functions in the argument list will be translated to a function invocation with the current list of elements as their argument.</p> <pre><code>(lquery:$ *doc*
   &quot;a&quot; #'(<a href="http://l1sp.org/cl/lambda">lambda</a> (els) (<a href="http://l1sp.org/cl/aref">aref</a> els 0)))
-</code></pre> <p>lQuery<sup>2.0</sup> also supports compile-time evaluation of forms, whose results are then put in place of their function calls:</p> <pre><code>(<a href="#LQUERY:$">lquery:$</a> *doc* (<a href="#LQUERY:EVAL">eval</a> (<a href="http://l1sp.org/cl/format">format</a> NIL &quot;~a&quot; *selector*)))
-</code></pre> <p>Keep in mind that the lexical environment is not the same at compile-time as at run-time.</p> <p>Often times you'll also want to retrieve multiple, different values from your current set of nodes. To make this more convenient, you can use the <code>COMBINE</code> form:</p> <pre><code>(<a href="#LQUERY:$">lquery:$</a> *doc*
+</code></pre> <p>lQuery<sup>2.0</sup> also supports compile-time evaluation of forms, whose results are then put in place of their function calls:</p> <pre><code>(lquery:$ *doc* (<a href="http://l1sp.org/cl/eval">eval</a> (<a href="http://l1sp.org/cl/format">format</a> NIL &quot;~a&quot; *selector*)))
+</code></pre> <p>Keep in mind that the lexical environment is not the same at compile-time as at run-time.</p> <p>Often times you'll also want to retrieve multiple, different values from your current set of nodes. To make this more convenient, you can use the <code>COMBINE</code> form:</p> <pre><code>(lquery:$ *doc*
   &quot;a&quot;
   (combine (attr :href) (text))
   (map-apply #'(<a href="http://l1sp.org/cl/lambda">lambda</a> (url text) (<a href="http://l1sp.org/cl/format">format</a> T &quot;[~a](~a)&quot; text url))))
-</code></pre> <p>lQuery uses vectors internally to modify and handle sets of nodes. These vectors are usually modified instead of copied to avoid unnecessary resource allocation. This however also means that lQuery functions are possibly side-effecting. If you pass an adjustable vector into lQuery through <code><a href="#LQUERY:INLINE">INLINE</a></code> or similar, it will not be copied and therefore side-effects might occur. lQuery will automatically copy everything else that isn't an adjustable vector through <code><a href="#LQUERY:ENSURE-PROPER-VECTOR">ENSURE-PROPER-VECTOR</a></code>. If you do want to pass in an adjustable vector, but make sure it doesn't affect it, use <code><a href="#LQUERY:COPY-PROPER-VECTOR">COPY-PROPER-VECTOR</a></code>.</p> <h2>Test Suite</h2> <p>To ensure that functions are at least somewhat stable in their behaviour, lQuery includes a test suite. You can load this through Quicklisp/ASDF with</p> <pre><code>(ql:quickload :lquery-test)
+</code></pre> <p>lQuery uses vectors internally to modify and handle sets of nodes. These vectors are usually modified instead of copied to avoid unnecessary resource allocation. This however also means that lQuery functions are possibly side-effecting. If you pass an adjustable vector into lQuery through <code><a href="http://l1sp.org/cl/inline">INLINE</a></code> or similar, it will not be copied and therefore side-effects might occur. lQuery will automatically copy everything else that isn't an adjustable vector through <code>ENSURE-PROPER-VECTOR</code>. If you do want to pass in an adjustable vector, but make sure it doesn't affect it, use <code>COPY-PROPER-VECTOR</code>.</p> <h2>Test Suite</h2> <p>To ensure that functions are at least somewhat stable in their behaviour, lQuery includes a test suite. You can load this through Quicklisp/ASDF with</p> <pre><code>(ql:quickload :lquery-test)
 (lquery-test:run)
 </code></pre> <p>The tests are rather loose, but should cover all functions to at least behave mostly according to expectation.</p> <h2>Extending lQuery<sup>3.1</sup></h2> <p>lQuery allows extension in a couple of ways. The most important of which are node functions themselves, which come in two flavours: lquery-funs and lquery-list-funs.
-Any lquery function resides in the package <code>LQUERY-FUNCS</code>, which is automatically scanned by the $ macro. The two macros responsible for defining new lquery functions automatically place the resulting operations in this package for you.</p> <pre><code>(<a href="#LQUERY:DEFINE-LQUERY-FUNCTION">define-lquery-function</a> name (node-name &amp;rest arguments) &amp;body body)
-(<a href="#LQUERY:DEFINE-LQUERY-LIST-FUNCTION">define-lquery-list-function</a> name (vector-name &amp;rest arguments) &amp;body body)
-</code></pre> <p>Any function generated by these macros can be called either with a single node or a vector of nodes. In the case of a regular node operation, if it receives a vector of nodes, the function is called once for each node and the results are collected into a vector, which is then returned. If it receives a single node, only a single result is returned. In the case of a node list function, the return value can be either a vector or a single value, depending on what the goal of the operation is. It is expected that node list functions will modify the given vector directly in order to avoid unnecessary copying.</p> <p>Some constructs would be very cumbersome to write as functions, or would simply be more suited in the form of a macro. To allow for this, lQuery<sup>3.1</sup> includes a mechanism of <code>$</code> local macros. The previously mentioned forms like <code><a href="#LQUERY:INLINE">INLINE</a></code> are handled through this system. Just like lquery functions, lquery macros reside in their own package <code>LQUERY-MACROS</code>. The responsible macro for defining new lquery macros will automatically place it in there for you.</p> <pre><code>(<a href="#LQUERY:DEFINE-LQUERY-MACRO">define-lquery-macro</a> name (previous-form &amp;rest arguments) &amp;body body)
-</code></pre> <p>The $ macro itself can be extended as well by providing additional argument- or value-handlers. The following two macros make this possible:</p> <pre><code>(<a href="#LQUERY:DEFINE-ARGUMENT-HANDLER">define-argument-handler</a> type (argument-name operator-name) &amp;body body)
-</code></pre> <p>Argument handlers transform the arguments at compile-time. For example, this would allow an extension to turn literal arrays into lists so they can be processed as well.</p> <pre><code>(<a href="#LQUERY:DEFINE-VALUE-HANDLER">define-value-handler</a> type (variable-name operator-name) &amp;body body)
+Any lquery function resides in the package <code>LQUERY-FUNCS</code>, which is automatically scanned by the $ macro. The two macros responsible for defining new lquery functions automatically place the resulting operations in this package for you.</p> <pre><code>(define-lquery-function name (node-name &amp;rest arguments) &amp;body body)
+(define-lquery-list-function name (vector-name &amp;rest arguments) &amp;body body)
+</code></pre> <p>Any function generated by these macros can be called either with a single node or a vector of nodes. In the case of a regular node operation, if it receives a vector of nodes, the function is called once for each node and the results are collected into a vector, which is then returned. If it receives a single node, only a single result is returned. In the case of a node list function, the return value can be either a vector or a single value, depending on what the goal of the operation is. It is expected that node list functions will modify the given vector directly in order to avoid unnecessary copying.</p> <p>Some constructs would be very cumbersome to write as functions, or would simply be more suited in the form of a macro. To allow for this, lQuery<sup>3.1</sup> includes a mechanism of <code>$</code> local macros. The previously mentioned forms like <code><a href="http://l1sp.org/cl/inline">INLINE</a></code> are handled through this system. Just like lquery functions, lquery macros reside in their own package <code>LQUERY-MACROS</code>. The responsible macro for defining new lquery macros will automatically place it in there for you.</p> <pre><code>(define-lquery-macro name (previous-form &amp;rest arguments) &amp;body body)
+</code></pre> <p>The $ macro itself can be extended as well by providing additional argument- or value-handlers. The following two macros make this possible:</p> <pre><code>(define-argument-handler type (argument-name operator-name) &amp;body body)
+</code></pre> <p>Argument handlers transform the arguments at compile-time. For example, this would allow an extension to turn literal arrays into lists so they can be processed as well.</p> <pre><code>(define-value-handler type (variable-name operator-name) &amp;body body)
 </code></pre> <p>Value handlers on the other hand determine the action at run-time. This is mostly useful for defining special actions on certain variable values.</p> <h2>What's New</h2> <h3><a name="3.1.0"/>3.1.0</h3> <p>Renamed <code>DEFINE-NODE-\*</code> macros into more sensible <code>DEFINE-LQUERY-*</code>.
-Added macro system, new standard <code>COMBINE</code> macro.</p> <h3><a name="3.0.0"/>3.0.0</h3> <p>Complete rewrite of everything. This version is <strong>compatibility breaking</strong>. While the node functions themselves perform just the same as before (with one or two exceptions), lQuery now uses vectors instead of lists internally. If you ever relied on lQuery return values, this version will most likely break your code. Effort has been made to keep upgrading as simple as possible though; passing lists into an lQuery chain automatically transforms it for example.</p> <p>Thanks to the change to Plump, lQuery is now also able to parse almost any kind of X/HT/ML document, which was not well possible previously. And thanks to switching to CLSS, lQuery is now much faster at selecting nodes from the DOM.</p> <h3><a name="2.0.0"/>2.0.0</h3> <p>Added extension system and <code><a href="#LQUERY:INLINE">INLINE</a></code>, <code><a href="#LQUERY:EVAL">EVAL</a></code> handling. Revamped base macros to be more stable and simple.</p> <h2>Further Reading</h2> <ul> <li><a href="https://shinmera.github.io/lquery">lQuery</a>'s symbol index.</li> <li><a href="https://shinmera.github.io/plump">Plump</a>, the HTML parser and DOM library lQuery is based on.</li> <li><a href="https://shinmera.github.io/CLSS">CLSS</a>, the CSS-selector DOM traversal engine.</li> <li><a href="https://shinmera.github.io/clip">Clip</a>, a templating system based on lQuery.</li> </ul> </div>  </article> <article id="copyright">  <h2>Copyright</h2> <span>lquery</span> is licensed under the <span><a href="https://tldrlegal.com/search?q=Artistic">Artistic</a></span> license.  © <span>Nicolas Hafner &lt;shinmera@tymoon.eu&gt;</span> .  This library can be obtained on <a href="https://github.com/Shinmera/lquery">https://github.com/Shinmera/lquery</a>.  </article>  <article id="symbol-index"> <h2>Package Index</h2> <ul><li class="package"> <h3> <a name="LQUERY" href="#LQUERY">LQUERY</a> <span class="nicknames">(ORG.SHIRAKUMO.LQUERY)</span> </h3> <ul><li> <a name="LQUERY:*LQUERY-MASTER-DOCUMENT*"> </a> <article> <header class="special"> <span class="type">special</span>  <h4 class="name"><code><a href="#LQUERY:*LQUERY-MASTER-DOCUMENT*">*LQUERY-MASTER-DOCUMENT*</a></code></h4>  </header> <pre class="docstring">The master document used at the beginning of a chain.</pre> </article> </li><li> <a name="LQUERY:COPY-PROPER-VECTOR"> </a> <article> <header class="function"> <span class="type">function</span>  <code>(</code><h4 class="name"><code><a href="#LQUERY:COPY-PROPER-VECTOR">COPY-PROPER-VECTOR</a></code></h4> <code class="qualifiers"></code> <code class="arguments">SEQUENCE &amp;KEY (TRANSFORM (FUNCTION IDENTITY))</code><code>)</code>  </header> <pre class="docstring">Copies the sequence into a new proper vector.</pre> </article> </li><li> <a name="LQUERY:ENSURE-PROPER-VECTOR"> </a> <article> <header class="function"> <span class="type">function</span>  <code>(</code><h4 class="name"><code><a href="#LQUERY:ENSURE-PROPER-VECTOR">ENSURE-PROPER-VECTOR</a></code></h4> <code class="qualifiers"></code> <code class="arguments">VAR</code><code>)</code>  </header> <pre class="docstring">Ensure that the variable is a proper vector.</pre> </article> </li><li> <a name="LQUERY:EVAL"> </a> <article> <header class="function"> <span class="type">function</span>  <code>(</code><h4 class="name"><code><a href="#LQUERY:EVAL">EVAL</a></code></h4> <code class="qualifiers"></code> <code class="arguments">ORIGINAL-EXP</code><code>)</code>  </header> <pre class="docstring">Evaluate the argument in a null lexical environment, returning the
-   result or results.</pre> </article> </li><li> <a name="LQUERY:INITIALIZE"> </a> <article> <header class="function"> <span class="type">function</span>  <code>(</code><h4 class="name"><code><a href="#LQUERY:INITIALIZE">INITIALIZE</a></code></h4> <code class="qualifiers"></code> <code class="arguments">DOCUMENT</code><code>)</code>  </header> <pre class="docstring">Sets the *lquery-master-document* variable to the provided document.</pre> </article> </li><li> <a name="LQUERY:LOAD-PAGE"> </a> <article> <header class="function"> <span class="type">function</span>  <code>(</code><h4 class="name"><code><a href="#LQUERY:LOAD-PAGE">LOAD-PAGE</a></code></h4> <code class="qualifiers"></code> <code class="arguments">FILE-OR-STRING</code><code>)</code>  </header> <pre class="docstring">Load the given file or string into a HTML DOM.</pre> </article> </li><li> <a name="LQUERY:MAKE-PROPER-VECTOR"> </a> <article> <header class="function"> <span class="type">function</span>  <code>(</code><h4 class="name"><code><a href="#LQUERY:MAKE-PROPER-VECTOR">MAKE-PROPER-VECTOR</a></code></h4> <code class="qualifiers"></code> <code class="arguments">&amp;KEY (SIZE 0) INITIAL-ELEMENT INITIAL-CONTENTS (FILL-POINTER T)</code><code>)</code>  </header> <pre class="docstring">Creates a new proper vector.</pre> </article> </li><li> <a name="LQUERY:PARSE-HTML"> </a> <article> <header class="function"> <span class="type">function</span>  <code>(</code><h4 class="name"><code><a href="#LQUERY:PARSE-HTML">PARSE-HTML</a></code></h4> <code class="qualifiers"></code> <code class="arguments">HTML</code><code>)</code>  </header> <pre class="docstring">Build the given string into DOM objects related to the master document.</pre> </article> </li><li> <a name="LQUERY:$"> </a> <article> <header class="macro"> <span class="type">macro</span>  <code>(</code><h4 class="name"><code><a href="#LQUERY:$">$</a></code></h4> <code class="qualifiers"></code> <code class="arguments">&amp;REST ARGS</code><code>)</code>  </header> <pre class="docstring">Performs lQuery operations on the current document.
-
-Each argument is executed in sequence. The arguments are evaluated according to the defined argument-handlers. By default, the following cases are handled: 
-  * STRING    Translates to a CLSS:QUERY on the current elements.
-  * FUNCTION  Translates to a function call with the list of nodes as argument.
-  * SYMBOL    Delegates to the value handlers.
-  * LIST      Lists are transformed according to their first element, which must be a symbol. If the symbol's name corresponds to a function found in the LQUERY-MACROS package, The form is assembled according to that function. Otherwise if it corresponds to an LQUERY-FUNCS function, it is expanded into a call to that function. If the symbol cannot be found in either package, it is put back in place, but the call itself is assembled like so: (FUNCTION PREVIOUS-RESULT ARGUMENT*)
-
-Values are handled at runtime according to the defined variable-handlers. By default, the following cases are handled at run time:
-  * STRING    Performs a CLSS:QUERY on the current elements.
-  * DOM:NODE  Replaces the current set of nodes with just this node.  
-  * FUNCTION  Calls the given function with the current set of nodes as argument.
-  * LIST      Lists are transformed into a proper vector.
-  * ARRAY     Arrays are transformed into a proper vector.
-  * VECTOR    Vectors that are not adjustable are transformed into a proper vector.
-  * T         Any other value simply replaces the current list of nodes.</pre> </article> </li><li> <a name="LQUERY:$1"> </a> <article> <header class="macro"> <span class="type">macro</span>  <code>(</code><h4 class="name"><code><a href="#LQUERY:$1">$1</a></code></h4> <code class="qualifiers"></code> <code class="arguments">&amp;REST ARGS</code><code>)</code>  </header> <pre class="docstring">This is the same as $, except it automatically uses NODE at the end and thus only returns the first result, if any.</pre> </article> </li><li> <a name="LQUERY:DEFINE-ARGUMENT-HANDLER"> </a> <article> <header class="macro"> <span class="type">macro</span>  <code>(</code><h4 class="name"><code><a href="#LQUERY:DEFINE-ARGUMENT-HANDLER">DEFINE-ARGUMENT-HANDLER</a></code></h4> <code class="qualifiers"></code> <code class="arguments">&amp;REST ARGS</code><code>)</code>  </header> <pre class="docstring">Defines a new argument handler that decides what to do with a certain type of argument at compile-time.
-
-TYPE          --- A type or EQL specifier.
-ARGUMENT-NAME --- Symbol bound to the argument.
-OPERATOR-NAME --- Symbol bound to the object being operated on.
-BODY          ::= form*</pre> </article> </li><li> <a name="LQUERY:DEFINE-LQUERY-FUNCTION"> </a> <article> <header class="macro"> <span class="type">macro</span>  <code>(</code><h4 class="name"><code><a href="#LQUERY:DEFINE-LQUERY-FUNCTION">DEFINE-LQUERY-FUNCTION</a></code></h4> <code class="qualifiers"></code> <code class="arguments">&amp;REST ARGS</code><code>)</code>  </header> <pre class="docstring">Defines a new node function. This is the main mechanism by which node manipulations are defined.
-All lquery functions are automatically created in the lquery-funcs package.
-
-NAME      --- A symbol naming the lquery function. Automatically interned in the LQUERY-FUNCS package.
-NODE-NAME --- Symbol bound to the current node.
-ARGUMENTS --- A lambda-list specifying the arguments for the function.
-BODY      ::= form*</pre> </article> </li><li> <a name="LQUERY:DEFINE-LQUERY-LIST-FUNCTION"> </a> <article> <header class="macro"> <span class="type">macro</span>  <code>(</code><h4 class="name"><code><a href="#LQUERY:DEFINE-LQUERY-LIST-FUNCTION">DEFINE-LQUERY-LIST-FUNCTION</a></code></h4> <code class="qualifiers"></code> <code class="arguments">&amp;REST ARGS</code><code>)</code>  </header> <pre class="docstring">Defines a new function that operates on the current node array instead of individual elements.
-All lquery functions are automatically created in the lquery-funcs package.
-
-NAME        --- A symbol naming the lquery function. Automatically interned in the LQUERY-FUNCS package.
-VECTOR-NAME --- Symbol bound to the node vector.
-ARGUMENTS   --- A lambda-list specifying the arguments for the function.
-BODY        ::= form*</pre> </article> </li><li> <a name="LQUERY:DEFINE-LQUERY-MACRO"> </a> <article> <header class="macro"> <span class="type">macro</span>  <code>(</code><h4 class="name"><code><a href="#LQUERY:DEFINE-LQUERY-MACRO">DEFINE-LQUERY-MACRO</a></code></h4> <code class="qualifiers"></code> <code class="arguments">&amp;REST ARGS</code><code>)</code>  </header> <pre class="docstring">Define a new lquery local macro.
-All lquery macros are automatically created in the lquery-macros package.
-
-NAME          --- A symbol naming the lquery macro. Automatically interned in the LQUERY-MACROS package.
-PREVIOUS-FORM --- Symbol bound to the so far assembled form, the previous value so to speak.
-ARGUMENTS     --- A lambda-list specifying the arguments for the macro (note that this must be a standard lambda-list).
-BODY          ::= form*</pre> </article> </li><li> <a name="LQUERY:DEFINE-LQUERY-SUBROUTINE"> </a> <article> <header class="macro"> <span class="type">macro</span>  <code>(</code><h4 class="name"><code><a href="#LQUERY:DEFINE-LQUERY-SUBROUTINE">DEFINE-LQUERY-SUBROUTINE</a></code></h4> <code class="qualifiers"></code> <code class="arguments">&amp;REST ARGS</code><code>)</code>  </header> <pre class="docstring">Defines a shorthand function. The body is a set of lQuery instructions as you'd use in $.
-
-NAME      --- A symbol naming the subroutine. Automatically interned in the LQUERY-FUNCS package.
-ARGUMENTS --- A lambda-list specifying the arguments for the function.
-BODY      ::= lquery-form*</pre> </article> </li><li> <a name="LQUERY:DEFINE-VALUE-HANDLER"> </a> <article> <header class="macro"> <span class="type">macro</span>  <code>(</code><h4 class="name"><code><a href="#LQUERY:DEFINE-VALUE-HANDLER">DEFINE-VALUE-HANDLER</a></code></h4> <code class="qualifiers"></code> <code class="arguments">&amp;REST ARGS</code><code>)</code>  </header> <pre class="docstring">Defines a new symbol handler that decides what to do with a certain type of symbol at run-time (variable type).
-
-TYPE          --- A type or EQL specifier.
-VARIABLE-NAME --- Symbol bound to the argument.
-OPERATOR-NAME --- Symbol bound to the object being operated on.
-BODY          ::= form*</pre> </article> </li><li> <a name="LQUERY:WITH-MASTER-DOCUMENT"> </a> <article> <header class="macro"> <span class="type">macro</span>  <code>(</code><h4 class="name"><code><a href="#LQUERY:WITH-MASTER-DOCUMENT">WITH-MASTER-DOCUMENT</a></code></h4> <code class="qualifiers"></code> <code class="arguments">&amp;REST ARGS</code><code>)</code>  </header> <pre class="docstring">Surrounds the body in a binding for the *lquery-master-document* to ensure it does not get clobbered.</pre> </article> </li></ul> </li></ul> </article>  </main> </body> </html> 
+Added macro system, new standard <code>COMBINE</code> macro.</p> <h3><a name="3.0.0"/>3.0.0</h3> <p>Complete rewrite of everything. This version is <strong>compatibility breaking</strong>. While the node functions themselves perform just the same as before (with one or two exceptions), lQuery now uses vectors instead of lists internally. If you ever relied on lQuery return values, this version will most likely break your code. Effort has been made to keep upgrading as simple as possible though; passing lists into an lQuery chain automatically transforms it for example.</p> <p>Thanks to the change to Plump, lQuery is now also able to parse almost any kind of X/HT/ML document, which was not well possible previously. And thanks to switching to CLSS, lQuery is now much faster at selecting nodes from the DOM.</p> <h3><a name="2.0.0"/>2.0.0</h3> <p>Added extension system and <code><a href="http://l1sp.org/cl/inline">INLINE</a></code>, <code><a href="http://l1sp.org/cl/eval">EVAL</a></code> handling. Revamped base macros to be more stable and simple.</p> <h2>Further Reading</h2> <ul> <li><a href="https://shinmera.github.io/lquery">lQuery</a>'s symbol index.</li> <li><a href="https://shinmera.github.io/plump">Plump</a>, the HTML parser and DOM library lQuery is based on.</li> <li><a href="https://shinmera.github.io/CLSS">CLSS</a>, the CSS-selector DOM traversal engine.</li> <li><a href="https://shinmera.github.io/clip">Clip</a>, a templating system based on lQuery.</li> </ul> </div>  </article> <article id="copyright">  <h2>Copyright</h2> <span>lquery</span> is licensed under the <span><a href="https://tldrlegal.com/search?q=Artistic">Artistic</a></span> license.  © <span>Nicolas Hafner &lt;shinmera@tymoon.eu&gt;</span> .  This library can be obtained on <a href="https://github.com/Shinmera/lquery">https://github.com/Shinmera/lquery</a>.  </article>  </main> </body> </html> 
