@@ -129,7 +129,22 @@
      #'(lambda (node) (eql node object)))))
 
 (defun classes (node)
-  (clss::split #\Space (plump:attribute node "class")))
+  (let ((attr (plump:attribute node "class")))
+    (when attr
+      (let ((out (make-string-output-stream))
+            (parts ()))
+        (flet ((maybe-add-piece ()
+                 (let ((str (get-output-stream-string out)))
+                   (when (and str (string/= str ""))
+                     (push str parts)))))
+          (loop for char across attr
+                do (case char
+                     ((#\Space #\Tab #\Return #\Linefeed)
+                      (maybe-add-piece))
+                     (T
+                      (write-char char out)))
+                finally (maybe-add-piece))
+          (nreverse parts))))))
 
 (defun parse-css (css)
   (macrolet ((pop-string (stream)
