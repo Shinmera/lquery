@@ -524,6 +524,16 @@ This is commonly useful in combination with COMBINE."
         do (plump:remove-attribute node (concatenate 'string "data-" dat)))
   node)
 
+(define-lquery-function render-text (node)
+  "Return the \"rendered\" representation of the text inside the node and its children.
+
+In effect the text is gathered from the component and all of
+its children, but transforming the text in such a way that:
+- All ASCII white space (Space, Tab, CR, LF) is converted into spaces.
+- There are no consecutive spaces.
+- There are no spaces at the beginning or end."
+  (plump-dom:render-text node))
+
 (define-lquery-list-function replace-all (working-nodes selector-or-nodes)
   "Replace each in the set of matched elements with the current nodes."
   (let ((targets (nodes-or-select selector-or-nodes)))

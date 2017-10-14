@@ -95,6 +95,7 @@
    #:remove-attr
    #:remove-class
    #:remove-data
+   #:render-text
    #:replace-all
    #:replace-with
    #:root
