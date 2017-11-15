@@ -698,9 +698,18 @@ its children, but transforming the text in such a way that:
     (plump:serialize (aref working-nodes 0) stream))
   working-nodes)
 
-(define-lquery-function serialize (node &optional (stream NIL))
-                      "Serialize the node into a string."
-  (if stream
-      (plump:serialize node stream)
-      (with-output-to-string (stream)
-        (plump:serialize node stream))))
+(define-lquery-function serialize (node &optional (stream NIL) (format :default))
+  "Serialize the node into a string.
+
+Allows two optional arguments:
+  STREAM --- NIL to return a string, or a stream to output to.
+  FORMAT --- One of :DEFAULT, :HTML, :XML to designate the way
+             in which to invoke Plump's serializer."
+  (let ((plump:*tag-dispatchers* (case format
+                                   (:default plump:*tag-dispatchers*)
+                                   (:html plump:*html-tags*)
+                                   (:xml plump:*xml-tags*))))
+    (if stream
+        (plump:serialize node stream)
+        (with-output-to-string (stream)
+          (plump:serialize node stream)))))
