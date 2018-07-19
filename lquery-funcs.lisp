@@ -276,7 +276,9 @@ If no matching element can be found the root is entered instead."
   (lquery-funcs:css working-nodes "display" "none"))
 
 (define-lquery-function html (node &optional new-content)
-  "Get the HTML contents of the elements or set the HTML contents of every matched element. If the new content is not a string, it is turned into one as per PRINC-TO-STRING."
+  "Get the HTML contents of the elements or set the HTML contents of every matched element.
+The new content can be either a plump node, root, pathname, or string. If it is none of those,
+it is treated as a string via PRINC-TO-STRING"
   (if new-content
       (progn
         (plump:clear node)
@@ -284,6 +286,7 @@ If no matching element can be found the root is entered instead."
           (plump:root (loop for child across (plump:children new-content)
                             do (plump:append-child node child)))
           (plump:node (plump:append-child node new-content))
+          (pathname (plump:parse new-content :root node))
           (T (plump:parse (princ-to-string new-content) :root node)))
         node)
       (with-output-to-string (stream)
