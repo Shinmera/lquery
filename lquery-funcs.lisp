@@ -11,10 +11,22 @@
   (vector-append working-nodes (nodes-or-select selector-or-nodes)))
 
 (define-lquery-function add-class (node &rest classes)
-  "Adds the specified class(es) to the set of matched elements."
+  "Adds the specified class(es) to the set of matched elements.
+
+The following types are handled for each class to add:
+  NULL    --- No class is added.
+  STRING  --- The string is added as a class.
+  SYMBOL  --- The symbol name, downcased, is added as a class."
   (setf (plump:attribute node "class")
         (with-output-to-string (stream)
-          (format stream "~@[~a ~]~{~a~^ ~}" (plump:attribute node "class") classes)))
+          (let ((prev (plump:attribute node "class")))
+            (when prev (write-string prev stream)))
+          (dolist (class classes)
+            (when class
+              (write-char #\Space stream)
+              (etypecase class
+                (string (write-string class stream))
+                (symbol (format stream "~(~a~)" (symbol-name class))))))))
   node)
 
 (define-lquery-list-function after (nodes html-or-nodes)
@@ -515,10 +527,21 @@ This is commonly useful in combination with COMBINE."
   node)
 
 (define-lquery-function remove-class (node &rest classes)
-  "Remove classes from each element."
+  "Remove classes from each element.
+
+Each class in the list can be of the following types:
+  NULL    --- Nothing is done.
+  STRING  --- Matching classes by string= are removed.
+  SYMBOL  --- Matching classes against the symbol name by string-equal are removed."
   (setf (plump:attribute node "class")
-        (format NIL "~{~a~^ ~}"
-                (remove-if #'(lambda (a) (find a classes :test #'string=)) (classes node))))
+        (let ((existing (classes node)))
+          (dolist (class classes)
+            (when class
+              (setf existing
+                    (typecase class
+                      (string (delete class existing :test #'string=))
+                      (symbol (delete (symbol-name class) existing :test #'string-equal))))))
+          (format NIL "~{~a~^ ~}" existing)))
   node)
 
 (define-lquery-function remove-data (node &rest data)
