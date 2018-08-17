@@ -12,7 +12,9 @@
   :maintainer "Nicolas Hafner <shinmera@tymoon.eu>"
   :license "Artistic"
   :description "A library to allow jQuery-like HTML/DOM manipulation."
-  :homepage "https://github.com/Shinmera/lquery"
+  :homepage "https://Shinmera.github.io/lquery/"
+  :bug-tracker "https://github.com/Shinmera/lquery/issues"
+  :source-control (:git "https://github.com/Shinmera/lquery.git")
   :serial T
   :components ((:file "package")
                (:file "toolkit")
