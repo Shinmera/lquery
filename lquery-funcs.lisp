@@ -16,13 +16,15 @@
 The following types are handled for each class to add:
   NULL    --- No class is added.
   STRING  --- The string is added as a class.
-  SYMBOL  --- The symbol name, downcased, is added as a class."
+  SYMBOL  --- The symbol name, downcased, is added as a class.
+  LIST    --- Add all classes in the list. Each item must be one of
+              the above types."
   (setf (plump:attribute node "class")
         (with-output-to-string (stream)
           (let ((prev (plump:attribute node "class")))
             (when prev (write-string prev stream)))
-          (dolist (class classes)
-            (when class
+          (dolist (classish classes)
+            (dolist (class (if (listp classish) classish (list classish)))
               (write-char #\Space stream)
               (etypecase class
                 (string (write-string class stream))
@@ -532,11 +534,13 @@ This is commonly useful in combination with COMBINE."
 Each class in the list can be of the following types:
   NULL    --- Nothing is done.
   STRING  --- Matching classes by string= are removed.
-  SYMBOL  --- Matching classes against the symbol name by string-equal are removed."
+  SYMBOL  --- Matching classes against the symbol name by string-equal are removed.
+  LIST    --- Add all classes in the list. Each item must be one of
+              the above types."
   (setf (plump:attribute node "class")
         (let ((existing (classes node)))
-          (dolist (class classes)
-            (when class
+          (dolist (classish classes)
+            (dolist (class (if (listp classish) classish (list classish)))
               (setf existing
                     (typecase class
                       (string (delete class existing :test #'string=))
