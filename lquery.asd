@@ -10,7 +10,7 @@
   :version "3.2.1"
   :author "Nicolas Hafner <shinmera@tymoon.eu>"
   :maintainer "Nicolas Hafner <shinmera@tymoon.eu>"
-  :license "Artistic"
+  :license "zlib"
   :description "A library to allow jQuery-like HTML/DOM manipulation."
   :homepage "https://Shinmera.github.io/lquery/"
   :bug-tracker "https://github.com/Shinmera/lquery/issues"
