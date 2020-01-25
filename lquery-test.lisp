@@ -404,10 +404,10 @@
 
 (test fun-not
   (init-test-environment)
-  (is (= 3
+  (is (= 2
          (length ($ "head, body, li" (not "li")))))
-  (is (eq (vfirst ($ "li"))
-          (vfirst ($ "head, body, li" (not "li"))))))
+  (is (eq (vfirst ($ "head"))
+          (vfirst ($ "li, head, body" (not "li"))))))
 
 (test fun-not-empty
   (init-test-environment)

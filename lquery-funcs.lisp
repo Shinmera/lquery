@@ -414,7 +414,7 @@ This is commonly useful in combination with COMBINE."
 (define-lquery-list-function not (working-nodes selector-or-nodes)
   "Remove matching elements from the working elements."
   (let ((fun (nodes-or-selector-func selector-or-nodes)))
-    (replace-vector-if working-nodes fun)))
+    (replace-vector-if working-nodes (complement fun))))
 
 (define-lquery-function not-empty (node)
   "Check if the node contains no children and/or only empty (whitespace) text nodes. If the node is effectively empty NIL is returned, otherwise T"
