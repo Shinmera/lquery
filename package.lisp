@@ -122,4 +122,6 @@
    #:eval
    #:combine
    #:initialize
-   #:function))
+   #:function
+   #:$
+   #:$1))

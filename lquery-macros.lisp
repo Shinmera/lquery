@@ -36,3 +36,15 @@ This construct is especially useful in combination with MAP-APPLY."
 This is merely a performance macro to avoid the unnecessary default allocation of a vector."
   (declare (ignore nodes))
   `(lquery-funcs:initialize NIL ,@init-calls))
+
+(define-lquery-macro $ (nodes &rest forms)
+  "Shorthand to allow dropping the package prefix when nesting $/$1.
+
+See $"
+  `(lquery:$ ,nodes ,@forms))
+
+(define-lquery-macro $1 (nodes &rest forms)
+  "Shorthand to allow dropping the package prefix when nesting $/$1.
+
+See $1"
+  `(lquery:$1 ,nodes ,@forms))
