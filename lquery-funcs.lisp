@@ -321,7 +321,6 @@ it is treated as a string via PRINC-TO-STRING"
 
 (define-lquery-list-function initialize (working-nodes document)
   "Re-initializes lQuery with a new page."
-  (declare (ignore working-nodes))
   (make-proper-vector :size 1 :initial-element (initialize (load-page document))))
 
 (define-lquery-list-function insert-after (working-nodes selector-or-nodes)
