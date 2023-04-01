@@ -146,7 +146,7 @@ If no matching element can be found the root is entered instead."
   (loop with string = (trim string)
         with result = (make-proper-vector)
         for node across nodes
-        do (when (string= string (trim (plump:text node)))
+        do (when (search string (plump:text node))
              (vector-push-extend node result))
         finally (return result)))
 
