@@ -1,15 +1,8 @@
-#|
-  This file is a part of lQuery
-  (c) 2014 Shirakumo http://tymoon.eu (shinmera@tymoon.eu)
-  Author: Nicolas Hafner <shinmera@tymoon.eu>
-|#
-
-
 (asdf:defsystem lquery
   :name "lQuery"
   :version "3.2.1"
-  :author "Nicolas Hafner <shinmera@tymoon.eu>"
-  :maintainer "Nicolas Hafner <shinmera@tymoon.eu>"
+  :author "Yukari Hafner <shinmera@tymoon.eu>"
+  :maintainer "Yukari Hafner <shinmera@tymoon.eu>"
   :license "zlib"
   :description "A library to allow jQuery-like HTML/DOM manipulation."
   :homepage "https://Shinmera.github.io/lquery/"
