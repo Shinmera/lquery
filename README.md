@@ -133,3 +133,10 @@ Further Reading
 * [Plump](https://shinmera.github.io/plump), the HTML parser and DOM library lQuery is based on.
 * [CLSS](https://shinmera.github.io/CLSS), the CSS-selector DOM traversal engine.
 * [Clip](https://shinmera.github.io/clip), a templating system based on lQuery.
+
+## Support
+If you'd like to support the continued development of Trial, please consider becoming a backer on Patreon:
+
+<a href="https://patreon.com/shinmera">
+  <img alt="Patreon" src="https://filebox.tymoon.eu//file/TWpjeU9RPT0=" />
+</a>
