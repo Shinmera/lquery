@@ -685,6 +685,7 @@ its children, but transforming the text in such a way that:
     (loop for node across nodes
           for wrapper = (plump:clone-node base)
           do (setf (aref (plump:family node) (plump:child-position node)) wrapper)
+             (setf (plump:parent wrapper) (plump:parent node))
              (plump:append-child wrapper node)))
   nodes)
 
