@@ -5,9 +5,9 @@
   :maintainer "Yukari Hafner <shinmera@tymoon.eu>"
   :license "zlib"
   :description "A library to allow jQuery-like HTML/DOM manipulation."
-  :homepage "https://Shinmera.github.io/lquery/"
-  :bug-tracker "https://github.com/Shinmera/lquery/issues"
-  :source-control (:git "https://github.com/Shinmera/lquery.git")
+  :homepage "https://shinmera.com/docs/lquery/"
+  :bug-tracker "https://shinmera.com/project/lquery/issues"
+  :source-control (:git "https://shinmera.com/project/lquery.git")
   :serial T
   :components ((:file "package")
                (:file "toolkit")
